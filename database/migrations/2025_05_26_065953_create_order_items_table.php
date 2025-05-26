@@ -11,18 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cart_items', function (Blueprint $table) {
+        Schema::create('order_items', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('cart_id');
-            $table->unsignedBigInteger('flash_sale_items_id');
+            $table->unsignedBigInteger('order_id');
             $table->unsignedBigInteger('product_variant_id');
+            $table->unsignedBigInteger('flash_sale_items_id');
             $table->integer('quantity');
             $table->decimal('price_at_time', 10, 2);
-            $table->timestamps();
-            $table->foreign('cart_id')->references('id')->on('carts')->onDelete('cascade');
-            $table->enum('promotion_type', ['0', 'flash_sale', 'bundle'])->default('0');
-            $table->foreign('flash_sale_items_id')->references('id')->on('flash_sale_items')->onDelete('cascade');
+            $table->decimal('total_price', 10, 2);
+            $table->enum('promotion_type',['0','flash_sale','bundle'])->default('0');
+            $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->foreign('product_variant_id')->references('id')->on('product_variants')->onDelete('cascade');
+            $table->foreign('flash_sale_items_id')->references('id')->on('flash_sale_items')->onDelete('cascade');
+            $table->timestamps();
         });
     }
 
@@ -31,6 +32,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cart_items');
+        Schema::dropIfExists('order_items');
     }
 };

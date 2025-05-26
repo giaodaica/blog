@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('vouchers', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->unique();
             $table->enum('type_discount',['percent','value']);
             $table->decimal('value',10,2);
             $table->date('start_date')->nullable();
@@ -22,7 +21,9 @@ return new class extends Migration
             $table->integer('max_used')->nullable();
             $table->decimal('min_order_value',10,2)->nullable();
             $table->enum('status',['active', 'expired', 'disabled', 'used_up'])->default('active');
+            $table->unsignedBigInteger('category_id');
             $table->timestamps();
+            $table->foreign('category_id')->references('id')->on('categories_vouchers')->onDelete('cascade');
         });
     }
 
