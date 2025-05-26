@@ -39,17 +39,23 @@
                             </div>
 
                             {{-- Trạng thái --}}
-                            <div class="mb-3">
-                                <label for="status" class="form-label">Trạng thái</label>
-                                <select id="status" name="status" 
-                                        class="form-select @error('status') is-invalid @enderror" required>
-                                    <option value="0" {{ (old('status', $category->status) == 0) ? 'selected' : '' }}>Không hoạt động</option>
+                              <div class="mb-3">
+                                    <label for="choices-publish-status-input" class="form-label">Trạng thái</label>
+
+                                    <select name="status" id="choices-publish-status-input"
+                                        class="form-select w-100 @error('status') is-invalid @enderror" data-choices
+                                        data-choices-search-false>
+                                        <option value="" disabled {{ old('status') === null ? 'selected' : '' }}>
+                                            -- Chọn trạng thái --
+                                        </option>
+                                        <option value="0" {{ (old('status', $category->status) == 0) ? 'selected' : '' }}>Không hoạt động</option>
                                     <option value="1" {{ (old('status', $category->status) == 1) ? 'selected' : '' }}>Hoạt động</option>
-                                </select>
-                                @error('status')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
+                                    </select>
+
+                                    @error('status')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
                             {{-- Ảnh mới --}}
                             <div class="mb-3">
