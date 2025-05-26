@@ -100,10 +100,14 @@ public function update(Request $request, $id)
     {
         $category = Categories::findOrFail($id);
         return view('dashboard.categories.show', compact('category'));
+        $category = Categories::findOrFail($id);
+        return view('dashboard.categories.show', compact('category'));
     }
 
     public function edit($id)
     {
+        $category = Categories::findOrFail($id);
+        return view('dashboard.categories.edit', compact('category'));
         $category = Categories::findOrFail($id);
         return view('dashboard.categories.edit', compact('category'));
     }

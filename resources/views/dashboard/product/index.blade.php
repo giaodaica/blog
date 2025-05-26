@@ -341,7 +341,7 @@
                             </div>
                         </div>
                         <!-- end card header -->
-                        <div class="card-body">
+                        {{-- <div class="card-body">
 
                             <div class="tab-content text-muted">
                                 <div class="tab-pane active" id="productnav-all" role="tabpanel">
@@ -365,7 +365,54 @@
                             </div>
                             <!-- end tab content -->
 
-                        </div>
+                        </div> --}}
+                          <div class="card-body">
+       
+
+        <!-- Bảng sản phẩm -->
+ <table class="table table-bordered table-striped align-middle text-center">
+  <thead class="table-dark">
+    <tr>
+      <th>#</th>
+      <th>Tên sản phẩm</th>
+      <th>Mô tả</th>
+      <th>Danh mục</th>
+      <th>Slug</th>
+      <th>Trạng thái</th>
+      <th>Hành động</th>
+    </tr>
+  </thead>
+  <tbody>
+    @foreach($products as $index => $product)
+      <tr>
+        <td>{{ $index + 1 }}</td>
+        <td>{{ $product->name }}</td>
+        <td>{{ $product->dsc }}</td>
+        <td>{{ $product->category->name ?? 'Chưa có' }}</td>
+        <td>{{ $product->slug }}</td>
+        <td>
+          @if($product->status == 1)
+            <span class="badge bg-success">Hiển thị</span>
+          @else
+            <span class="badge bg-secondary">Ẩn</span>
+          @endif
+        </td>
+        <td>
+          <a href="{{ route('products.show', $product->id) }}" class="btn btn-sm btn-info">Xem</a>
+          <a href="{{ route('products.edit', $product->id) }}" class="btn btn-sm btn-warning">Sửa</a>
+          <form action="{{ route('products.destroy', $product->id) }}" method="POST" style="display:inline-block" onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này?');">
+            @csrf
+            @method('DELETE')
+            <button type="submit" class="btn btn-sm btn-danger">Xóa</button>
+          </form>
+        </td>
+      </tr>
+    @endforeach
+  </tbody>
+</table>
+
+
+      </div>
                         <!-- end card body -->
                     </div>
                     <!-- end card -->
