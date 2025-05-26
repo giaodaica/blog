@@ -13,12 +13,22 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->decimal('total_amount',10,2);
-            $table->decimal('final_amount',10,2);
-            // $table->
+            $table->unsignedBigInteger('voucher_id');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('address_books_id');
+            $table->string('name');
+            $table->string('phone');
+            $table->string('address');
+            $table->decimal('total_amount', 10, 2);
+            $table->decimal('final_amount', 10, 2);
+            $table->enum('status', ['pending', 'confirmed', 'shipping', 'success', 'cancelled'])->default('pending');
+            $table->string('code_order', 16)->unique();
+            $table->enum('pay_method', ['COD', 'QR'])->nullable();
+            $table->enum('status_pay', ['unpaid', 'paid', 'failed', 'cancelled', 'cod_paid'])->default('unpaid');
             $table->timestamps();
+            $table->foreign('voucher_id')->references('id')->on('vouchers')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('address_books_id')->references('id')->on('address_books')->onDelete('cascade');
         });
     }
 
