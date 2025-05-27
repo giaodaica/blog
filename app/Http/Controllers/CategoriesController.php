@@ -10,12 +10,12 @@ class CategoriesController extends Controller
     public function index()
     {
         $categories = Categories::paginate(10);
-        return view('dashboard.categories.index', compact('categories'));
+        return view('dashboard.pages.categories.index', compact('categories'));
     }
 
     public function create()
     {
-        return view('dashboard.categories.create');
+        return view('dashboard.pages.categories.create');
     }
 
 public function store(Request $request)
@@ -99,14 +99,14 @@ public function update(Request $request, $id)
     public function show($id)
     {
         $category = Categories::findOrFail($id);
-        return view('dashboard.categories.show', compact('category'));
+        return view('dashboard.pages.categories.show', compact('category'));
     
     }
 
     public function edit($id)
     {
         $category = Categories::findOrFail($id);
-        return view('dashboard.categories.edit', compact('category'));
+        return view('dashboard.pages.categories.edit', compact('category'));
  
     }
 

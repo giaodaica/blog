@@ -17,7 +17,7 @@ class ProductsController extends Controller
     public function index()
     {
         $products = Products::with(['variants.attributeValues.attribute'])->get();
-        return view('dashboard.product.index', compact('products'));
+        return view('dashboard.pages.product.index', compact('products'));
     }
 
     // Trang tạo sản phẩm mới (cần danh sách danh mục + thuộc tính biến thể để chọn)
@@ -26,7 +26,7 @@ class ProductsController extends Controller
     $categories = Categories::all();
     $variantAttributes = Variant_attribute::all(); // lấy tất cả thuộc tính biến thể
 
-    return view('dashboard.product.create', compact('categories', 'variantAttributes'));
+    return view('dashboard.pages.product.create', compact('categories', 'variantAttributes'));
 }
 
     // Lưu sản phẩm mới và biến thể + thuộc tính biến thể
@@ -85,7 +85,7 @@ class ProductsController extends Controller
         $categories = Categories::all();
         $variantAttributes = Variant_attribute::with('values')->get();
 
-        return view('dashboard.product.edit', compact('product', 'categories', 'variantAttributes'));
+        return view('dashboard.pages.product.edit', compact('product', 'categories', 'variantAttributes'));
     }
 
     // Cập nhật sản phẩm + biến thể + thuộc tính biến thể
@@ -178,6 +178,6 @@ class ProductsController extends Controller
     {
          $product = Products::with(['variants.attributeValues.attribute'])->findOrFail($id);
     
-    return view('dashboard.product.show', compact('product'));
+    return view('dashboard.pages.product.show', compact('product'));
      }
 }

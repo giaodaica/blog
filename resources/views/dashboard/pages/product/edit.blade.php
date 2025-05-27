@@ -318,64 +318,6 @@
     </div>
 </div>
 
-{{-- Script --}}
-{{-- @section('scripts')
-<script>
-    let variantIndex = {{ count(old('variants', $product->variants ?? [])) }};
 
-    // Tạo HTML mẫu biến thể bằng Blade, lưu thành biến JS string
-    const variantTemplate = `
-        <div class="variant-item border p-3 mb-3 position-relative">
-            <button type="button" class="btn btn-danger btn-sm position-absolute top-0 end-0 remove-variant-btn" style="z-index:10;">Xóa</button>
-            <div class="mb-2">
-                <label>SKU</label>
-                <input type="text" name="variants[__INDEX__][sku]" class="form-control" placeholder="Nhập SKU" required>
-            </div>
-            <div class="mb-2">
-                <label>Giá</label>
-                <input type="number" name="variants[__INDEX__][price]" class="form-control" placeholder="Nhập giá" step="0.01" required>
-            </div>
-            <div class="mb-2">
-                <label>Số lượng</label>
-                <input type="number" name="variants[__INDEX__][quantity]" class="form-control" placeholder="Nhập số lượng" required>
-            </div>
-            <div class="mb-2">
-                <label>Ảnh biến thể</label>
-                <input type="file" name="variants[__INDEX__][image]" class="form-control" accept="image/*">
-            </div>
-            @foreach ($variantAttributes as $attribute)
-                <div class="mb-2">
-                    <label>{{ $attribute->name }}</label>
-                    <select name="variants[__INDEX__][attributes][{{ $attribute->id }}]" class="form-select" required>
-                        <option value="">-- Chọn giá trị {{ $attribute->name }} --</option>
-                        @foreach ($attribute->values as $value)
-                            <option value="{{ $value->id }}">{{ $value->value }}</option>
-                        @endforeach
-                    </select>
-                </div>
-            @endforeach
-            <div class="mb-2">
-                <label>Trạng thái</label>
-                <select name="variants[__INDEX__][status]" class="form-select">
-                    <option value="1" selected>Hiện</option>
-                    <option value="0">Ẩn</option>
-                </select>
-            </div>
-        </div>
-    `;
-
-    // Khi ấn nút thêm, thay __INDEX__ bằng biến variantIndex rồi append
-    $('#add-variant-btn').click(function() {
-        const newVariantHTML = variantTemplate.replace(/__INDEX__/g, variantIndex);
-        $('#variants-container').append(newVariantHTML);
-        variantIndex++;
-    });
-
-    // Xóa biến thể
-    $(document).on('click', '.remove-variant-btn', function() {
-        $(this).closest('.variant-item').remove();
-    });
-</script>
-@endsection --}}
 
 @endsection
