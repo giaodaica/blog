@@ -2,6 +2,7 @@
 <html lang="en" data-layout="vertical" data-topbar="light" data-sidebar="dark" data-sidebar-size="lg" data-sidebar-image="none" data-preloader="disable">
 
 @include('dashboard.card.head')
+@yield('css-content')
 
 <body>
 
@@ -83,6 +84,7 @@
 
     <!-- JAVASCRIPT -->
    @include('dashboard.card.js')
+   @yield('js-content')
 </body>
 
 </html>
