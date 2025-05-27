@@ -37,6 +37,9 @@ class VouchersController extends Controller
     {
         $categories = CategoriesVouchers::all();
         $data_voucher = Vouchers::with('cate_vouchers')->where('id', $id)->first();
+        if(!$data_voucher){
+        abort(403, 'Không thấy');
+        }
         return view('dashboard.pages.voucher.detail', compact('data_voucher', 'action', 'categories'));
     }
     public function update(VoucherRequest $request, $id)
