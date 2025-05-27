@@ -21,4 +21,16 @@ class Products extends Model
         'status',
         'slug',
     ];
+
+    // Quan hệ: Một sản phẩm có nhiều biến thể
+    public function variants()
+    {
+        return $this->hasMany(Product_variants::class, 'product_id', 'id');
+    }
+
+    // (Gợi ý) Nếu bạn muốn lấy category của sản phẩm
+    public function category()
+    {
+        return $this->belongsTo(Categories::class, 'category_id');
+    }
 }
