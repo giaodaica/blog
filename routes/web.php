@@ -40,7 +40,7 @@ Route::prefix('dashboard')->group(function () {
     Route::get('voucher/{action}/{id}', [VouchersController::class, 'detail']);
     Route::get('voucher/{action}/{id}/edit', [VouchersController::class, 'edit']);
     Route::post('voucher/{id}/update', [VouchersController::class, 'update']);
-    Route::post('voucher/ads', [VouchersController::class, 'ads']);
+    Route::post('voucher/ads', [VouchersController::class, 'ads'])->middleware('throttle:5,1');
     Route::post('voucher/disable/{id}', [VouchersController::class, 'disable']);
     Route::post('voucher/active/{id}', [VouchersController::class, 'active']);
 

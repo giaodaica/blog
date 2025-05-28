@@ -24,8 +24,8 @@ return new class extends Migration
     {
         Schema::table('vouchers', function (Blueprint $table) {
             //
-             $table->date('start_date')->change();
-              $table->date('end_date')->change();
+             $table->dateTime('start_date')->change();
+              $table->dateTime('end_date')->change();
         });
     }
 };
