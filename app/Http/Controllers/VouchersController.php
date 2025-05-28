@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\AdsRequest;
 use App\Http\Requests\VoucherRequest;
 use App\Models\CategoriesVouchers;
 use App\Models\Vouchers;
@@ -18,7 +19,10 @@ class VouchersController extends Controller
         if ($title) {
             $type = $title->name;
         }
-        if ($action) {
+        if(!$title){
+            abort(403,'Không tìm thấy trang này');
+        }
+        else if ($action) {
             $data_voucher = Vouchers::with('cate_vouchers')->where('category_id', $title->id)->Where('status', $action)->paginate(5);
         } else {
             $data_voucher = Vouchers::with('cate_vouchers')->where('category_id', $title->id)->paginate(5);
@@ -51,5 +55,18 @@ class VouchersController extends Controller
          $data_voucher->update($request->validated());
         return redirect()->back();
        }
+    }
+    public function ads(AdsRequest $request){
+       $data = $request->validated();
+       CategoriesVouchers::create($data);
+       return redirect()->back();
+    }
+    public function disable($id){
+        $data = Vouchers::findOrFail($id);
+        if($data->status !== 'active'){
+            abort(403,'Không thể làm hành động này');
+        }
+        $data->update(['status'=>'disabled']);
+        return redirect()->back();
     }
 }

@@ -137,6 +137,13 @@
                                             <i class="ri-close-circle-line me-1 align-bottom"></i> Hết lượt sử dụng
                                         </a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link py-3 Cancelled" data-bs-toggle="" id="Cancelled"
+                                            href="{{ url("dashboard/voucher/$id?type=draft") }}" role="tab"
+                                            aria-selected="false">
+                                            <i class="ri-close-circle-line me-1 align-bottom"></i> Chưa phát hành
+                                        </a>
+                                    </li>
                                 </ul>
 
                                 <div class="table-responsive table-card mb-1">
@@ -153,7 +160,7 @@
                                                 <th class="sort" data-sort="date">Bắt đầu</th>
                                                 <th class="sort" data-sort="amount">Kết thúc</th>
                                                 <th class="sort" data-sort="status">Trạng thái</th>
-                                                <th class="sort" data-sort="city">Hành động</th>
+                                                <th class="sort" data-sort="city">Chi tiết</th>
                                             </tr>
                                         </thead>
                                         <tbody class="list form-check-all">
@@ -212,12 +219,14 @@
 
                                                         @case('draft')
                                                             <td class="status"><span
-                                                                    class="badge bg-primary-subtle text-black text-uppercase">Chưa phát hành</span>
+                                                                    class="badge bg-primary-subtle text-black text-uppercase">Chưa
+                                                                    phát hành</span>
                                                             </td>
                                                         @break
 
                                                         @default
                                                     @endswitch
+
                                                     <td>
                                                         <ul class="list-inline hstack gap-2 mb-0">
                                                             <li class="list-inline-item" data-bs-toggle="tooltip"
@@ -230,6 +239,20 @@
                                                             </li>
                                                         </ul>
                                                     </td>
+                                                          @if ($render_voucher->status === 'active')
+                                                        <td>
+                                                            <ul class="list-inline hstack gap-2 mb-0">
+                                                                <li class="list-inline-item" data-bs-toggle="tooltip"
+                                                                    data-bs-trigger="hover" data-bs-placement="top"
+                                                                    title="View">
+                                                                    <form action="{{url('dashboard/voucher/disable/'.$render_voucher->id)}}" method="post">
+                                                                        @csrf
+                                                                        <button class="btn btn-danger">Vô hiệu hóa</button>
+                                                                    </form>
+                                                                </li>
+                                                            </ul>
+                                                        </td>
+                                                    @endif
                                                 </tr>
                                             @endforeach
                                         </tbody>
@@ -261,10 +284,13 @@
                                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                                 aria-label="Close" id="close-modal"></button>
                                         </div>
-                                        <form class="tablelist-form" id="myForm" autocomplete="off"
+                                        <form class="tablelist-form" name="_form" value="add" id="myForm"
+                                            autocomplete="off"
                                             action="{{ url('dashboard/voucher/add_voucher?action=' . $id) }}"
                                             method="POST">
                                             @csrf
+                                            <input type="hidden" name="_form" value="add">
+
                                             <div class="modal-body">
                                                 <div class="mb-3">
                                                     <label for="customername-field" class="form-label">Mã voucher</label>
@@ -421,8 +447,6 @@
     </div>
 @endsection
 @section('js-content')
-    <script src="https://unpkg.com/just-validate@4.3.0/dist/just-validate.production.min.js"></script>
-
     <script>
         const validation = new JustValidate('#myForm');
 
@@ -514,7 +538,7 @@
                 event.target.submit();
             });
         document.addEventListener('DOMContentLoaded', function() {
-            @if ($errors->any())
+            @if ($errors->any() && old('_form') === 'add')
 
                 var myModal = new bootstrap.Modal(document.getElementById('showModal'));
                 myModal.show();
