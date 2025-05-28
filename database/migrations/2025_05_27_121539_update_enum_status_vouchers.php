@@ -17,10 +17,5 @@ return new class extends Migration
         NOT NULL DEFAULT 'draft'");
 }
 
-public function down()
-{
-    DB::statement("ALTER TABLE vouchers
-        MODIFY COLUMN status ENUM('active', 'expired', 'disabled', 'used_up')
-        NOT NULL DEFAULT 'active'");
-}
+
 };
