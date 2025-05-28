@@ -29,7 +29,7 @@
 
             <div class="row">
 
-                <!-- Left column: main info + variants -->
+                <!-- Left column: main info -->
                 <div class="col-lg-8">
                     <div class="card">
                         <div class="card-body">
@@ -56,138 +56,6 @@
                                 @enderror
                             </div>
 
-                            {{-- Nút thêm biến thể --}}
-                <button type="button" class="btn btn-sm btn-primary mb-3" id="add-variant-btn">Thêm biến
-                                    thể</button>
-
-                            {{-- Container chứa biến thể --}}
-                            <div id="variants-container">
-                                @php
-                                    $oldVariants = old('variants', $product->variants->toArray() ?? []);
-                                @endphp
-
-                                @if (count($oldVariants) > 0)
-                                    @foreach ($oldVariants as $i => $variant)
-                                        <div class="variant-item border p-3 mb-3 position-relative">
-                                            <button type="button"
-                                                class="btn btn-danger btn-sm position-absolute top-0 end-0 remove-variant-btn"
-                                                style="z-index:10;">Xóa</button>
-
-                                            <div class="mb-2">
-                                                <label>SKU</label>
-                                                <input type="text" name="variants[{{ $i }}][sku]" class="form-control"
-                                                    placeholder="Nhập SKU" value="{{ $variant['sku'] ?? '' }}" required>
-                                            </div>
-                                            <div class="mb-2">
-                                                <label>Giá</label>
-                                                <input type="number" name="variants[{{ $i }}][price]" class="form-control"
-                                                    placeholder="Nhập giá" step="0.01"
-                                                    value="{{ $variant['price'] ?? '' }}" required>
-                                            </div>
-                                            <div class="mb-2">
-                                                <label>Số lượng</label>
-                                                <input type="number" name="variants[{{ $i }}][quantity]" class="form-control"
-                                                    placeholder="Nhập số lượng"
-                                                    value="{{ $variant['quantity'] ?? '' }}" required>
-                                            </div>
-
-                                            <div class="mb-2">
-                                                <label>Ảnh biến thể</label>
-                                                <input type="file" name="variants[{{ $i }}][image]" class="form-control"
-                                                    accept="image/*">
-                                                @if(!empty($variant['image_url'] ?? ''))
-                                                    <img src="{{ $variant['image_url'] }}" alt="Ảnh biến thể"
-                                                        style="max-height: 80px; margin-top: 5px;">
-                                                @endif
-                                            </div>
-
-                                            {{-- Thuộc tính biến thể --}}
-                                            @foreach ($variantAttributes as $attribute)
-                                                <div class="mb-2">
-                                                    <label>{{ $attribute->name }}</label>
-                                                    <select
-                                                        name="variants[{{ $i }}][attributes][{{ $attribute->id }}]"
-                                                        class="form-select" required>
-                                                        <option value="">-- Chọn giá trị {{ $attribute->name }}
-                                                            --</option>
-                                                        @foreach ($attribute->values as $value)
-                                                            <option value="{{ $value->id }}"
-                                                                {{ isset($variant['attributes'][$attribute->id]) && $variant['attributes'][$attribute->id] == $value->id ? 'selected' : '' }}>
-                                                                {{ $value->value }}
-                                                            </option>
-                                                        @endforeach
-                                                    </select>
-                                                </div>
-                                            @endforeach
-
-                                            <div class="mb-2">
-                                                <label>Trạng thái</label>
-                                                <select name="variants[{{ $i }}][status]" class="form-select">
-                                                    <option value="1"
-                                                        {{ isset($variant['status']) && $variant['status'] == 1 ? 'selected' : '' }}>
-                                                        Hiện</option>
-                                                    <option value="0"
-                                                        {{ isset($variant['status']) && $variant['status'] == 0 ? 'selected' : '' }}>
-                                                        Ẩn</option>
-                                                </select>
-                                            </div>
-                                        </div>
-                                    @endforeach
-                                @else
-                                    {{-- Nếu không có biến thể nào thì hiện 1 biến thể trống --}}
-                                    <div class="variant-item border p-3 mb-3 position-relative">
-                                        <button type="button"
-                                            class="btn btn-danger btn-sm position-absolute top-0 end-0 remove-variant-btn"
-                                            style="z-index:10;">Xóa</button>
-
-                                        <div class="mb-2">
-                                            <label>SKU</label>
-                                            <input type="text" name="variants[0][sku]" class="form-control"
-                                                placeholder="Nhập SKU" required>
-                                        </div>
-                                        <div class="mb-2">
-                                            <label>Giá</label>
-                                            <input type="number" name="variants[0][price]" class="form-control"
-                                                placeholder="Nhập giá" step="0.01" required>
-                                        </div>
-                                        <div class="mb-2">
-                                            <label>Số lượng</label>
-                                            <input type="number" name="variants[0][quantity]" class="form-control"
-                                                placeholder="Nhập số lượng" required>
-                                        </div>
-
-                                        <div class="mb-2">
-                                            <label>Ảnh biến thể</label>
-                                            <input type="file" name="variants[0][image]" class="form-control"
-                                                accept="image/*">
-                                        </div>
-
-                                        {{-- Thuộc tính biến thể --}}
-                                        @foreach ($variantAttributes as $attribute)
-                                            <div class="mb-2">
-                                                <label>{{ $attribute->name }}</label>
-                                                <select name="variants[0][attributes][{{ $attribute->id }}]"
-                                                    class="form-select" required>
-                                                    <option value="">-- Chọn giá trị {{ $attribute->name }} --
-                                                    </option>
-                                                    @foreach ($attribute->values as $value)
-                                                        <option value="{{ $value->id }}">{{ $value->value }}</option>
-                                                    @endforeach
-                                                </select>
-                                            </div>
-                                        @endforeach
-
-                                        <div class="mb-2">
-                                            <label>Trạng thái</label>
-                                            <select name="variants[0][status]" class="form-select">
-                                                <option value="1" selected>Hiện</option>
-                                                <option value="0">Ẩn</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                @endif
-                            </div>
-
                             {{-- Slug --}}
                             <div class="mb-3">
                                 <label for="product-slug-input" class="form-label">Slug</label>
@@ -195,48 +63,6 @@
                                     id="product-slug-input" name="slug" value="{{ old('slug', $product->slug) }}"
                                     placeholder="Nhập slug" required>
                                 @error('slug')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                            </div>
-
-                            {{-- Giảm giá --}}
-                            <div class="mb-3">
-                                <label class="form-label" for="product-discount-input">Giảm giá (%)</label>
-                                <div class="input-group mb-3">
-                                    <span class="input-group-text" id="product-discount-addon">%</span>
-                                    <input type="number" min="0" max="100"
-                                        class="form-control @error('discount') is-invalid @enderror"
-                                        id="product-discount-input" name="discount"
-                                        value="{{ old('discount', $product->discount) }}" placeholder="Nhập giảm giá">
-                                    @error('discount')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-                            </div>
-
-                            {{-- Ảnh đại diện --}}
-                            <div class="mb-3">
-                                <label for="product-main-image-input" class="form-label">Ảnh đại diện</label>
-                                <input class="form-control @error('main_image') is-invalid @enderror"
-                                    type="file" id="product-main-image-input" name="main_image" accept="image/*">
-                                @error('main_image')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-
-                                <div class="mt-2">
-                                    <img id="main-image-preview"
-                                        src="{{ old('main_image_url', $product->main_image_url ?? '') }}"
-                                        alt="Ảnh đại diện"
-                                        style="max-height: 150px; object-fit: contain;">
-                                </div>
-                            </div>
-
-                            {{-- Thư viện ảnh (chưa hiển thị ảnh hiện có) --}}
-                            <div class="mb-3">
-                                <label for="product-gallery-input" class="form-label">Thư viện ảnh</label>
-                                <input class="form-control @error('gallery.*') is-invalid @enderror" type="file"
-                                    id="product-gallery-input" name="gallery[]" accept="image/*" multiple>
-                                @error('gallery.*')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -281,10 +107,10 @@
                             {{-- Meta description --}}
                             <div class="mb-3">
                                 <label for="meta-description-input" class="form-label">Meta Description</label>
-                                <textarea class="form-control @error('meta_description') is-invalid @enderror"
-                                    id="meta-description-input" name="meta_description" rows="3"
-                                    placeholder="Meta description">{{ old('meta_description', $product->meta_description) }}</textarea>
-                                @error('meta_description')
+                                <textarea class="form-control @error('meta_dsc') is-invalid @enderror"
+                                    id="meta-description-input" name="meta_dsc" rows="3"
+                                    placeholder="Meta description">{{ old('meta_dsc', $product->meta_dsc) }}</textarea>
+                                @error('meta_dsc')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -317,7 +143,4 @@
 
     </div>
 </div>
-
-
-
 @endsection

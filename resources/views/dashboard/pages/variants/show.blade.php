@@ -736,7 +736,7 @@
    
 
 
-   <div class="page-content">
+    <div class="page-content">
     <div class="container-fluid">
 
         <!-- start page title -->
@@ -761,131 +761,193 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <div class="mt-0">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h4>{{ $product->name }}</h4>
-                                    <div class="hstack gap-3 flex-wrap">
-                                        <div><a href="#" class="text-primary d-block">{{ $product->brand ?? 'No Brand' }}</a></div>
-                                        <div class="vr"></div>
-                                        <div class="text-muted">Seller : <span class="text-body fw-medium">{{ $product->seller ?? 'Unknown' }}</span></div>
-                                        <div class="vr"></div>
-                                        <div class="text-muted">Published : <span class="text-body fw-medium">{{ $product->created_at ? $product->created_at->format('d M, Y') : 'N/A' }}</span></div>
-                                    </div>
-                                </div>
-                                <div>
-                                    <a href="{{ route('products.edit', $product->id) }}" class="btn btn-light"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
-                                        <i class="ri-pencil-fill align-bottom"></i>
-                                    </a>
-                                </div>
-                            </div>
-
-                            <div class="d-flex flex-wrap gap-2 align-items-center mt-3">
-                                <div class="text-muted fs-16">
-                                    @for ($i = 0; $i < 5; $i++)
-                                        <span class="mdi mdi-star text-warning"></span>
-                                    @endfor
-                                </div>
-                                <div class="text-muted">( {{ number_format($product->reviews_count ?? 0) }} Customer Review )</div>
-                            </div>
-
-                            <div class="row mt-4">
-                                <div class="col-lg-3 col-sm-6">
-                                    <div class="p-2 border border-dashed rounded">
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar-sm me-2">
-                                                <div class="avatar-title rounded bg-transparent text-success fs-24">
-                                                    <i class="ri-money-dollar-circle-fill"></i>
+                        <div class="row gx-lg-5">
+                            <div class="col-xl-4 col-md-8 mx-auto">
+                                <div class="product-img-slider sticky-side-div">
+                                    <div class="swiper product-thumbnail-slider p-2 rounded bg-light">
+                                        @foreach ($product->variants as $variant)
+                                            @if($variant->image)
+                                                <div class="swiper-slide">
+                                                    <img src="{{ asset('storage/' . $variant->image) }}"
+                                                        alt="{{ $product->name }}" class="img-fluid d-block" />
                                                 </div>
+                                            @endif
+                                        @endforeach
+                                        <div class="swiper-button-next"></div>
+                                        <div class="swiper-button-prev"></div>
+                                    </div>
+                                    <!-- end swiper thumbnail slide -->
+                                </div>
+                            </div>
+                            <!-- end col -->
+
+                            <div class="col-xl-8">
+                                <div class="mt-xl-0 mt-5">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <h4>{{ $product->name }}</h4>
+                                            <div class="hstack gap-3 flex-wrap">
+                                                <div><a href="#" class="text-primary d-block">{{ $product->brand ?? 'No Brand' }}</a></div>
+                                                <div class="vr"></div>
+                                                <div class="text-muted">Seller : <span class="text-body fw-medium">{{ $product->seller ?? 'Unknown' }}</span></div>
+                                                <div class="vr"></div>
+                                                <div class="text-muted">Published : <span class="text-body fw-medium">{{ $product->created_at ? $product->created_at->format('d M, Y') : 'N/A' }}</span></div>
                                             </div>
-                                            <div class="flex-grow-1">
-                                                <p class="text-muted mb-1">Price :</p>
-                                                <h5 class="mb-0">${{ number_format($product->price ?? 0, 2) }}</h5>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <div>
+                                                <a href="{{ route('products.edit', $product->id) }}" class="btn btn-light"
+                                                    data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                                    <i class="ri-pencil-fill align-bottom"></i>
+                                                </a>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                                <!-- end col -->
-                                <div class="col-lg-3 col-sm-6">
-                                    <div class="p-2 border border-dashed rounded">
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar-sm me-2">
-                                                <div class="avatar-title rounded bg-transparent text-success fs-24">
-                                                    <i class="ri-file-copy-2-fill"></i>
+
+                                    <div class="d-flex flex-wrap gap-2 align-items-center mt-3">
+                                        <div class="text-muted fs-16">
+                                            @for ($i = 0; $i < 5; $i++)
+                                                <span class="mdi mdi-star text-warning"></span>
+                                            @endfor
+                                        </div>
+                                        <div class="text-muted">( {{ number_format($product->reviews_count ?? 0) }} Customer Review )</div>
+                                    </div>
+
+                                    <div class="row mt-4">
+                                        <div class="col-lg-3 col-sm-6">
+                                            <div class="p-2 border border-dashed rounded">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-sm me-2">
+                                                        <div class="avatar-title rounded bg-transparent text-success fs-24">
+                                                            <i class="ri-money-dollar-circle-fill"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <p class="text-muted mb-1">Price :</p>
+                                                        <h5 class="mb-0">${{ number_format($product->variants->min('price'), 2) }}</h5>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="flex-grow-1">
-                                                <p class="text-muted mb-1">No. of Orders :</p>
-                                                <h5 class="mb-0">{{ number_format($product->orders_count ?? 0) }}</h5>
-                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <!-- end col -->
-                                <div class="col-lg-3 col-sm-6">
-                                    <div class="p-2 border border-dashed rounded">
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar-sm me-2">
-                                                <div class="avatar-title rounded bg-transparent text-success fs-24">
-                                                    <i class="ri-stack-fill"></i>
+                                        <!-- end col -->
+                                        <div class="col-lg-3 col-sm-6">
+                                            <div class="p-2 border border-dashed rounded">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-sm me-2">
+                                                        <div class="avatar-title rounded bg-transparent text-success fs-24">
+                                                            <i class="ri-file-copy-2-fill"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <p class="text-muted mb-1">No. of Orders :</p>
+                                                        <h5 class="mb-0">{{ number_format($product->orders_count ?? 0) }}</h5>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="flex-grow-1">
-                                                <p class="text-muted mb-1">Available Stocks :</p>
-                                                <h5 class="mb-0">{{ number_format($product->stock ?? 0) }}</h5>
-                                            </div>
                                         </div>
-                                    </div>
-                                </div>
-                                <!-- end col -->
-                                <div class="col-lg-3 col-sm-6">
-                                    <div class="p-2 border border-dashed rounded">
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar-sm me-2">
-                                                <div class="avatar-title rounded bg-transparent text-success fs-24">
-                                                    <i class="ri-inbox-archive-fill"></i>
+                                        <!-- end col -->
+                                        <div class="col-lg-3 col-sm-6">
+                                            <div class="p-2 border border-dashed rounded">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-sm me-2">
+                                                        <div class="avatar-title rounded bg-transparent text-success fs-24">
+                                                            <i class="ri-stack-fill"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <p class="text-muted mb-1">Available Stocks :</p>
+                                                        <h5 class="mb-0">{{ number_format($product->variants->sum('quantity')) }}</h5>
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <div class="flex-grow-1">
-                                                <p class="text-muted mb-1">Total Revenue :</p>
-                                                <h5 class="mb-0">${{ number_format($product->revenue ?? 0, 2) }}</h5>
+                                        </div>
+                                        <!-- end col -->
+                                        <div class="col-lg-3 col-sm-6">
+                                            <div class="p-2 border border-dashed rounded">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-sm me-2">
+                                                        <div class="avatar-title rounded bg-transparent text-success fs-24">
+                                                            <i class="ri-inbox-archive-fill"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <p class="text-muted mb-1">Total Revenue :</p>
+                                                        <h5 class="mb-0">${{ number_format(($product->variants->sum(function($v) { return $v->price * $v->quantity; })), 2) }}</h5>
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
+                                        <!-- end col -->
                                     </div>
+
+                                    <div class="mt-4 text-muted">
+                                        <h5 class="fs-14">Description :</h5>
+                                        <p>{{ $product->description ?? 'No description available.' }}</p>
+                                    </div>
+
+                                    <div class="product-content mt-5">
+                                        <h5 class="fs-14 mb-3">Product Variants :</h5>
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th>SKU</th>
+                                                    <th>Price</th>
+                                                    <th>Quantity</th>
+                                                    <th>Status</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach ($product->variants as $variant)
+                                                    <tr>
+                                                        <td>{{ $variant->sku }}</td>
+                                                        <td>${{ number_format($variant->price, 2) }}</td>
+                                                        <td>{{ $variant->quantity }}</td>
+                                                        <td>
+                                                            @if ($variant->status)
+                                                                <span class="badge bg-success">Active</span>
+                                                            @else
+                                                                <span class="badge bg-danger">Inactive</span>
+                                                            @endif
+                                                        </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <!-- nếu bạn có thêm các phần khác thì thêm tương tự -->
+
                                 </div>
-                                <!-- end col -->
                             </div>
-
-                            <div class="mt-4 text-muted">
-                                <h5 class="fs-14">Description :</h5>
-                                <p>{{ $product->description ?? 'No description available.' }}</p>
-                            </div>
-
-                            <!-- Bỏ bảng variants -->
-
+                            <!-- end col -->
                         </div>
+                        <!-- end row -->
+                    </div>
+                    <!-- end card body -->
+                </div>
+                <!-- end card -->
+            </div>
+            <!-- end col -->
+        </div>
+        <!-- end row -->
+
+    </div>
+    <!-- container-fluid -->
+</div>
+ <footer class="footer">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6">
+                    <script>
+                        document.write(new Date().getFullYear())
+                    </script> © Velzon.
+                </div>
+                <div class="col-sm-6">
+                    <div class="text-sm-end d-none d-sm-block">
+                        Design & Develop by Themesbrand
                     </div>
                 </div>
             </div>
         </div>
-
-    </div>
-</div>
-<footer class="footer">
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-sm-6">
-                <script>
-                    document.write(new Date().getFullYear())
-                </script> © Velzon.
-            </div>
-            <div class="col-sm-6">
-                <div class="text-sm-end d-none d-sm-block">
-                    Design & Develop by Themesbrand
-                </div>
-            </div>
-        </div>
-    </div>
-</footer>
+    </footer>
 @endsection
