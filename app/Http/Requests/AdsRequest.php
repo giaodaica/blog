@@ -22,18 +22,20 @@ class AdsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'string', 'regex:/^[\pL\s0-9]+$/u'],
+            'name' => ['required', 'string', 'regex:/^[\pL\s0-9]+$/u','unique:categories_vouchers,name'],
 
-            'slug' => 'required|alpha_dash'
+            'slug' => 'required|alpha_dash|unique:categories_vouchers,slug'
         ];
 
     }
     public function messages()
     {
         return [
+        'name.unique' => 'Tên chiến dịch không được trùng',
         'name.required' => 'Tên chiến dịch không được để trống',
         'name.string' => 'Tên chiến dịch chứa ký tự không hợp lệ',
         'name.regex' => 'Tên chiến dịch chứa ký tự không hợp lệ',
+        'slug.unique' => 'slug không được trùng',
         'slug.required' => 'Slug không được để trống',
         'slug.alpha_dash' => 'Slug chỉ chấp nhận kí tự không dấu và phải có - ngăn-cách',
         ];

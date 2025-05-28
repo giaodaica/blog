@@ -24,8 +24,8 @@ return new class extends Migration
     {
         Schema::table('vouchers', function (Blueprint $table) {
             //
-             $table->date('value')->change();
-              $table->date('min_order_value')->change();
+             $table->integer('value')->change();
+              $table->integer('min_order_value')->change();
         });
     }
 };
