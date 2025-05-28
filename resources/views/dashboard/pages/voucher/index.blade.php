@@ -239,20 +239,43 @@
                                                             </li>
                                                         </ul>
                                                     </td>
-                                                          @if ($render_voucher->status === 'active')
-                                                        <td>
-                                                            <ul class="list-inline hstack gap-2 mb-0">
-                                                                <li class="list-inline-item" data-bs-toggle="tooltip"
-                                                                    data-bs-trigger="hover" data-bs-placement="top"
-                                                                    title="View">
-                                                                    <form action="{{url('dashboard/voucher/disable/'.$render_voucher->id)}}" method="post">
-                                                                        @csrf
-                                                                        <button class="btn btn-danger">Vô hiệu hóa</button>
-                                                                    </form>
-                                                                </li>
-                                                            </ul>
-                                                        </td>
-                                                    @endif
+                                                    @switch($render_voucher->status)
+                                                        @case('active')
+                                                            <td>
+                                                                <ul class="list-inline hstack gap-2 mb-0">
+                                                                    <li class="list-inline-item" data-bs-toggle="tooltip"
+                                                                        data-bs-trigger="hover" data-bs-placement="top"
+                                                                        title="View">
+                                                                        <form
+                                                                            action="{{ url('dashboard/voucher/disable/' . $render_voucher->id) }}"
+                                                                            method="post">
+                                                                            @csrf
+                                                                            <button class="btn btn-danger">Vô hiệu hóa</button>
+                                                                        </form>
+                                                                    </li>
+                                                                </ul>
+                                                            </td>
+                                                        @break
+
+                                                        @case('draft')
+                                                            <td>
+                                                                <ul class="list-inline hstack gap-2 mb-0">
+                                                                    <li class="list-inline-item" data-bs-toggle="tooltip"
+                                                                        data-bs-trigger="hover" data-bs-placement="top"
+                                                                        title="View">
+                                                                        <form
+                                                                            action="{{ url('dashboard/voucher/active/' . $render_voucher->id) }}"
+                                                                            method="post">
+                                                                            @csrf
+                                                                            <button class="btn btn-success">Khởi động</button>
+                                                                        </form>
+                                                                    </li>
+                                                                </ul>
+                                                            </td>
+                                                        @break
+
+                                                        @default
+                                                    @endswitch
                                                 </tr>
                                             @endforeach
                                         </tbody>

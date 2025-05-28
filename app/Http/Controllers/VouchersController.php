@@ -69,4 +69,12 @@ class VouchersController extends Controller
         $data->update(['status'=>'disabled']);
         return redirect()->back();
     }
+       public function active($id){
+        $data = Vouchers::findOrFail($id);
+        if($data->status !== 'draft'){
+            abort(403,'Không thể làm hành động này');
+        }
+        $data->update(['status'=>'active']);
+        return redirect()->back();
+    }
 }

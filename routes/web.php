@@ -42,5 +42,6 @@ Route::prefix('dashboard')->group(function () {
     Route::post('voucher/{id}/update', [VouchersController::class, 'update']);
     Route::post('voucher/ads', [VouchersController::class, 'ads']);
     Route::post('voucher/disable/{id}', [VouchersController::class, 'disable']);
+    Route::post('voucher/active/{id}', [VouchersController::class, 'active']);
 
 });
