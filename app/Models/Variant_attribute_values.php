@@ -13,7 +13,7 @@ class Variant_attribute_values extends Model
         'value',
     ];
 
-    public function attribute()
+ public function variant_attribute()
     {
         return $this->belongsTo(Variant_attribute::class, 'attribute_id');
     }

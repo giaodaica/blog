@@ -330,8 +330,8 @@
                                 <div class="row g-4">
                                     <div class="col-sm-auto">
                                         <div>
-                                            <a href="{{ route('products.index') }}" class="btn btn-info"
-                                                id="addproduct-btn"> Quản lý sản phẩm</a>
+                                            <a href="{{ route('variant-attributes.create') }}" class="btn btn-success"
+                                                id="addproduct-btn"><i class="ri-add-line align-bottom me-1"></i> Thêm thuộc tính</a>
                                         </div>
                                     </div>
                                     <div class="col-sm">
@@ -418,57 +418,37 @@
                                     <thead class="table-dark">
                                         <tr>
                                             <th>#</th>
-                                            <th>Ảnh</th> <!-- Cột ảnh -->
-                                            <th>SKU</th>
-                                            <th>Giá</th>
-                                            <th>Số lượng</th>
-                                            <th>Tên sản phẩm</th>
-                                            <th>Trạng thái</th>
+                                            <th>Tên thuộc tính</th>
+                                    
                                             <th>Hành động</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($variants as $index => $variant)
-                                            @php
-                                                $product = $variant->product;
-                                            @endphp
+                                        @foreach ($attributes as $index => $attribute)
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
+                                                <td>{{ $attribute->name }}</td>
+                
                                                 <td>
-                                                    <img src="{{ asset($variant->image) }}" alt="Ảnh biến thể"
-                                                        style="width: 60px; height: auto;">
-                                                </td>
-                                                <td>{{ $variant->sku }}</td>
-                                                <td>{{ number_format($variant->price) }} đ</td>
-                                                <td>{{ $variant->quantity }}</td>
-                                                <td>{{ $product->name ?? 'Chưa có' }}</td>
-                                                <td>
-                                                    @if ($variant->status == 1)
-                                                        <span class="badge bg-success">Hiển thị</span>
-                                                    @else
-                                                        <span class="badge bg-secondary">Ẩn</span>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <a href="{{ route('variants.show', ['productId' => $variant->product_id, 'variantId' => $variant->id]) }}"
-                                                        class="btn btn-sm btn-info me-1">Xem</a>
+                                                 
 
-                                                    <a href="{{ route('variants.edit', ['productId' => $variant->product_id, 'variantId' => $variant->id]) }}"
+                                                    <a href="{{ route('variant-attributes.edit', $attribute->id) }}"
                                                         class="btn btn-sm btn-warning me-1">Sửa</a>
 
                                                     <form
-                                                        action="{{ route('variants.destroy', ['productId' => $variant->product_id, 'variantId' => $variant->id]) }}"
+                                                        action="{{ route('variant-attributes.destroy', $attribute->id) }}"
                                                         method="POST" style="display:inline-block;">
                                                         @csrf
                                                         @method('DELETE')
                                                         <button type="submit" class="btn btn-sm btn-danger"
-                                                            onclick="return confirm('Bạn có chắc muốn xóa biến thể này?');">Xóa</button>
+                                                            onclick="return confirm('Bạn có chắc muốn xóa thuộc tính này?');">Xóa</button>
                                                     </form>
                                                 </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
+
 
 
 
