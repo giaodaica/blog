@@ -56,13 +56,39 @@
                         </tr>
                         <tr>
                             <th>Trạng thái</th>
-                            <td>
-                                @if ($data_voucher->status)
-                                    <span class="badge bg-success">Kích hoạt</span>
-                                @else
-                                    <span class="badge bg-secondary">Không kích hoạt</span>
-                                @endif
-                            </td>
+                            @switch($data_voucher->status)
+                                @case('active')
+                                    <td class="status"><span class="badge bg-success-subtle text-success text-uppercase">Đang
+                                            hoạt động</span>
+                                    </td>
+                                @break
+
+                                @case('expired')
+                                    <td class="status"><span class="badge bg-warning-subtle text-warning text-uppercase">Hết
+                                            hạn</span>
+                                    </td>
+                                @break
+
+                                @case('disabled')
+                                    <td class="status"><span class="badge bg-danger-subtle text-danger text-uppercase">Vô
+                                            hiệu hóa</span>
+                                    </td>
+                                @break
+
+                                @case('used_up')
+                                    <td class="status"><span class="badge bg-info-subtle text-info text-uppercase">Đã hết
+                                            lượt</span>
+                                    </td>
+                                @break
+
+                                @case('draft')
+                                    <td class="status"><span class="badge bg-primary-subtle text-black text-uppercase">Chưa phát
+                                            hành</span>
+                                    </td>
+                                @break
+
+                                @default
+                            @endswitch
                         </tr>
                         <tr>
                             <th>Danh mục</th>
@@ -89,7 +115,7 @@
                     </tbody>
                 </table>
                 <div>
-                    <a href="{{ url()->previous() }}" class="btn btn-secondary mt-3"> <i
+                    <a href="{{ url("dashboard/voucher/$action") }}" class="btn btn-secondary mt-3"> <i
                             class="ri-arrow-left-line me-1"></i> Quay lại danh sách</a>
                     <button type="button" class="btn btn-secondary mt-3" data-bs-toggle="modal" id="create-btn"
                         data-bs-target="#showModal"
@@ -111,13 +137,14 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
                                     id="close-modal"></button>
                             </div>
-                            <form class="tablelist-form" id="myForm" autocomplete="off"
+                            <form class="tablelist-form" name="_form" value="edit" id="myForm9" autocomplete="off"
                                 action="{{ url("dashboard/voucher/$data_voucher->id/update") }}" method="POST">
                                 @csrf
+                                <input type="hidden" name="_form" value="edit">
                                 <div class="modal-body">
                                     <div class="mb-3">
                                         <label for="customername-field" class="form-label">Mã voucher</label>
-                                        <input type="text" id="name" name="code" class="form-control"
+                                        <input type="text" id="code" name="code" class="form-control"
                                             placeholder="Nhập mã code" required value="{{ $data_voucher->code }}" />
                                         <div class="text-danger">
                                             @error('code')
@@ -144,10 +171,10 @@
                                     </div>
                                     <div class="mb-3">
                                         <label for="customername-field" class="form-label">Giá trị
-                                            giảm ({{ $data_voucher->type_discount == 'percent' ? '%' : 'Nghìn đồng' }})</label>
+                                            giảm
+                                            ({{ $data_voucher->type_discount == 'percent' ? '%' : 'Nghìn đồng' }})</label>
                                         <input type="text" id="value" name="value" class="form-control"
-                                            placeholder="5% hoặc 50000" required
-                                            value="{{ $data_voucher->value }}" />
+                                            placeholder="5% hoặc 50000" required value="{{ $data_voucher->value }}" />
                                         <div class="text-danger">
                                             @error('value')
                                                 {{ $message }}
@@ -186,9 +213,10 @@
 
                                     <div class="mb-3">
                                         <label for="date-field" class="form-label">Thời gian bắt đầu</label>
-                                        <input type="datetime-local" id="start_date" name="start_date" class="form-control"
-                                            data-provider="flatpickr" data-date-format="d M, Y" data-enable-time
-                                            placeholder="chọn thời gian" value="{{ $data_voucher->start_date }}" />
+                                        <input type="datetime-local" id="start_date" name="start_date"
+                                            class="form-control" data-provider="flatpickr" data-date-format="d M, Y"
+                                            data-enable-time placeholder="chọn thời gian"
+                                            value="{{ $data_voucher->start_date }}" />
                                         <div class="text-danger">
                                             @error('start_date')
                                                 {{ $message }}
@@ -255,13 +283,11 @@
     </div>
 @endsection
 @section('js-content')
-    <script src="https://unpkg.com/just-validate@4.3.0/dist/just-validate.production.min.js"></script>
-
     <script>
-        const validation = new JustValidate('#myForm');
+        const validation = new JustValidate('#myForm9');
 
         validation
-            .addField('#name', [{
+            .addField('#code', [{
                     rule: 'required',
                     errorMessage: 'Vui lòng nhập mã voucher',
                 },
@@ -339,21 +365,17 @@
                 rule: 'number',
                 errorMessage: 'Số lượt sử dụng phải là số',
             }])
-        validation.addField('#min_order_value', [{
-            validator: (value) => {
-                // Loại bỏ dấu phẩy
-                const normalized = value.replace(/,/g, '');
-                // Kiểm tra có phải số không (có thể là số nguyên hoặc số thực)
-                return !isNaN(normalized) && normalized.trim() !== '';
-            },
-            errorMessage: 'Yêu cầu đơn hàng tối thiểu phải là số',
-        }, ]);
+            .addField('#min_order_value', [{
+                rule: 'number',
+                errorMessage: 'Yêu cầu đơn hàng tối thiểu phải là số',
+            }])
 
-        .onSuccess((event) => {
-            event.target.submit();
-        });
+            .onSuccess((event) => {
+                event.target.submit();
+            });
         document.addEventListener('DOMContentLoaded', function() {
-            @if ($errors->any())
+            @if ($errors->any() && old('_form') === 'edit')
+
                 var myModal = new bootstrap.Modal(document.getElementById('showModal'));
                 myModal.show();
             @endif

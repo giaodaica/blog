@@ -1,4 +1,6 @@
-   <script src="{{asset('admin/libs/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+    <script src="https://unpkg.com/just-validate@4.3.0/dist/just-validate.production.min.js"></script>
+
+  <script src="{{asset('admin/libs/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
     <script src="{{asset('admin/libs/simplebar/simplebar.min.js')}}"></script>
     <script src="{{asset('admin/libs/node-waves/waves.min.js')}}"></script>
     <script src="{{asset('admin/libs/feather-icons/feather.min.js')}}"></script>
@@ -52,4 +54,4 @@
 </script>
 
 
-    
+

@@ -8,6 +8,7 @@ class CategoriesVouchers extends Model
 {
     //
     protected $table = 'categories_vouchers';
+    protected $fillable = ['slug','name'];
     public function vouchers(){
         return $this->hasMany(Vouchers::class,'category_id','id');
     }
