@@ -96,7 +96,8 @@
         @include('card.best_sale_product')
         <!-- end section -->
         <!-- start section -->
-        <section class="p-15px bg-dark-gray text-white">
+        @if(!empty($voucher_id))
+         <section class="p-15px bg-dark-gray text-white">
             <div class="container">
                 <div class="row">
                     <div class="col-12 text-center">
@@ -110,6 +111,20 @@
                 </div>
             </div>
         </section>
+        @else
+         <section class="p-15px bg-dark-gray text-white">
+            <div class="container">
+                <div class="row">
+                    <div class="col-12 text-center">
+                        <span class="fs-15 text-uppercase fw-500"><span class="fs-14 fw-700 lh-28 alt-font text-dark-gray text-uppercase d-inline-block border-radius-30px ps-15px pe-15px ms-5px align-middle">
+                            <button class="btn btn-gradient border-0 px-3 py-1 rounded-pill fw-600 shadow-sm align-middle" style="background: linear-gradient(90deg,#ffb347 0,#ffcc33 100%); color: #222; font-size: 15px;">Mua hàng từ 200k để được free ship</button>
+
+                        </span></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+        @endif
         <!-- end section -->
         <!-- start section -->
        @include('card.new_product')
