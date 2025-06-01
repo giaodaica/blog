@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\ChatBotController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductsController;
@@ -33,8 +34,12 @@ Route::resource('categories', CategoriesController::class);
 Auth::routes(['verify' => true]);
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])
-    ->middleware(['auth', 'verified'])
     ->name('home');
+
+
+// Chatbot
+
+Route::post('/chat', [ChatBotController::class, 'reply']);
 // Login google
 Route::get('/auth/redirect/google', [GoogleController::class, 'redirectToGoogle'])->name('google.redirect');
 Route::get('auth/callback/google', [GoogleController::class, 'handleGoogleCallback'])->name('google.callback');
@@ -50,7 +55,6 @@ Route::prefix('dashboard')->group(function () {
     Route::post('voucher/ads', [VouchersController::class, 'ads'])->middleware('throttle:5,1');
     Route::post('voucher/disable/{id}', [VouchersController::class, 'disable']);
     Route::post('voucher/active/{id}', [VouchersController::class, 'active']);
-
 });
 
 
