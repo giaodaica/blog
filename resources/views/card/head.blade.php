@@ -5,6 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width,initial-scale=1.0" />
     <meta name="author" content="OUTFITLY">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- description -->
     <meta name="description"
         content="Mua quần áo thời trang đẹp, chất lượng tại OUTFITLY. Cập nhật xu hướng mới nhất với áo thun, váy, quần jeans, phụ kiện phong cách tại OUTFITLY.">
