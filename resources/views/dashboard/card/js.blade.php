@@ -1,4 +1,6 @@
-   <script src="{{asset('admin/libs/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
+    <script src="https://unpkg.com/just-validate@4.3.0/dist/just-validate.production.min.js"></script>
+
+  <script src="{{asset('admin/libs/bootstrap/js/bootstrap.bundle.min.js')}}"></script>
     <script src="{{asset('admin/libs/simplebar/simplebar.min.js')}}"></script>
     <script src="{{asset('admin/libs/node-waves/waves.min.js')}}"></script>
     <script src="{{asset('admin/libs/feather-icons/feather.min.js')}}"></script>
@@ -30,5 +32,26 @@
     <script src="{{asset('admin/libs/nouislider/nouislider.min.js')}}"></script>
     <script src="{{asset('admin/libs/wnumb/wNumb.min.js')}}"></script>
 
+    <script>
+  // Khi click mở menu "Danh sách", lưu trạng thái mở
+  document.addEventListener('DOMContentLoaded', function () {
+    const menuToggle = document.querySelector('[href="#sidebarDashboards"]');
+    const menuDropdown = document.getElementById('sidebarDashboards');
 
-    
+    // Đọc trạng thái từ localStorage
+    const isOpen = localStorage.getItem('sidebarDashboardsOpen');
+    if (isOpen === 'true') {
+      menuDropdown.classList.add('show');
+      menuToggle.setAttribute('aria-expanded', 'true');
+    }
+
+    // Ghi trạng thái mỗi khi click
+    menuToggle.addEventListener('click', function () {
+      const willOpen = !menuDropdown.classList.contains('show');
+      localStorage.setItem('sidebarDashboardsOpen', willOpen);
+    });
+  });
+</script>
+
+
+

@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('variant_attribute_values', function (Blueprint $table) {
+        Schema::create('categories_vouchers', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('attribute_id');
-            $table->string('value')->unique();
+            $table->string('name');
             $table->timestamps();
-            $table->foreign('attribute_id')->references('id')->on('variant_attributes')->onDelete('cascade');
         });
     }
 
@@ -25,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('variant_attribute_values');
+        Schema::dropIfExists('categories_vouchers');
     }
 };

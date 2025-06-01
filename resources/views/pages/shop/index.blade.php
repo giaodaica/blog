@@ -5,6 +5,7 @@
     .nav-link.no-wrap{
         white-space: nowrap;
     }
+
 </style>
     <body data-mobile-nav-style="classic">
         <!-- start header -->
@@ -99,7 +100,12 @@
             <div class="container">
                 <div class="row">
                     <div class="col-12 text-center">
-                        <span class="fs-15 text-uppercase fw-500">Take an extra 25% discount our favorite dress style. Use code:<span class="fs-14 fw-700 lh-28 alt-font text-dark-gray text-uppercase bg-base-color d-inline-block border-radius-30px ps-15px pe-15px ms-5px align-middle">fw205</span></span>
+                        <span class="fs-15 text-uppercase fw-500">Mã giảm giá 15% tối đa 500k <span class="fs-14 fw-700 lh-28 alt-font text-dark-gray text-uppercase d-inline-block border-radius-30px ps-15px pe-15px ms-5px align-middle">
+                        <form action="{{url("accept_voucher/".$voucher_id->id)}}" method="post">
+                            @csrf
+                            <button class="btn btn-gradient border-0 px-3 py-1 rounded-pill fw-600 shadow-sm align-middle" style="background: linear-gradient(90deg,#ffb347 0,#ffcc33 100%); color: #222; font-size: 15px;">Nhận ngay</button>
+                        </form>
+                        </span></span>
                     </div>
                 </div>
             </div>
@@ -261,3 +267,22 @@
         @include('card.js')
     </body>
 </html>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    @if(session('success'))
+        Swal.fire({
+            icon: 'success',
+            title: 'Thành công!',
+            text: "{{ session('success') }}",
+        });
+    @endif
+
+    @if(session('error'))
+        Swal.fire({
+            icon: 'error',
+            title: 'Lỗi!',
+            text: "{{ session('error') }}",
+        });
+    @endif
+</script>
