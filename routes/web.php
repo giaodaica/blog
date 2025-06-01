@@ -3,6 +3,7 @@
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoriesController;
+use App\Http\Controllers\ChatBotController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductsController;
@@ -29,8 +30,20 @@ Route::get('checkout', [OrderController::class, 'index'])->name('home.checkout')
 Route::get('done', [OrderController::class, 'done'])->name('home.done');
 Route::get('dashboard', [HomeController::class, 'admin']);
 
+Route::resource('products', ProductsController::class);
+Route::resource('categories', CategoriesController::class);
+
+// Xác thực tài khoản
+
+Auth::routes(['verify' => true]);
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])
+    ->name('home');
 
 
+// Chatbot
+
+Route::post('/chat', [ChatBotController::class, 'reply']);
 // Login google
 Route::get('/auth/redirect/google', [GoogleController::class, 'redirectToGoogle'])->name('google.redirect');
 Route::get('auth/callback/google', [GoogleController::class, 'handleGoogleCallback'])->name('google.callback');
@@ -46,26 +59,9 @@ Route::prefix('dashboard')->group(function () {
     Route::post('voucher/ads', [VouchersController::class, 'ads'])->middleware('throttle:5,1');
     Route::post('voucher/disable/{id}', [VouchersController::class, 'disable']);
     Route::post('voucher/active/{id}', [VouchersController::class, 'active']);
-
-    Route::resource('products', ProductsController::class);
-    Route::resource('categories', CategoriesController::class);
-    Route::resource('variant-attributes', VariantAttributeController::class);
-    Route::resource('variant-attributes-values', VariantAttributeValuesController::class);
-    Route::resource('product_variant_attribute_values', ProductVariantAttributeValuesController::class);
-    Route::get('variants', [ProductVariantsController::class, 'index'])->name('variants.index');
-
-    Route::prefix('products/{productId}')->group(function () {
-        // Hiển thị form tạo biến thể mới
-        Route::get('variants/create', [ProductVariantsController::class, 'create'])->name('variants.create');
-        // Xử lý lưu biến thể mới
-        Route::post('variants', [ProductVariantsController::class, 'store'])->name('variants.store');
-        // Hiển thị form chỉnh sửa biến thể
-        Route::get('variants/{variantId}/edit', [ProductVariantsController::class, 'edit'])->name('variants.edit');
-        // Xử lý cập nhật biến thể
-        Route::put('variants/{variantId}/update', [ProductVariantsController::class, 'update'])->name('variants.update');
-        // Xóa biến thể (nếu cần, có thể dùng POST thay vì DELETE)
-        Route::delete('variants/{variantId}/delete', [ProductVariantsController::class, 'destroy'])->name('variants.destroy');
-        // Hiển thị chi tiết biến thể
-        Route::get('variants/{variantId}', [ProductVariantsController::class, 'show'])->name('variants.show');
-    });
 });
+
+
+
+// client voucher
+Route::post('accept_voucher/{id}', [VouchersController::class, 'accept_voucher'])->middleware('auth');

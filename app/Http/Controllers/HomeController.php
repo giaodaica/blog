@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Vouchers;
 use Illuminate\Http\Request;
 
 class HomeController extends Controller
@@ -23,7 +24,8 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('pages.shop.index');
+        $voucher_id = Vouchers::where('id',1)->where('status','active')->first();
+        return view('pages.shop.index',compact('voucher_id'));
     }
     public function info_customer(){
         return view('pages.shop.account');
@@ -34,5 +36,5 @@ class HomeController extends Controller
     public function admin(){
         return view('dashboard.index');
     }
-  
+
 }

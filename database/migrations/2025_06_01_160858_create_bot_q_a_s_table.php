@@ -11,12 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('variant_attribute_values', function (Blueprint $table) {
+        Schema::create('bot_q_a_s', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('attribute_id');
-            $table->string('value')->unique();
+            $table->string('question'); // câu hỏi mẫu
+            $table->text('answer');     // câu trả lời
+            $table->string('keywords')->nullable(); // từ khóa tách nhau bởi dấu phẩy
             $table->timestamps();
-            $table->foreign('attribute_id')->references('id')->on('variant_attributes')->onDelete('cascade');
         });
     }
 
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('variant_attribute_values');
+        Schema::dropIfExists('bot_q_a_s');
     }
 };
