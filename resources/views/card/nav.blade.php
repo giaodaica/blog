@@ -9,7 +9,7 @@
                     <a href="https://www.instagram.com/" target="_blank"><i class="feather icon-feather-instagram d-inline-block me-5px"></i><span class="d-none d-xxl-inline-block">100k Theo dõi</span></a>
                 </div>
             </div>
-            <a class="navbar-brand" href="demo-fashion-store.html">
+            <a class="navbar-brand" href="{{route('home')}}">
                 <img src="{{asset('assets/images/logooutfitly.png')}}" data-at2x="{{asset('assets/images/logooutfitly.png')}}" alt="" class="default-logo">
                 <img src="{{asset('assets/images/logooutfitly.png')}}" data-at2x="{{asset('assets/images/logooutfitly.png')}}" alt="" class="alt-logo">
                 <img src="{{asset('assets/images/logooutfitly.png')}}" data-at2x="{{asset('assets/images/logooutfitly.png')}}" alt="" class="mobile-logo">

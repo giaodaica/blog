@@ -28,6 +28,13 @@ Route::get('dashboard', [HomeController::class, 'admin']);
 Route::resource('products', ProductsController::class);
 Route::resource('categories', CategoriesController::class);
 
+// Xác thực tài khoản
+
+Auth::routes(['verify' => true]);
+
+Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])
+    ->middleware(['auth', 'verified'])
+    ->name('home');
 // Login google
 Route::get('/auth/redirect/google', [GoogleController::class, 'redirectToGoogle'])->name('google.redirect');
 Route::get('auth/callback/google', [GoogleController::class, 'handleGoogleCallback'])->name('google.callback');
