@@ -45,3 +45,8 @@ Route::prefix('dashboard')->group(function () {
     Route::post('voucher/active/{id}', [VouchersController::class, 'active']);
 
 });
+
+
+
+// client voucher
+Route::post('accept_voucher/{id}', [VouchersController::class, 'accept_voucher'])->middleware('auth');

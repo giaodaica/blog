@@ -47,11 +47,11 @@ class VoucherRequest extends FormRequest
             'start_date' => 'required|date',
             'end_date' => 'required|date|after:start_date',
             'used' => 'prohibited',
-            'max_used' => 'required|numeric|min:0',
-            'min_order_value' => 'required|numeric|min:100000',
+            'max_used' => 'required|numeric|min:0|max:1000',
+            'min_order_value' => 'required|numeric|min:100000|max:50000000',
             'status' => 'prohibited',
             'category_id' => 'required|exists:categories_vouchers,id',
-            'max_discount' => 'nullable|numeric|min:10000',
+            'max_discount' => 'nullable|numeric|min:10000|max:50000000',
         ];
     }
    public function messages(): array
@@ -90,6 +90,9 @@ class VoucherRequest extends FormRequest
         'category_id.exists' => 'Danh mục không tồn tại.',
         'max_discount.numeric' => 'Giá trị giảm giá tối đa phải là số.',
         'max_discount.min' => 'Giá trị giảm giá tối đa phải từ 10000 trở lên.',
+        'min_order_value.max' => 'Quá giới hạn cho phép là 50.000.000.',
+        'max_used.max' => 'Quá giới hạn cho phép là 1000.',
+        'max_discount.max' => 'Quá giới hạn cho phép là 50.000.000.',
 
     ];
 }
