@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('meta_keyword')->nullable();
             // $table->string('brand')->
             $table->unsignedBigInteger('category_id');
-            $table->enum('status',[0,1])->default(1);
+            $table->enum('status', [0, 1])->default(1);
             $table->string('slug')->unique();
             $table->timestamps();
             $table->softDeletes();

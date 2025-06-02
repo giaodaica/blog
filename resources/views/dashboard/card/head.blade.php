@@ -27,5 +27,5 @@
     <link href="{{asset('admin/css/app.min.css')}}" rel="stylesheet" type="text/css" />
     <!-- custom Css-->
     <link href="{{asset('admin/css/custom.min.css')}}" rel="stylesheet" type="text/css" />
-
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 </head>

@@ -736,22 +736,20 @@
    
 
 
-   <div class="page-content">
+<div class="page-content">
     <div class="container-fluid">
 
         <!-- start page title -->
         <div class="row">
             <div class="col-12">
                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                    <h4 class="mb-sm-0">Product Details</h4>
-
+                    <h4 class="mb-sm-0">Variant Details</h4>
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="javascript: void(0);">Ecommerce</a></li>
-                            <li class="breadcrumb-item active">Product Details</li>
+                            <li class="breadcrumb-item"><a href="javascript:void(0);">Ecommerce</a></li>
+                            <li class="breadcrumb-item active">Variant Details</li>
                         </ol>
                     </div>
-
                 </div>
             </div>
         </div>
@@ -761,109 +759,122 @@
             <div class="col-lg-12">
                 <div class="card">
                     <div class="card-body">
-                        <div class="mt-0">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <div>
-                                    <h4>{{ $product->name }}</h4>
-                                    <div class="hstack gap-3 flex-wrap">
-                                        <div><a href="#" class="text-primary d-block">{{ $product->brand ?? 'No Brand' }}</a></div>
-                                        <div class="vr"></div>
-                                        <div class="text-muted">Seller : <span class="text-body fw-medium">{{ $product->seller ?? 'Unknown' }}</span></div>
-                                        <div class="vr"></div>
-                                        <div class="text-muted">Published : <span class="text-body fw-medium">{{ $product->created_at ? $product->created_at->format('d M, Y') : 'N/A' }}</span></div>
+                        <div class="row gx-lg-5">
+                            <div class="col-xl-4 col-md-8 mx-auto">
+                                <div class="product-img-slider sticky-side-div">
+                                    <div class="swiper product-thumbnail-slider p-2 rounded bg-light">
+                                        @if($variant->image)
+                                            <div class="swiper-slide">
+                                                <img src="{{ asset('storage/' . $variant->image) }}"
+                                                    alt="{{ $variant->product->name }}" class="img-fluid d-block" />
+                                            </div>
+                                        @else
+                                            <div class="swiper-slide">
+                                                <img src="{{ asset('storage/no-image.png') }}"
+                                                    alt="No Image" class="img-fluid d-block" />
+                                            </div>
+                                        @endif
+                                        <div class="swiper-button-next"></div>
+                                        <div class="swiper-button-prev"></div>
                                     </div>
-                                </div>
-                                <div>
-                                    <a href="{{ route('products.edit', $product->id) }}" class="btn btn-light"
-                                        data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
-                                        <i class="ri-pencil-fill align-bottom"></i>
-                                    </a>
                                 </div>
                             </div>
 
-                            <div class="d-flex flex-wrap gap-2 align-items-center mt-3">
-                                <div class="text-muted fs-16">
-                                    @for ($i = 0; $i < 5; $i++)
-                                        <span class="mdi mdi-star text-warning"></span>
-                                    @endfor
+                            <div class="col-xl-8">
+                                <div class="mt-xl-0 mt-5">
+                                    <div class="d-flex">
+                                        <div class="flex-grow-1">
+                                            <h4>{{ $variant->product->name }}</h4>
+                                            <div class="hstack gap-3 flex-wrap">
+                                                <div><a href="#" class="text-primary d-block">{{ $variant->product->brand ?? 'No Brand' }}</a></div>
+                                                <div class="vr"></div>
+                                                <div class="text-muted">Seller: <span class="text-body fw-medium">{{ $variant->product->seller ?? 'Unknown' }}</span></div>
+                                                <div class="vr"></div>
+                                                <div class="text-muted">Published: <span class="text-body fw-medium">{{ $variant->product->created_at ? $variant->product->created_at->format('d M, Y') : 'N/A' }}</span></div>
+                                            </div>
+                                        </div>
+                                        <div class="flex-shrink-0">
+                                            <a href="{{ route('variants.edit', $variant->id) }}" class="btn btn-light"
+                                               data-bs-toggle="tooltip" data-bs-placement="top" title="Edit">
+                                               <i class="ri-pencil-fill align-bottom"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex flex-wrap gap-2 align-items-center mt-3">
+                                        <div class="text-muted fs-16">
+                                            @for ($i = 0; $i < 5; $i++)
+                                                <span class="mdi mdi-star text-warning"></span>
+                                            @endfor
+                                        </div>
+                                        <div class="text-muted">( {{ number_format($variant->product->reviews_count ?? 0) }} Customer Review )</div>
+                                    </div>
+
+                                    <div class="row mt-4">
+                                        <div class="col-lg-3 col-sm-6">
+                                            <div class="p-2 border border-dashed rounded">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-sm me-2">
+                                                        <div class="avatar-title rounded bg-transparent text-success fs-24">
+                                                            <i class="ri-money-dollar-circle-fill"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <p class="text-muted mb-1">Price :</p>
+                                                        <h5 class="mb-0">${{ number_format($variant->price, 2) }}</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- end col -->
+                                        <div class="col-lg-3 col-sm-6">
+                                            <div class="p-2 border border-dashed rounded">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-sm me-2">
+                                                        <div class="avatar-title rounded bg-transparent text-success fs-24">
+                                                            <i class="ri-stack-fill"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <p class="text-muted mb-1">Quantity :</p>
+                                                        <h5 class="mb-0">{{ $variant->quantity }}</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- end col -->
+                                        <div class="col-lg-3 col-sm-6">
+                                            <div class="p-2 border border-dashed rounded">
+                                                <div class="d-flex align-items-center">
+                                                    <div class="avatar-sm me-2">
+                                                        <div class="avatar-title rounded bg-transparent text-success fs-24">
+                                                            <i class="ri-information-fill"></i>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex-grow-1">
+                                                        <p class="text-muted mb-1">Status :</p>
+                                                        <h5 class="mb-0">
+                                                            @if ($variant->status)
+                                                                <span class="badge bg-success">Active</span>
+                                                            @else
+                                                                <span class="badge bg-danger">Inactive</span>
+                                                            @endif
+                                                        </h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-4 text-muted">
+                                        <h5 class="fs-14">Product Description :</h5>
+                                        <p>{{ $variant->product->dsc ?? 'No description available.' }}</p>
+                                    </div>
+
+                                    <!-- Bạn có thể thêm phần hiển thị thuộc tính biến thể nếu có -->
+
                                 </div>
-                                <div class="text-muted">( {{ number_format($product->reviews_count ?? 0) }} Customer Review )</div>
                             </div>
-
-                            <div class="row mt-4">
-                                <div class="col-lg-3 col-sm-6">
-                                    <div class="p-2 border border-dashed rounded">
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar-sm me-2">
-                                                <div class="avatar-title rounded bg-transparent text-success fs-24">
-                                                    <i class="ri-money-dollar-circle-fill"></i>
-                                                </div>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <p class="text-muted mb-1">Price :</p>
-                                                <h5 class="mb-0">${{ number_format($product->price ?? 0, 2) }}</h5>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- end col -->
-                                <div class="col-lg-3 col-sm-6">
-                                    <div class="p-2 border border-dashed rounded">
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar-sm me-2">
-                                                <div class="avatar-title rounded bg-transparent text-success fs-24">
-                                                    <i class="ri-file-copy-2-fill"></i>
-                                                </div>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <p class="text-muted mb-1">No. of Orders :</p>
-                                                <h5 class="mb-0">{{ number_format($product->orders_count ?? 0) }}</h5>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- end col -->
-                                <div class="col-lg-3 col-sm-6">
-                                    <div class="p-2 border border-dashed rounded">
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar-sm me-2">
-                                                <div class="avatar-title rounded bg-transparent text-success fs-24">
-                                                    <i class="ri-stack-fill"></i>
-                                                </div>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <p class="text-muted mb-1">Available Stocks :</p>
-                                                <h5 class="mb-0">{{ number_format($product->stock ?? 0) }}</h5>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- end col -->
-                                <div class="col-lg-3 col-sm-6">
-                                    <div class="p-2 border border-dashed rounded">
-                                        <div class="d-flex align-items-center">
-                                            <div class="avatar-sm me-2">
-                                                <div class="avatar-title rounded bg-transparent text-success fs-24">
-                                                    <i class="ri-inbox-archive-fill"></i>
-                                                </div>
-                                            </div>
-                                            <div class="flex-grow-1">
-                                                <p class="text-muted mb-1">Total Revenue :</p>
-                                                <h5 class="mb-0">${{ number_format($product->revenue ?? 0, 2) }}</h5>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!-- end col -->
-                            </div>
-
-                            <div class="mt-4 text-muted">
-                                <h5 class="fs-14">Description :</h5>
-                                <p>{{ $product->description ?? 'No description available.' }}</p>
-                            </div>
-
-                            <!-- Bỏ bảng variants -->
-
                         </div>
                     </div>
                 </div>
@@ -872,13 +883,12 @@
 
     </div>
 </div>
+
 <footer class="footer">
     <div class="container-fluid">
         <div class="row">
             <div class="col-sm-6">
-                <script>
-                    document.write(new Date().getFullYear())
-                </script> © Velzon.
+                <script>document.write(new Date().getFullYear())</script> © Velzon.
             </div>
             <div class="col-sm-6">
                 <div class="text-sm-end d-none d-sm-block">
@@ -888,4 +898,5 @@
         </div>
     </div>
 </footer>
+
 @endsection
