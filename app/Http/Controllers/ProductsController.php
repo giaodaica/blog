@@ -8,9 +8,6 @@ use Illuminate\Http\Request;
 
 class ProductsController extends Controller
 {
-    // Danh sách sản phẩm
-    public function index()
-    {
         $products = Products::with(['category', 'variants'])->paginate(10); // Lấy thêm biến thể
         return view('dashboard.pages.product.index', compact('products'));
     }
