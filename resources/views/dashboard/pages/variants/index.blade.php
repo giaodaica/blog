@@ -418,11 +418,13 @@
                                     <thead class="table-dark">
                                         <tr>
                                             <th>#</th>
-                                            <th>Ảnh</th> <!-- Cột ảnh -->
+                                            <th>Name</th>
                                             <th>SKU</th>
                                             <th>Giá</th>
                                             <th>Số lượng</th>
                                             <th>Tên sản phẩm</th>
+                                            <th>Size</th>
+                                            <th>Màu sắc</th>
                                             <th>Trạng thái</th>
                                             <th>Hành động</th>
                                         </tr>
@@ -434,30 +436,31 @@
                                             @endphp
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
-                                                <td>
-                                                    <img src="{{ asset($variant->image) }}" alt="Ảnh biến thể"
-                                                        style="width: 60px; height: auto;">
-                                                </td>
+                                                <td>{{ $variant->name }}</td>
                                                 <td>{{ $variant->sku }}</td>
-                                                <td>{{ number_format($variant->price) }} đ</td>
+                                                <td>{{ number_format($variant->price, 0, ',', '.') }} đ</td>
                                                 <td>{{ $variant->quantity }}</td>
                                                 <td>{{ $product->name ?? 'Chưa có' }}</td>
+                                                <td>{{ $variant->size ?? '-' }}</td>
+                                                <td>{{ $variant->color ? ucfirst($variant->color) : '-' }}</td>
                                                 <td>
-                                                    @if ($variant->status == 1)
+                                                    @if ($variant->status == 'active')
                                                         <span class="badge bg-success">Hiển thị</span>
                                                     @else
                                                         <span class="badge bg-secondary">Ẩn</span>
                                                     @endif
                                                 </td>
                                                 <td>
-                                                    <a href="{{ route('variants.show', ['productId' => $variant->product_id, 'variantId' => $variant->id]) }}"
+                                                    <a href="{{ route('variants.show', $variant->id) }}"
                                                         class="btn btn-sm btn-info me-1">Xem</a>
-
-                                                    <a href="{{ route('variants.edit', ['productId' => $variant->product_id, 'variantId' => $variant->id]) }}"
+                                                    <a href="{{ route('variants.edit', $variant->id) }}"
                                                         class="btn btn-sm btn-warning me-1">Sửa</a>
 
-                                                    <form
-                                                        action="{{ route('variants.destroy', ['productId' => $variant->product_id, 'variantId' => $variant->id]) }}"
+                                                    <!-- Nút Thêm ảnh -->
+                                                    <a href="{{ route('image_product_variants.create', $variant->id) }}"
+                                                        class="btn btn-sm btn-primary me-1">Thêm ảnh</a>
+
+                                                    <form action="{{ route('variants.destroy', $variant->id) }}"
                                                         method="POST" style="display:inline-block;">
                                                         @csrf
                                                         @method('DELETE')
@@ -469,6 +472,7 @@
                                         @endforeach
                                     </tbody>
                                 </table>
+
 
 
 

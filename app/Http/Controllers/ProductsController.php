@@ -11,7 +11,7 @@ class ProductsController extends Controller
     // Danh sách sản phẩm
     public function index()
     {
-        $products = Products::with('category')->get();
+        $products = Products::with(['category', 'variants'])->paginate(10); // Lấy thêm biến thể
         return view('dashboard.pages.product.index', compact('products'));
     }
 
@@ -35,9 +35,11 @@ class ProductsController extends Controller
             'slug' => 'required|unique:products,slug',
         ]);
 
-        Products::create($request->only([
+        $product = Products::create($request->only([
             'name', 'dsc', 'meta_title', 'meta_dsc', 'meta_keyword', 'category_id', 'slug'
         ]));
+
+        // Nếu có thêm biến thể, bạn có thể xử lý ở đây (tùy bài làm)
 
         return redirect()->route('products.index')->with('success', 'Thêm sản phẩm thành công!');
     }
@@ -45,7 +47,7 @@ class ProductsController extends Controller
     // Form chỉnh sửa sản phẩm
     public function edit($id)
     {
-        $product = Products::findOrFail($id);
+        $product = Products::with('variants')->findOrFail($id); // lấy kèm biến thể nếu cần
         $categories = Categories::all();
         return view('dashboard.pages.product.edit', compact('product', 'categories'));
     }
@@ -69,6 +71,8 @@ class ProductsController extends Controller
             'name', 'dsc', 'meta_title', 'meta_dsc', 'meta_keyword', 'category_id', 'slug'
         ]));
 
+        // Xử lý cập nhật biến thể nếu có
+
         return redirect()->route('products.index')->with('success', 'Cập nhật sản phẩm thành công!');
     }
 
@@ -84,7 +88,7 @@ class ProductsController extends Controller
     // Hiển thị chi tiết sản phẩm
     public function show($id)
     {
-        $product = Products::with('category')->findOrFail($id);
+        $product = Products::with(['category', 'variants'])->findOrFail($id);
         return view('dashboard.pages.product.show', compact('product'));
     }
 }

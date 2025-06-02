@@ -535,17 +535,11 @@
                                 <a href="{{ url("dashboard/variants") }}"  class="nav-link"
                                     data-key="t-horizontal">Biến thể sản phẩm</a>
                             </li>
-                          <li class="nav-item">
-                                <a href="{{ url("dashboard/variant-attributes") }}"  class="nav-link"
-                                    data-key="t-horizontal">Thuộc tính</a>
-                            </li>
-                               <li class="nav-item">
-                                <a href="{{ url("dashboard/variant-attributes-values") }}"  class="nav-link"
-                                    data-key="t-horizontal">Giá trị thuộc tính</a>
-                            </li>
-                                 <li class="nav-item">
-                                <a href="{{ url("dashboard/product_variant_attribute_values") }}"  class="nav-link"
-                                    data-key="t-horizontal">Liên kết</a>
+                        </ul>
+                           <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="{{ url("dashboard/images") }}"  class="nav-link"
+                                    data-key="t-horizontal">Hình ảnh</a>
                             </li>
                         </ul>
                     </div>

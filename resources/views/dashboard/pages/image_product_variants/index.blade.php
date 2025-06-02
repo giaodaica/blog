@@ -330,9 +330,8 @@
                                 <div class="row g-4">
                                     <div class="col-sm-auto">
                                         <div>
-                                            <a href="{{ route('product_variant_attribute_values.create') }}"
-                                                class="btn btn-success" id="addproduct-btn"><i
-                                                    class="ri-add-line align-bottom me-1"></i> Thêm liên kết</a>
+                                            <a href="{{ route('variants.index') }}" class="btn btn-info"
+                                                id="addproduct-btn"> Quản lý biến thể</a>
                                         </div>
                                     </div>
                                     <div class="col-sm">
@@ -419,45 +418,32 @@
                                     <thead class="table-dark">
                                         <tr>
                                             <th>#</th>
-                                            <th>Biến thể</th>
-                                            <th>Thuộc tính</th>
-                                            <th>Giá trị</th>
-                                            <th>Hành động</th>
+                                            <th>SKU Biến thể</th>
+                                            <th>Ảnh</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach ($items as $index => $item)
+                                        @foreach ($variants as $index => $variant)
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
-                                                <td>{{ $item->variant->sku ?? 'Chưa có' }}</td>
-                                                <td>{{ $item->attribute->name ?? 'Chưa có' }}</td>
-                                                <td>{{ $item->value->value ?? 'Chưa có' }}</td>
+                                                <td>{{ $variant->sku ?? '-' }}</td>
                                                 <td>
-                                                    <a href="{{ route('product_variant_attribute_values.show', $item->id) }}"
-                                                        class="btn btn-sm btn-info me-1">Xem</a>
-                                                    <a href="{{ route('product_variant_attribute_values.edit', $item->id) }}"
-                                                        class="btn btn-sm btn-warning me-1">Sửa</a>
-
-                                                    <form
-                                                        action="{{ route('product_variant_attribute_values.destroy', $item->id) }}"
-                                                        method="POST" style="display:inline-block;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger"
-                                                            onclick="return confirm('Bạn có chắc muốn xóa liên kết thuộc tính này?');">
-                                                            Xóa
-                                                        </button>
-                                                    </form>
+                                                    @if ($variant->images && count($variant->images) > 0)
+                                                        <div class="d-flex flex-wrap justify-content-center gap-2">
+                                                            @foreach ($variant->images as $image)
+                                                                <img src="{{ asset($image->image_url_base) }}"
+                                                                    alt="Ảnh biến thể" width="80" height="80"
+                                                                    style="object-fit:cover; border-radius: 5px;">
+                                                            @endforeach
+                                                        </div>
+                                                    @else
+                                                        <span class="text-muted">Chưa có ảnh</span>
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
-
-
-
-
-
 
 
 

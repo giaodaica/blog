@@ -13,21 +13,21 @@ class Product_variants extends Model
 
     protected $fillable = [
         'product_id',
+        'name',
         'sku',
         'price',
         'quantity',
-        'image',
         'status',
+        'size',
+        'color'
     ];
 
     public function product()
     {
         return $this->belongsTo(Products::class);
     }
-
-    // Thêm quan hệ với product_variant_attribute_values
-    public function attributeValues()
+    public function images()
     {
-        return $this->hasMany(Product_variant_attribute_values::class, 'variant_id');
+        return $this->hasMany(ImageProductVariants::class, 'product_variant_id');
     }
 }
