@@ -46,6 +46,10 @@
                             <th>Đã sử dụng</th>
                             <td>{{ $data_voucher->used }}</td>
                         </tr>
+                         <tr>
+                            <th>Đã Nhận</th>
+                            <td>{{ $data_voucher->received }}</td>
+                        </tr>
                         <tr>
                             <th>Số lần sử dụng tối đa</th>
                             <td>{{ $data_voucher->max_used }}</td>
