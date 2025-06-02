@@ -84,11 +84,11 @@
                             ký</button>
                         <div class="form-results mt-20px d-none"></div>
                         <div class="mt-20px">
-                            <a href="{{ route('auth.google') }}"
+                            <a href="{{ route('google.redirect') }}"
                                 class="btn btn-medium btn-round-edge btn-outline-dark btn-box-shadow w-100 d-flex align-items-center justify-content-center">
                                 <img src="https://developers.google.com/identity/images/g-logo.png" alt="Google"
                                     style="width: 20px; margin-right: 10px;">
-                                <span class="text-black">Đăng ký bằng Google</span>
+                                <span class="text-black">Đăng nhập bằng Google</span>
                             </a>
                         </div>
                     </form>

@@ -14,11 +14,13 @@ return new class extends Migration
         Schema::create('product_variants', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_id');
+            $table->string('name')->nullable();
             $table->string('sku')->unique();
-            $table->float('price',10.2);
+            $table->decimal('price', 10, 2);
             $table->integer('quantity');
-            $table->string('image');
-            $table->enum('status',[0,1])->default(1);
+            $table->enum('status', ['active', 'inactive'])->default('active');
+            $table->enum('size', ['S', 'M', 'L', 'XL', 'XXL'])->nullable();
+            $table->enum('color', ['red', 'blue', 'green', 'black', 'white'])->nullable();
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
