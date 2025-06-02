@@ -83,23 +83,29 @@ class VouchersController extends Controller
     }
     public function accept_voucher($id)
     {
-        if (Auth::user()->email_verified_at) {
-            $user_id = Auth::id();
-
-            $check = VouchersUsers::where('voucher_id', $id)->where('user_id', $user_id)->exists();
-            // dd($check);
-            if ($check) {
-                return redirect()->back()->with('error','Bạn đã nhận voucher này');
-            } else {
-                VouchersUsers::create([
-                    'user_id' => $user_id,
-                    'voucher_id' => $id,
-                ]);
-                return redirect()->back()->with('success','Nhận thành công');
-                // echo "đang chạy vào đây";
-            }
-        } else {
-            return redirect()->back()->with('error','Tài khoản của bạn chưa được xác thực vui lòng xác nhận email để nhận được ưu đãi từ chúng tôi');
+        if (!Auth::user()->email_verified_at) {
+            return redirect()->back()->with('error', 'Tài khoản của bạn chưa xác thực vui lòng xác thực tài khoản để nhận được ưu đãi từ chúng tôi');
         }
+        $user_id = Auth::id();
+        $voucher = Vouchers::find($id);
+        if (!$voucher) {
+            return redirect()->back()->with('error', 'Voucher này không tồn tại vui lòng thử lại sau');
+        }
+        $voucher_user = VouchersUsers::where('voucher_id', $id)->where('user_id', $user_id)->exists();
+        if ($voucher_user) {
+            return redirect()->back()->with('error', 'Bạn đã có voucher này');
+        }
+        if ($voucher->max_used == 0) {
+            return redirect()->back()->with('error', 'Voucher này đã hết lượt nhận. Cảm ơn bạn đã quan tâm! Hãy đón chờ nhiều ưu đãi mới từ chúng tôi trong thời gian tới');
+        }
+        VouchersUsers::create([
+            'user_id' => $user_id,
+            'voucher_id' => $id
+        ]);
+        $voucher->update([
+            'max_used' => $voucher->max_used - 1,
+            'received' => $voucher->received + 1
+        ]);
+        return redirect()->back()->with('success', 'Nhận thành công');
     }
 }

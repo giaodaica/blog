@@ -24,7 +24,7 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $voucher_id = Vouchers::where('id',1)->where('status','active')->first();
+        $voucher_id = Vouchers::where('type_discount','percent')->where('status','active')->where('value',15)->where('max_used','>=',1)->first();
         return view('pages.shop.index',compact('voucher_id'));
     }
     public function info_customer(){

@@ -127,7 +127,7 @@
     @include('card.best_sale_product')
     <!-- end section -->
     <!-- start section -->
-    @if (!empty($voucher_id))
+    @if (!empty($voucher_id) && $voucher_id->max_used >= 1)
         <section class="p-15px bg-dark-gray text-white">
             <div class="container">
                 <div class="row">

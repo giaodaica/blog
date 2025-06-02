@@ -27,7 +27,7 @@ class VoucherRequest extends FormRequest
         return [
             'code' => [
             'required',
-            'alpha',
+            'alpha_num',
             'min:10',
             'max:50',
             Rule::unique('vouchers', 'code')->ignore($id),
