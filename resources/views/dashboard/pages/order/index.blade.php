@@ -160,14 +160,15 @@
                                                             value="option">
                                                     </div>
                                                 </th>
-                                                <th class="sort" data-sort="id">Order ID</th>
-                                                <th class="sort" data-sort="customer_name">Khách hàng</th>
-                                                <th class="sort" data-sort="date">Thời gian đặt</th>
-                                                <th class="sort" data-sort="amount">Đơn giá</th>
-                                                <th class="sort" data-sort="payment">Phương thức thanh toán</th>
-                                                <th class="sort" data-sort="status">Trạng thái</th>
-                                                <th class="sort" data-sort="city">Hành động</th>
-                                                <th class="sort" data-sort="product_name">Xác nhận</th>
+                                                <th >Order ID</th>
+                                                <th class="" data-sort="customer_name">Khách hàng</th>
+                                                <th class="" data-sort="date">Thời gian đặt</th>
+                                                <th class="" data-sort="amount">Đơn giá</th>
+                                                <th class="" data-sort="payment">Phương thức thanh toán</th>
+                                                <th class="" data-sort="payment_mothod">Trạng thái thanh toán</th>
+                                                <th class="" data-sort="status">Trạng thái</th>
+                                                <th class="" data-sort="city">Hành động</th>
+                                                <th class="" data-sort="product_name">Xác nhận</th>
 
                                             </tr>
                                         </thead>
@@ -188,6 +189,31 @@
                                                     <td class="amount">{{ number_format($render_order->final_amount) }}
                                                     </td>
                                                     <td class="payment">{{ $render_order->pay_method }}</td>
+                                                    <td class="payment">
+                                                        @switch($render_order->status_pay)
+                                                            @case('unpaid')
+                                                                Chưa thanh toán
+                                                            @break
+
+                                                            @case('paid')
+                                                                Đã thanh toán
+                                                            @break
+
+                                                            @case('failed')
+                                                                Thanh toán thất bại
+                                                            @break
+
+                                                            @case('cancelled')
+                                                                Đã hủy thanh toán
+                                                            @break
+
+                                                            @case('cod_paid')
+                                                                Thanh toán khi nhận hàng
+                                                            @break
+
+                                                            @default
+                                                        @endswitch
+                                                    </td>
                                                     <td class="status">
                                                         @switch($render_order->status)
                                                             @case('pending')
@@ -258,23 +284,57 @@
                                                     <td class="customer_name">
                                                         @switch($render_order->status)
                                                             @case('pending')
-                                                                <form action="" method="post">
-                                                                    <button class="btn btn-success">Xác nhận</button>
-                                                                </form>
+                                                                <div class="d-flex gap-2">
+                                                                    <form
+                                                                        action="{{ url("dashboard/order/change/$render_order->id") }}"
+                                                                        method="post">
+                                                                        @csrf
+                                                                        <input type="hidden" name="change" value="pending">
+                                                                        <button class="btn btn-success">Xác nhận</button>
+                                                                    </form>
+                                                                    <form
+                                                                        action="{{ url("dashboard/order/change/$render_order->id") }}"
+                                                                        method="post">
+                                                                        @csrf
+                                                                        <input type="hidden" name="change" value="cancelled">
+                                                                        <button class="btn btn-danger">Hủy đơn</button>
+                                                                    </form>
+                                                                </div>
                                                             @break
 
                                                             @case('confirmed')
-                                                                <form action="" method="post">
-                                                                    <button class="btn btn-success">Giao Hàng</button>
-                                                                </form>
+                                                                <div class="d-flex gap-2">
+                                                                    <form
+                                                                        action="{{ url("dashboard/order/change/$render_order->id") }}"
+                                                                        method="post">
+                                                                        @csrf
+                                                                        <input type="hidden" name="change" value="confirmed">
+                                                                        <button class="btn btn-success">Giao Hàng</button>
+                                                                    </form>
+                                                                    <form
+                                                                        action="{{ url("dashboard/order/change/$render_order->id") }}"
+                                                                        method="post">
+                                                                        @csrf
+                                                                        <input type="hidden" name="change" value="cancelled">
+                                                                        <button class="btn btn-danger">Hủy đơn</button>
+                                                                    </form>
+                                                                </div>
                                                             @break
 
                                                             @case('shipping')
                                                                 <div class="d-flex gap-2">
-                                                                    <form action="" method="post">
+                                                                    <form
+                                                                        action="{{ url("dashboard/order/change/$render_order->id") }}"
+                                                                        method="post">
+                                                                        @csrf
+                                                                        <input type="hidden" name="change" value="shipping">
                                                                         <button class="btn btn-success">Đã giao</button>
                                                                     </form>
-                                                                    <form action="" method="post">
+                                                                    <form
+                                                                        action="{{ url("dashboard/order/change/$render_order->id") }}"
+                                                                        method="post">
+                                                                        @csrf
+                                                                        <input type="hidden" name="change" value="failed">
                                                                         <button class="btn btn-danger">Giao thất bại</button>
                                                                     </form>
                                                                 </div>
@@ -282,14 +342,23 @@
 
                                                             @case('failed')
                                                                 <div class="d-flex gap-2">
-                                                                    <form action="" method="post">
+                                                                    <form
+                                                                        action="{{ url("dashboard/order/change/$render_order->id") }}"
+                                                                        method="post">
+                                                                        @csrf
+                                                                        <input type="hidden" name="change" value="return">
                                                                         <button class="btn btn-success">Giao lại</button>
                                                                     </form>
-                                                                    <form action="" method="post">
+                                                                    <form
+                                                                        action="{{ url("dashboard/order/change/$render_order->id") }}"
+                                                                        method="post">
+                                                                        @csrf
+                                                                        <input type="hidden" name="change" value="cancelled">
                                                                         <button class="btn btn-danger">Hủy đơn</button>
                                                                     </form>
                                                                 </div>
                                                             @break
+
                                                             @default
                                                         @endswitch
                                                     </td>
