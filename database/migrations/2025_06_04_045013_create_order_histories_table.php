@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('to_status');
             $table->string('note');
             $table->string('users');
-            $table->string('time_action');
+            $table->timestamp('time_action');
             $table->timestamps();
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
         });
