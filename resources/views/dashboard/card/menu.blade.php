@@ -35,12 +35,12 @@
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarDashboards" data-bs-toggle="collapse" role="button"
                         aria-expanded="false" aria-controls="sidebarDashboards">
-                        <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboards">Dashboards</span>
+                        <i class="ri-dashboard-2-line"></i> <span data-key="t-dashboards">Đơn hàng</span>
                     </a>
                     <div class="collapse menu-dropdown" id="sidebarDashboards">
                         <ul class="nav nav-sm flex-column">
                             <li class="nav-item">
-                                <a href="dashboard-analytics.html" class="nav-link" data-key="t-analytics"> Analytics
+                                <a href="{{route('dashboard.order')}}" class="nav-link" data-key="t-analytics"> Danh sách
                                 </a>
                             </li>
                             <li class="nav-item">
@@ -511,7 +511,7 @@
                 <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Product</span></li>
                  <a class="nav-link menu-link" href="#sidebarProducts" data-bs-toggle="collapse" role="button"
                         aria-expanded="false" aria-controls="sidebarProducts">
-                        <i class="ri-layout-3-line"></i> <span data-key="t-layouts">Danh sách</span> 
+                        <i class="ri-layout-3-line"></i> <span data-key="t-layouts">Danh sách</span>
                     </a>
                     <div class="collapse menu-dropdown" id="sidebarProducts">
                         <ul class="nav nav-sm flex-column">
@@ -527,7 +527,7 @@
                     </div>
                    <a class="nav-link menu-link" href="#sidebarAttributes" data-bs-toggle="collapse" role="button"
                         aria-expanded="false" aria-controls="sidebarAttributes">
-                        <i class="ri-layout-3-line"></i> <span data-key="t-layouts">Biến thể</span> 
+                        <i class="ri-layout-3-line"></i> <span data-key="t-layouts">Biến thể</span>
                     </a>
                     <div class="collapse menu-dropdown" id="sidebarAttributes">
                         <ul class="nav nav-sm flex-column">
@@ -543,7 +543,7 @@
                             </li>
                         </ul>
                     </div>
-                
+
 
                 <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-components">Components</span>
                 </li>
