@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('voucher_id');
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('address_books_id');
+            $table->unsignedBigInteger('voucher_id')->nullable();
+            $table->unsignedBigInteger('user_id')->nullable();
+            $table->unsignedBigInteger('address_books_id')->nullable();
             $table->string('name');
             $table->string('phone');
             $table->string('address');
