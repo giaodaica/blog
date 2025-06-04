@@ -237,7 +237,7 @@
                             </li>
                             <li class="cart-total">
                                 <div class="fs-18 alt-font mb-15px"><span class="w-50 fw-500 text-start">Subtotal:</span><span class="w-50 text-end fw-700">$199.99</span></div>
-                                <a href="demo-fashion-store-cart.html" class="btn btn-large btn-transparent-light-gray border-color-extra-medium-gray">View cart</a>
+                                <a href="{{url('cart')}}" class="btn btn-large btn-transparent-light-gray border-color-extra-medium-gray">View cart</a>
                                 <a href="demo-fashion-store-checkout.html" class="btn btn-large btn-dark-gray btn-box-shadow">Checkout</a>
                             </li>
                         </ul>
