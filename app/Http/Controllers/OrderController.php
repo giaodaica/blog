@@ -104,8 +104,7 @@ class OrderController extends Controller
                 'order_id' => $id,
                 'from_status' => $old_status->status,
                 'to_status' => $present->status,
-                'note' => $note,
-                'time_action' => time()
+                'note' => $note
             ]);
         } catch (\Exception $e) {
             Log::error('Lỗi khi cập nhật trạng thái đơn hàng: ' . $e->getMessage());
