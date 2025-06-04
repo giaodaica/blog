@@ -13,15 +13,10 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            $table->string('name')->unique();
-            $table->string('dsc')->nullable();
-            $table->string('meta_title')->nullable();
-            $table->string('meta_dsc')->nullable();
-            $table->string('meta_keyword')->nullable();
-            // $table->string('brand')->
             $table->unsignedBigInteger('category_id');
-            $table->enum('status', [0, 1])->default(1);
+            $table->string('name')->unique();
             $table->string('slug')->unique();
+            $table->string('image_url');
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');

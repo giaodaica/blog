@@ -14,16 +14,20 @@ return new class extends Migration
         Schema::create('product_variants', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('product_id');
-            $table->string('name')->nullable();
-            $table->string('sku')->unique();
-            $table->decimal('price', 10, 2);
-            $table->integer('quantity');
-            $table->enum('status', ['active', 'inactive'])->default('active');
-            $table->enum('size', ['S', 'M', 'L', 'XL', 'XXL'])->nullable();
-            $table->enum('color', ['red', 'blue', 'green', 'black', 'white'])->nullable();
+            $table->unsignedBigInteger('color_id');
+            $table->unsignedBigInteger('size_id');
+            $table->string('name')->unique();
+            $table->string('variant_image_url');
+            $table->decimal('import_price', 10, 2);
+            $table->decimal('listed_price', 10, 2);
+            $table->decimal('sale_price', 10, 2);
+            $table->integer('stock');
+            $table->boolean('is_show')->default('1');
             $table->timestamps();
             $table->softDeletes();
             $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
+            $table->foreign('color_id')->references('id')->on('colors')->onDelete('cascade');
+            $table->foreign('size_id')->references('id')->on('sizes')->onDelete('cascade');
         });
     }
     /**

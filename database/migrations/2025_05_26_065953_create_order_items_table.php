@@ -15,14 +15,19 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('order_id');
             $table->unsignedBigInteger('product_variant_id');
-            $table->unsignedBigInteger('flash_sale_items_id');
+            $table->unsignedBigInteger('flash_sale_items_id')->nullable();
+            $table->unsignedBigInteger('product_id');
+            $table->string('product_name');
+            $table->string('product_image_url');
+            $table->decimal('import_price', 10, 2);
+            $table->decimal('listed_price', 10, 2);
+            $table->decimal('sale_price', 10, 2);
             $table->integer('quantity');
-            $table->decimal('price_at_time', 10, 2);
-            $table->decimal('total_price', 10, 2);
             $table->enum('promotion_type',['0','flash_sale','bundle'])->default('0');
             $table->foreign('order_id')->references('id')->on('orders')->onDelete('cascade');
             $table->foreign('product_variant_id')->references('id')->on('product_variants')->onDelete('cascade');
             $table->foreign('flash_sale_items_id')->references('id')->on('flash_sale_items')->onDelete('cascade');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('cascade');
             $table->timestamps();
         });
     }
