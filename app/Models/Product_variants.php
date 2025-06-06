@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\ProductVariantsFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product_variants extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes; use HasFactory;
 
     protected $table = 'product_variants';
 
@@ -30,4 +32,5 @@ class Product_variants extends Model
     {
         return $this->hasMany(ImageProductVariants::class, 'product_variant_id');
     }
+ 
 }

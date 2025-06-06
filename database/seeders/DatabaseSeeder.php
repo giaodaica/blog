@@ -23,10 +23,18 @@ class DatabaseSeeder extends Seeder
         // $this->call([
         //     UserSeeder::class,
         // ]);
-        BotQA::create([
-            'question' => 'Giờ làm việc là khi nào?',
-            'keywords' => 'giờ,làm việc,thời gian',
-            'answer' => 'Shop hoạt động từ 8h đến 17h, từ thứ 2 đến thứ 7.'
-        ]);
+        // BotQA::create([
+        //     'question' => 'Giờ làm việc là khi nào?',
+        //     'keywords' => 'giờ,làm việc,thời gian',
+        //     'answer' => 'Shop hoạt động từ 8h đến 17h, từ thứ 2 đến thứ 7.'
+        // ]);
+        $this->call([
+        ColorsSeeder::class,
+    SizesSeeder::class,
+    CategoriesSeeder::class,
+    ProductsSeeder::class,
+    ProductVariantsSeeder::class,
+    ]);
+
     }
 }
