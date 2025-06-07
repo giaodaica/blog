@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\OrderHistories;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -112,5 +113,29 @@ class OrderController extends Controller
         }
 
         return redirect()->back()->with('success', 'Cập nhật trạng thái đơn hàng thành công!');
+    }
+    public function db_order_show($id)
+    {
+        $data_order = Order::join('vouchers','vouchers.id','orders.voucher_id')->
+        join('address_books','address_books.id','orders.address_books_id')->
+        select(
+            'orders.*',
+            
+        )
+        ->get();
+        $data_order_items = OrderItem::join('orders', 'orders.id', 'order_items.order_id')->
+        join('product_variants', 'product_variants.id', 'order_items.product_variant_id')->
+        join('sizes', 'sizes.id', 'product_variants.size_id')->
+        join('colors', 'colors.id', 'product_variants.color_id')->
+        where('order_id', $id)->
+        select(
+                'order_items.*',
+                'sizes.size_name',
+                'colors.color_name',
+            )->get();
+        dd($data_order);
+        // dd($data_order_items);
+
+        return view('dashboard.pages.order.detail', compact('data_order', 'data_order_items'));
     }
 }
