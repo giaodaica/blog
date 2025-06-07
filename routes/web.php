@@ -71,6 +71,7 @@ Route::prefix('dashboard')->group(function () {
         // phần order
     Route::get('order',[OrderController::class,'db_order'])->name('dashboard.order');
     Route::post('order/change/{id}',[OrderController::class,'db_order_change']);
+    Route::get('order/{id}',[OrderController::class,'db_order_show']);
 
     // Các route resource chuẩn cho variants (index, show, edit, update, destroy) không cần productId
     Route::resource('variants', ProductVariantsController::class)->except(['create', 'store']);
