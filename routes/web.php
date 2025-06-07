@@ -1,11 +1,13 @@
 <?php
 
+use App\Http\Controllers\Auth\ChangepasswordController;
 use App\Http\Controllers\Auth\GoogleController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\ChatBotController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImageProductVariantsController;
+use App\Http\Controllers\InfoController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ProductVariantsController;
