@@ -181,7 +181,7 @@
                                                                 name="checkAll" value="option1">
                                                         </div>
                                                     </th>
-                                                    <td class="id"><a href="apps-ecommerce-order-details.html"
+                                                    <td class="id"><a href="{{url("dashboard/order/$render_order->id")}}"
                                                             class="fw-medium link-primary">{{ $render_order->code_order }}</a>
                                                     </td>
                                                     <td class="product_name">{{ $render_order->name }}</td>
@@ -258,7 +258,7 @@
                                                             <li class="list-inline-item" data-bs-toggle="tooltip"
                                                                 data-bs-trigger="hover" data-bs-placement="top"
                                                                 title="View">
-                                                                <a href="apps-ecommerce-order-details.html"
+                                                                <a href="{{url("dashboard/order/$render_order->id")}}"
                                                                     class="text-primary d-inline-block">
                                                                     <i class="ri-eye-fill fs-16"></i>
                                                                 </a>

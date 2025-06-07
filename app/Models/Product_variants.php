@@ -32,5 +32,9 @@ class Product_variants extends Model
     {
         return $this->hasMany(ImageProductVariants::class, 'product_variant_id');
     }
- 
+ public function color()
+{
+    return $this->belongsTo(\App\Models\Color::class, 'color_id');
+}
+
 }
