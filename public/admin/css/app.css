@@ -7,37 +7,28 @@ Website: https://themesbrand.com/
 Contact: support@themesbrand.com
 File: Main Css File
 */
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap");
-@font-face {
-  font-family: "hkgrotesk";
-  src: url("../fonts/hkgrotesk-light.eot");
-  src: local("hkgrotesk light"), url("../fonts/hkgrotesk-light.woff") format("woff");
-  font-weight: 300;
+/* Import 2 font từ Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Open+Sans:wght@400;700&display=swap");
+
+/* Định nghĩa biến CSS cho font */
+:root {
+  --alt-font: 'Roboto', sans-serif;
+  --primary-font: 'Open Sans', sans-serif;
 }
-@font-face {
-  font-family: "hkgrotesk";
-  src: url("../fonts/hkgrotesk-regular.eot");
-  src: local("hkgrotesk regular"), url("../fonts/hkgrotesk-regular.woff") format("woff");
-  font-weight: 400;
-}
-@font-face {
-  font-family: "hkgrotesk";
-  src: url("../fonts/hkgrotesk-medium.eot");
-  src: local("hkgrotesk medium"), url("../fonts/hkgrotesk-medium.woff") format("woff");
+
+/* Ví dụ áp dụng font chính cho toàn trang */
+body {
+  font-family: var(--primary-font);
   font-weight: 500;
+  color: #333;
 }
-@font-face {
-  font-family: "hkgrotesk";
-  src: url("../fonts/hkgrotesk-semibold.eot");
-  src: local("hkgrotesk semibold"), url("../fonts/hkgrotesk-semibold.woff") format("woff");
-  font-weight: 600;
-}
-@font-face {
-  font-family: "hkgrotesk";
-  src: url("../fonts/hkgrotesk-bold.eot");
-  src: local("hkgrotesk bold"), url("../fonts/hkgrotesk-bold.woff") format("woff");
+
+/* Ví dụ dùng font phụ cho tiêu đề */
+h1, h2, h3 {
+  font-family: var(--alt-font);
   font-weight: 700;
 }
+
 /*********************variables-custom dark Mode***************************/
 #page-topbar {
   position: fixed;
@@ -1903,10 +1894,10 @@ File: Main Css File
 
 /*!
  * Waves v0.7.6
- * http://fian.my.id/Waves 
- * 
- * Copyright 2014-2018 Alfiana E. Sibuea and other contributors 
- * Released under the MIT license 
+ * http://fian.my.id/Waves
+ *
+ * Copyright 2014-2018 Alfiana E. Sibuea and other contributors
+ * Released under the MIT license
  * https://github.com/fians/Waves/blob/master/LICENSE */
 .waves-effect {
   position: relative;

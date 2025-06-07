@@ -13,7 +13,7 @@ return new class extends Migration
   public function up()
 {
     DB::statement("ALTER TABLE vouchers
-        MODIFY COLUMN status ENUM('draft', 'active', 'disabled', 'used_up', 'expired', 'revoked')
+        MODIFY COLUMN status ENUM('draft', 'active', 'disabled', 'used_up', 'expired', 'revoked','save')
         NOT NULL DEFAULT 'draft'");
 }
 

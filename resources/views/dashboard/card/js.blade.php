@@ -20,19 +20,9 @@
     <!-- Dashboard init -->
     <script src="{{asset('admin/js/pages/dashboard-ecommerce.init.js')}}"></script>
 
-   <!-- Layout config Js -->
-    {{-- <script src="{{asset('admin/js/layout.js')}}"></script> --}}
-    <!-- Bootstrap Css -->
-    <link href="{{asset('admin/css/bootstrap.min.css')}}" rel="stylesheet" type="text/css" />
-    <!-- Icons Css -->
-    <link href="{{asset('admin/css/icons.min.css')}}" rel="stylesheet" type="text/css" />
-    <!-- App Css-->
-    <link href="{{asset('admin/css/app.min.css')}}" rel="stylesheet" type="text/css" />
-    <!-- custom Css-->
-    <link href="{{asset('admin/css/custom.min.css')}}" rel="stylesheet" type="text/css" />
+    <script src="{{asset('admin/js/app.js')}}"></script>
 
-
-    <!-- gridjs js -->
+    {{-- <!-- gridjs js -->
     <script src="{{asset('admin/libs/gridjs/gridjs.umd.js')}}"></script>
    <script src="https://unpkg.com/gridjs/plugins/selection/dist/selection.umd.js"></script>
 
@@ -48,7 +38,6 @@
 
     <script src="{{asset('admin/js/pages/select2.init.js')}}"></script>
   <!-- App js -->
-    <script src="{{asset('admin/js/app.js')}}"></script>
     <script>
   // Khi click mở menu "Danh sách", lưu trạng thái mở
   document.addEventListener('DOMContentLoaded', function () {
@@ -71,4 +60,4 @@
 </script>
 
 
-
+ --}}
