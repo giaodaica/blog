@@ -3393,21 +3393,7 @@ if ($.fn.countdown !== undefined && $.fn.countdown !== null) {
      Quantity input
      ====================================== */
 
-  $('.qty-plus').click(function () {
-    var th = $(this).closest('.quantity').find('.qty-text');
-    th.val(+th.val() + 1);
-    updateCartTotals(); // Cập nhật tổng giá sau khi tăng
-});
-
-$('.qty-minus').click(function () {
-    var th = $(this).closest('.quantity').find('.qty-text');
-    if (th.val() > 1)
-        th.val(+th.val() - 1);
-    updateCartTotals(); // Cập nhật tổng giá sau khi giảm
-});
-$('.qty-text').on('input', function () {
-    updateCartTotals();
-});
+ 
 
 
     /* ===================================

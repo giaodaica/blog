@@ -26,6 +26,9 @@ Route::get('shop', [HomeController::class, 'shop'])->name('home.shop');
 Route::get('info', [HomeController::class, 'info_customer'])->name('home.info')->middleware('auth', 'cache');
 Route::get('aonam/{id}', [HomeController::class, 'show'])->name('home.show');
 Route::get('cart', [CartController::class, 'index'])->name('home.cart');
+Route::delete('/cart/delete-selected', [CartController::class, 'deleteSelected'])->name('cart.deleteSelected');
+Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity');
+
 Route::get('checkout', [OrderController::class, 'index'])->name('home.checkout');
 Route::get('done', [OrderController::class, 'done'])->name('home.done');
 Route::get('dashboard', [HomeController::class, 'admin']);

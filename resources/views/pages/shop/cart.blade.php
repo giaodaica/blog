@@ -42,7 +42,8 @@
                                      @foreach($cartItems as $item)
                                         <tr>
                                             <td class="product-remove">
-                                                <input type="checkbox" class="cart-item-checkbox">
+                                               <input type="checkbox" class="cart-item-checkbox" value="{{ $item->id }}">
+
                                             </td>
                                            <td class="product-thumbnail">
                                                 <a href="demo-jewellery-store-single-product.html">
@@ -61,9 +62,9 @@
                                                 {{ number_format($item->price_at_time, 0, ',', '.') }} đ
                                             </td>
                                             <td class="product-quantity" data-title="Quantity">
-                                                <div class="quantity">
+                                                <div class="quantity" data-id="{{ $item->id }}">
                                                     <button type="button" class="qty-minus">-</button>
-                                                    <input class="qty-text" type="text" id="1" value="{{ $item->quantity }}" aria-label="qty-text">
+                                                    <input class="qty-text" type="text" value="{{ $item->quantity }}" readonly>
                                                     <button type="button" class="qty-plus">+</button>
                                                 </div>
                                             </td>
@@ -91,19 +92,18 @@
                         <div class="col-xl-6 col-xxl-7 col-md-6">
                             <div class="coupon-code-panel">
                                 <input type="text" class="bg-white border-radius-4px" placeholder="Coupon code">
-                                <a href="#" class="btn apply-coupon-btn fs-13 fw-600 text-uppercase">Apply</a>
+                                <a href="#" class="btn apply-coupon-btn fs-13 fw-600 text-uppercase">Áp dụng</a>
                             </div>
                         </div>
 
 
 
                         <div class="col-xl-6 col-xxl-5 col-md-6 text-center text-md-end sm-mt-15px">
-                            <a href="#"
-                                class="btn btn-small border-1 btn-round-edge btn-transparent-light-gray text-transform-none me-15px lg-me-5px">Empty
-                                cart</a>
-                            {{-- <a href="#"
-                                class="btn btn-small border-1 btn-round-edge btn-transparent-light-gray text-transform-none">Update
-                                cart</a> --}}
+                          <a href="#" id="delete-selected-btn"
+                                class="btn btn-small border-1 btn-round-edge btn-transparent-light-gray text-transform-none me-15px lg-me-5px">
+                                Xóa sản phẩm đã chọn
+                        </a>
+
                         </div>
                     </div>
                 </div>
@@ -204,6 +204,67 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 // ...existing code...
 </script>
+<script>
+document.getElementById('delete-selected-btn').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    const selected = document.querySelectorAll('.cart-item-checkbox:checked');
+    const ids = Array.from(selected).map(cb => cb.value);
+
+    if (ids.length === 0) {
+        alert("Vui lòng chọn sản phẩm để xoá.");
+        return;
+    }
+
+    fetch("{{ route('cart.deleteSelected') }}", {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ ids })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('Đã xoá sản phẩm thành công.');
+            location.reload();
+        } else {
+            alert('Xoá thất bại.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Có lỗi xảy ra.');
+    });
+});
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $('.qty-plus, .qty-minus').on('click', function () {
+        let parent = $(this).closest('.quantity');
+        let id = parent.data('id');
+        let input = parent.find('.qty-text');
+        let currentQty = parseInt(input.val());
+        let action = $(this).hasClass('qty-plus') ? 'increase' : 'decrease';
+
+        $.ajax({
+            url: "{{ route('cart.updateQuantity') }}",
+            method: "POST",
+            data: {
+                _token: '{{ csrf_token() }}',
+                id: id,
+                action: action
+            },
+            success: function (res) {
+                input.val(res.quantity);
+                parent.closest('tr').find('.product-subtotal').text(res.subtotal);
+                // nếu muốn cập nhật tổng giỏ hàng bên dưới thì gọi thêm 1 hàm update tổng ở đây
+            }
+        });
+    });
+</script>
+
 
 @endsection
 @section('cdn-custom')
