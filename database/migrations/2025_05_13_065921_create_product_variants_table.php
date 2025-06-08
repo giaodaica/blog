@@ -35,6 +35,7 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('image_product_variants'); // Bảng phụ có khóa ngoại
         Schema::dropIfExists('product_variants');
     }
 };
