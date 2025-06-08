@@ -45,10 +45,10 @@
 
                     <!-- Buttons -->
                     <div class="text-end pt-3">
-                        <button type="button" class="btn btn-outline-secondary me-2 px-4 rounded-pill" data-bs-dismiss="modal">
+                        <button type="button" class="btn btn-outline-secondary me-2 px-4 rounded-pill no-hover" data-bs-dismiss="modal">
                             Hủy
                         </button>
-                        <button type="submit" class="btn btn-primary px-4 rounded-pill shadow-sm">
+                        <button type="submit" class="btn btn-primary px-4 rounded-pill shadow-sm no-hover">
                             Cập nhật
                         </button>
                     </div>
@@ -57,3 +57,21 @@
         </div>
     </div>
 </div>
+
+<style>
+    .no-hover:hover {
+        background-color: inherit !important;
+        border-color: inherit !important;
+        color: inherit !important;
+    }
+    .btn-primary.no-hover:hover {
+        background-color: #0d6efd !important;
+        border-color: #0d6efd !important;
+        color: #fff !important;
+    }
+    .btn-outline-secondary.no-hover:hover {
+        background-color: transparent !important;
+        border-color: #6c757d !important;
+        color: #6c757d !important;
+    }
+</style>
