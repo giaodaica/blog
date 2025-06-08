@@ -22,27 +22,54 @@ class ProductsController extends Controller
         return view('dashboard.pages.product.create', compact('categories'));
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'name' => 'required|unique:products,name',
-            'slug' => 'required|unique:products,slug',
-            'category_id' => 'required|exists:categories,id',
-            'image_url' => 'required|image|mimes:jpg,png,jpeg|max:2048'
-        ]);
+   public function store(Request $request)
+{
+    $request->validate([
+        'name' => 'required|unique:products,name',
+        'slug' => 'required|unique:products,slug',
+        'category_id' => 'required|exists:categories,id',
+        'image_url' => 'required|image|mimes:jpg,png,jpeg|max:2048'
+    ]);
 
-        // Xử lý upload ảnh
-        $path = $request->file('image_url')->store('uploads/products', 'public');
+    $data = $request->only(['name', 'slug', 'category_id']);
 
-        Products::create([
-            'name' => $request->name,
-            'slug' => $request->slug,
-            'category_id' => $request->category_id,
-            'image_url' => $path,
-        ]);
-
-        return redirect()->route('products.index')->with('success', 'Thêm sản phẩm thành công!');
+    if ($request->hasFile('image_url')) {
+        $file = $request->file('image_url');
+        $filename = time() . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('uploads/products'), $filename);
+        $data['image_url'] = 'uploads/products/' . $filename;
     }
+
+    Products::create($data);
+
+    return redirect()->route('products.index')->with('success', 'Thêm sản phẩm thành công!');
+}
+
+public function update(Request $request, $id)
+{
+    $product = Products::findOrFail($id);
+
+    $request->validate([
+        'name' => 'required|unique:products,name,' . $id,
+        'slug' => 'required|unique:products,slug,' . $id,
+        'category_id' => 'required|exists:categories,id',
+        'image_url' => 'nullable|image|mimes:jpg,png,jpeg|max:2048'
+    ]);
+
+    $data = $request->only(['name', 'slug', 'category_id']);
+
+    if ($request->hasFile('image_url')) {
+        $file = $request->file('image_url');
+        $filename = time() . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('uploads/products'), $filename);
+        $data['image_url'] = 'uploads/products/' . $filename;
+    }
+
+    $product->update($data);
+
+    return redirect()->route('products.index')->with('success', 'Cập nhật sản phẩm thành công!');
+}
+
 
     public function edit($id)
     {
@@ -51,27 +78,7 @@ class ProductsController extends Controller
         return view('dashboard.pages.product.edit', compact('product', 'categories'));
     }
 
-    public function update(Request $request, $id)
-    {
-        $product = Products::findOrFail($id);
-
-        $request->validate([
-            'name' => 'required|unique:products,name,' . $id,
-            'slug' => 'required|unique:products,slug,' . $id,
-            'category_id' => 'required|exists:categories,id',
-            'image_url' => 'nullable|image|mimes:jpg,png,jpeg|max:2048'
-        ]);
-
-        $data = $request->only(['name', 'slug', 'category_id']);
-
-        if ($request->hasFile('image_url')) {
-            $data['image_url'] = $request->file('image_url')->store('uploads/products', 'public');
-        }
-
-        $product->update($data);
-
-        return redirect()->route('products.index')->with('success', 'Cập nhật sản phẩm thành công!');
-    }
+  
 
     public function destroy($id)
     {
@@ -83,7 +90,7 @@ class ProductsController extends Controller
 
     public function show($id)
     {
-        $product = Products::with('category')->findOrFail($id);
+        $product = Products::with(relations: 'category')->findOrFail($id);
         return view('dashboard.pages.product.show', compact('product'));
     }
 }

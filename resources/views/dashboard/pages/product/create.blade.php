@@ -28,7 +28,7 @@
 
                 <div class="row">
 
-                    <!-- Left column: main info + variants -->
+                    <!-- Left column: main info -->
                     <div class="col-lg-8">
                         <div class="card">
                             <div class="card-body">
@@ -44,15 +44,6 @@
                                     @enderror
                                 </div>
 
-                                {{-- Mô tả sản phẩm --}}
-                                <div class="mb-3">
-                                    <label for="product-dsc-input" class="form-label">Mô tả sản phẩm</label>
-                                    <textarea class="form-control @error('dsc') is-invalid @enderror" id="product-dsc-input" name="dsc" rows="6"
-                                        placeholder="Nhập mô tả sản phẩm">{{ old('dsc') }}</textarea>
-                                    @error('dsc')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
                                 {{-- Slug --}}
                                 <div class="mb-3">
                                     <label for="product-slug-input" class="form-label">Slug</label>
@@ -64,11 +55,19 @@
                                     @enderror
                                 </div>
 
-                             
+                                {{-- Ảnh đại diện --}}
+                                <div class="mb-3">
+                                    <label for="product-image-input" class="form-label">Ảnh đại diện</label>
+                                    <input type="file" class="form-control @error('image_url') is-invalid @enderror"
+                                        id="product-image-input" name="image_url" accept="image/*" required>
+                                    @error('image_url')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                    <img id="product-img" src="#" alt="Preview Image" class="mt-2" style="max-height: 150px; display:none;">
+                                </div>
 
-                            
+                          
 
-                            
                             </div>
                         </div>
                     </div>
@@ -98,43 +97,6 @@
                                 @error('category_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
-                            </div>
-                        </div>
-
-                        {{-- Meta dữ liệu --}}
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">Meta dữ liệu</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label for="meta_title" class="form-label">Tiêu đề Meta</label>
-                                    <input type="text" class="form-control @error('meta_title') is-invalid @enderror"
-                                        id="meta_title" name="meta_title" value="{{ old('meta_title') }}"
-                                        placeholder="Nhập tiêu đề Meta">
-                                    @error('meta_title')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div class="mb-3">
-                                    <label for="meta_keyword" class="form-label">Từ khóa Meta</label>
-                                    <input type="text" class="form-control @error('meta_keyword') is-invalid @enderror"
-                                        id="meta_keyword" name="meta_keyword" value="{{ old('meta_keyword') }}"
-                                        placeholder="Nhập từ khóa Meta">
-                                    @error('meta_keyword')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
-
-                                <div>
-                                    <label for="meta_dsc" class="form-label">Mô tả Meta</label>
-                                    <textarea class="form-control @error('meta_dsc') is-invalid @enderror" id="meta_dsc" name="meta_dsc"
-                                        placeholder="Nhập mô tả Meta" rows="3">{{ old('meta_dsc') }}</textarea>
-                                    @error('meta_dsc')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
                             </div>
                         </div>
 
@@ -174,20 +136,21 @@
         </div>
     </div>
 
-  <script>
-    // Xử lý preview ảnh đại diện
-    const mainImageInput = document.getElementById('product-image-input');
-    const mainImagePreview = document.getElementById('product-img');
+    <script>
+        // Xử lý preview ảnh đại diện
+        const mainImageInput = document.getElementById('product-image-input');
+        const mainImagePreview = document.getElementById('product-img');
 
-    mainImageInput.addEventListener('change', e => {
-        if (e.target.files && e.target.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                mainImagePreview.src = e.target.result;
-            };
-            reader.readAsDataURL(e.target.files[0]);
-        }
-    });
-</script>
+        mainImageInput.addEventListener('change', e => {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    mainImagePreview.src = e.target.result;
+                    mainImagePreview.style.display = 'block';
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+    </script>
 
 @endsection

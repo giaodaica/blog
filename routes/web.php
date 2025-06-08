@@ -67,26 +67,23 @@ Route::prefix('dashboard')->group(function () {
     Route::post('voucher/active/{id}', [VouchersController::class, 'active']);
     Route::resource('products', ProductsController::class);
     Route::resource('categories', CategoriesController::class);
-    // Tạo biến thể: cần productId
-    Route::get('variants/create/{productId}', [ProductVariantsController::class, 'create'])->name('variants.create');
-    Route::post('variants/store/{productId}', [ProductVariantsController::class, 'store'])->name('variants.store');
+ 
         // phần order
     Route::get('order',[OrderController::class,'db_order'])->name('dashboard.order');
     Route::post('order/change/{id}',[OrderController::class,'db_order_change']);
     Route::get('order/{id}',[OrderController::class,'db_order_show']);
 
-    // Các route resource chuẩn cho variants (index, show, edit, update, destroy) không cần productId
-    Route::resource('variants', ProductVariantsController::class)->except(['create', 'store']);
-    Route::get('images', [ImageProductVariantsController::class, 'index'])->name('image_product_variants.index');
-    Route::prefix('variants/{variant}')->group(function () {
-
-    Route::get('images/create', [ImageProductVariantsController::class, 'create'])->name('image_product_variants.create');
-    Route::post('images', [ImageProductVariantsController::class, 'store'])->name('image_product_variants.store');
-    Route::delete('images/{image}', [ImageProductVariantsController::class, 'destroy'])->name('image_product_variants.destroy');
-
-    });
-
+ 
        // Route resource cho color và size
     Route::resource('colors', ColorController::class);
     Route::resource('sizes', SizeController::class);
+
+
+     Route::get('variants', [ProductVariantsController::class, 'index'])->name('variants.index');
+    Route::get('variants/create/{productId}', [ProductVariantsController::class, 'create'])->name('variants.create');
+    Route::post('variants/store/{productId}', [ProductVariantsController::class, 'store'])->name('variants.store');
+    Route::get('variants/{id}', [ProductVariantsController::class, 'show'])->name('variants.show');
+    Route::get('variants/{id}/edit', [ProductVariantsController::class, 'edit'])->name('variants.edit');
+    Route::put('variants/{id}/update', [ProductVariantsController::class, 'update'])->name('variants.update');
+    Route::delete('variants/{id}', [ProductVariantsController::class, 'destroy'])->name('variants.destroy');
 });

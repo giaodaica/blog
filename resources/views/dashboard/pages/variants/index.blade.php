@@ -412,74 +412,60 @@
                         </div> --}}
                             <div class="card-body">
 
+    <!-- Bảng biến thể sản phẩm -->
+    <table class="table table-bordered table-striped align-middle text-center">
+        <thead class="table-dark">
+            <tr>
+                <th>#</th>
+                <th>Tên biến thể</th>
+                <th>Ảnh</th>
+                <th>Giá nhập</th>
+                <th>Giá niêm yết</th>
+                <th>Giá bán</th>
+                <th>Kho</th>
+                <th>Tên sản phẩm</th>
+                <th>Size</th>
+                <th>Màu sắc</th>
+                <th>Hành động</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach ($variants as $index => $variant)
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>{{ $variant->name }}</td>
+                    <td>
+                        @if($variant->variant_image_url)
+                            <img src="{{ asset( $variant->variant_image_url) }}" alt="{{ $variant->name }}" width="50" height="50">
+                        @else
+                            <img src="{{ asset('storage/no-image.png') }}" alt="No Image" width="50" height="50">
+                        @endif
+                    </td>
+                    <td>{{ number_format($variant->import_price, 0, ',', '.') }} đ</td>
+                    <td>{{ number_format($variant->listed_price, 0, ',', '.') }} đ</td>
+                    <td>{{ number_format($variant->sale_price, 0, ',', '.') }} đ</td>
+                    <td>{{ $variant->stock }}</td>
+                    <td>{{ $variant->product->name ?? 'Chưa có' }}</td>
+                    <td>{{ $variant->size->size_name ?? '-' }}</td>
+                  <td>{{ $variant->color->color_name ?? '-' }}</td>
+                    <td>
+                        <a href="{{ route('variants.show', $variant->id) }}" class="btn btn-sm btn-info me-1">Xem</a>
+                        <a href="{{ route('variants.edit', $variant->id) }}" class="btn btn-sm btn-warning me-1">Sửa</a>
 
-                                <!-- Bảng sản phẩm -->
-                                <table class="table table-bordered table-striped align-middle text-center">
-                                    <thead class="table-dark">
-                                        <tr>
-                                            <th>#</th>
-                                            <th>Name</th>
-                                            <th>SKU</th>
-                                            <th>Giá</th>
-                                            <th>Số lượng</th>
-                                            <th>Tên sản phẩm</th>
-                                            <th>Size</th>
-                                            <th>Màu sắc</th>
-                                            <th>Trạng thái</th>
-                                            <th>Hành động</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach ($variants as $index => $variant)
-                                            @php
-                                                $product = $variant->product;
-                                            @endphp
-                                            <tr>
-                                                <td>{{ $index + 1 }}</td>
-                                                <td>{{ $variant->name }}</td>
-                                                <td>{{ $variant->sku }}</td>
-                                                <td>{{ number_format($variant->price, 0, ',', '.') }} đ</td>
-                                                <td>{{ $variant->quantity }}</td>
-                                                <td>{{ $product->name ?? 'Chưa có' }}</td>
-                                                <td>{{ $variant->size ?? '-' }}</td>
-                                                <td>{{ $variant->color ? ucfirst($variant->color) : '-' }}</td>
-                                                <td>
-                                                    @if ($variant->status == 'active')
-                                                        <span class="badge bg-success">Hiển thị</span>
-                                                    @else
-                                                        <span class="badge bg-secondary">Ẩn</span>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <a href="{{ route('variants.show', $variant->id) }}"
-                                                        class="btn btn-sm btn-info me-1">Xem</a>
-                                                    <a href="{{ route('variants.edit', $variant->id) }}"
-                                                        class="btn btn-sm btn-warning me-1">Sửa</a>
+                        <form action="{{ route('variants.destroy', $variant->id) }}" method="POST" style="display:inline-block;">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-danger"
+                                onclick="return confirm('Bạn có chắc muốn xóa biến thể này?');">Xóa</button>
+                        </form>
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
 
-                                                    <!-- Nút Thêm ảnh -->
-                                                    <a href="{{ route('image_product_variants.create', $variant->id) }}"
-                                                        class="btn btn-sm btn-primary me-1">Thêm ảnh</a>
+</div>
 
-                                                    <form action="{{ route('variants.destroy', $variant->id) }}"
-                                                        method="POST" style="display:inline-block;">
-                                                        @csrf
-                                                        @method('DELETE')
-                                                        <button type="submit" class="btn btn-sm btn-danger"
-                                                            onclick="return confirm('Bạn có chắc muốn xóa biến thể này?');">Xóa</button>
-                                                    </form>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-
-
-
-
-
-
-
-                            </div>
                             <!-- end card body -->
                         </div>
                         <!-- end card -->

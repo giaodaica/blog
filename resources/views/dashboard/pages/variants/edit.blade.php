@@ -1,119 +1,133 @@
 @extends('dashboard.layouts.layout')
 
 @section('main-content')
-    <div class="page-content">
-        <div class="container-fluid">
+<div class="page-content">
+    <div class="container-fluid">
 
-            <!-- Tiêu đề -->
-            <div class="row">
-                <div class="col-12">
-                    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                        <h4 class="mb-sm-0">Edit Product Variant</h4>
-                        <div class="page-title-right">
-                            <ol class="breadcrumb m-0">
-                                <li class="breadcrumb-item"><a href="#">Ecommerce</a></li>
-                                <li class="breadcrumb-item active">Edit Product Variant</li>
-                            </ol>
-                        </div>
+        <!-- start page title -->
+        <div class="row">
+            <div class="col-12">
+                <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                    <h4 class="mb-sm-0">Chỉnh sửa biến thể sản phẩm</h4>
+
+                    <div class="page-title-right">
+                        <ol class="breadcrumb m-0">
+                            <li class="breadcrumb-item"><a href="{{ route('variants.index') }}">Danh sách biến thể</a></li>
+                            <li class="breadcrumb-item active">Chỉnh sửa biến thể</li>
+                        </ol>
                     </div>
+
                 </div>
             </div>
+        </div>
+        <!-- end page title -->
 
-            <!-- Form sửa biến thể sản phẩm -->
-            <form id="editproduct-form" class="needs-validation" method="POST"
-                action="{{ route('variants.update', $variant->id) }}" novalidate>
-                @csrf
-                @method('PUT')
+        <form action="{{ route('variants.update', $variant->id) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            @method('PUT')
 
-                <div class="row">
-                    <div class="col-lg-8">
-                        <div class="card">
-                            <div class="card-body" id="variants-container">
-
-                                <div class="variant-item border p-3 mb-3 position-relative">
-                                    <div class="mb-3">
-                                        <label for="name-input" class="form-label">Tên biến thể</label>
-                                        <input type="text" id="name-input" name="name"
-                                            class="form-control @error('name') is-invalid @enderror"
-                                            value="{{ old('name', $variant->name) }}" required>
-                                        @error('name')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                    <!-- SKU -->
-                                    <div class="mb-2">
-                                        <label>SKU</label>
-                                        <input type="text" name="sku" class="form-control"
-                                            value="{{ old('sku', $variant->sku) }}" required>
-                                    </div>
-
-                                    <!-- Giá -->
-                                    <div class="mb-2">
-                                        <label>Giá</label>
-                                        <input type="number" name="price" class="form-control"
-                                            value="{{ old('price', $variant->price) }}" step="0.01" required>
-                                    </div>
-
-                                    <!-- Số lượng -->
-                                    <div class="mb-2">
-                                        <label>Số lượng</label>
-                                        <input type="number" name="quantity" class="form-control"
-                                            value="{{ old('quantity', $variant->quantity) }}" required>
-                                    </div>
-
-                                    <!-- Trạng thái -->
-                                    <div class="mb-2">
-                                        <label>Trạng thái</label>
-                                        <select name="status" class="form-select">
-                                            <option value="active"
-                                                {{ old('status', $variant->status) == 'active' ? 'selected' : '' }}>Hiện
-                                            </option>
-                                            <option value="inactive"
-                                                {{ old('status', $variant->status) == 'inactive' ? 'selected' : '' }}>Ẩn
-                                            </option>
-                                        </select>
-                                    </div>
-
-                                    <!-- Size -->
-                                    <div class="mb-2">
-                                        <label>Size</label>
-                                        <select name="size" class="form-select">
-                                            <option value="">-- Chọn size --</option>
-                                            @foreach (['S', 'M', 'L', 'XL', 'XXL'] as $size)
-                                                <option value="{{ $size }}"
-                                                    {{ old('size', $variant->size) == $size ? 'selected' : '' }}>
-                                                    {{ $size }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                    <!-- Color -->
-                                    <div class="mb-2">
-                                        <label>Màu sắc</label>
-                                        <select name="color" class="form-select">
-                                            <option value="">-- Chọn màu --</option>
-                                            @foreach (['red', 'blue', 'green', 'black', 'white'] as $color)
-                                                <option value="{{ $color }}"
-                                                    {{ old('color', $variant->color) == $color ? 'selected' : '' }}>
-                                                    {{ ucfirst($color) }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                    </div>
-
-                                </div>
-
-                            </div>
-                        </div>
-                    </div>
+            <div class="row g-4">
+                <!-- Sản phẩm (không sửa được) -->
+                <div class="col-lg-12">
+                    <h6 class="fw-semibold">Sản phẩm</h6>
+                    <select class="form-select" disabled>
+                        <option value="{{ $variant->product->id }}" selected>{{ $variant->product->name }}</option>
+                    </select>
                 </div>
 
-                <!-- Nút lưu -->
-                <div class="d-flex justify-content-end mb-5">
-                    <button type="submit" class="btn btn-primary">Lưu biến thể</button>
+                <!-- Chọn Size -->
+                <div class="col-lg-6">
+                    <h6 class="fw-semibold">Size</h6>
+                    <select class="form-select" name="size_id" required>
+                        @foreach ($sizes as $size)
+                            <option value="{{ $size->id }}" {{ $size->id == $variant->size_id ? 'selected' : '' }}>
+                                {{ $size->size_name }}
+                            </option>
+                        @endforeach
+                    </select>
                 </div>
-            </form>
+
+                <!-- Chọn Color -->
+                <div class="col-lg-6">
+                    <h6 class="fw-semibold">Màu</h6>
+                    <select class="form-select" name="color_id" required>
+                        @foreach ($colors as $color)
+                            <option value="{{ $color->id }}" {{ $color->id == $variant->color_id ? 'selected' : '' }}>
+                                {{ $color->color_name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </div>
+
+                <!-- Các trường khác -->
+                <div class="col-lg-4">
+                    <h6 class="fw-semibold">Tên biến thể</h6>
+                    <input type="text" name="name" class="form-control" value="{{ old('name', $variant->name) }}" required>
+                </div>
+                <div class="col-lg-4">
+                    <h6 class="fw-semibold">Giá nhập</h6>
+                    <input type="number" name="import_price" class="form-control" min="0" value="{{ old('import_price', $variant->import_price) }}" required>
+                </div>
+                <div class="col-lg-4">
+                    <h6 class="fw-semibold">Giá niêm yết</h6>
+                    <input type="number" name="listed_price" class="form-control" min="0" value="{{ old('listed_price', $variant->listed_price) }}" required>
+                </div>
+                <div class="col-lg-4">
+                    <h6 class="fw-semibold">Giá bán</h6>
+                    <input type="number" name="sale_price" class="form-control" min="0" value="{{ old('sale_price', $variant->sale_price) }}" required>
+                </div>
+                <div class="col-lg-4">
+                    <h6 class="fw-semibold">Số lượng kho</h6>
+                    <input type="number" name="stock" class="form-control" min="0" value="{{ old('stock', $variant->stock) }}" required>
+                </div>
+                <div class="col-lg-4">
+                    <h6 class="fw-semibold">Ảnh biến thể (bạn có thể chọn ảnh mới để thay thế)</h6>
+                    <input type="file" name="variant_image_url" class="form-control" accept="image/*">
+                    @if($variant->variant_image_url)
+                        <img src="{{ asset($variant->variant_image_url) }}" alt="Ảnh biến thể" style="max-width: 150px; margin-top: 10px;">
+                    @endif
+                </div>
+
+                <div class="col-lg-12 mt-3">
+                    <button type="submit" class="btn btn-primary">Cập nhật biến thể</button>
+                    <a href="{{ route('variants.index') }}" class="btn btn-secondary">Hủy</a>
+                </div>
+            </div>
+        </form>
+
+    </div>
+    <!-- container-fluid -->
+</div>
+<!-- End Page-content -->
+
+<footer class="footer">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <script>document.write(new Date().getFullYear())</script> © Velzon.
+            </div>
+            <div class="col-sm-6">
+                <div class="text-sm-end d-none d-sm-block">
+                    Design & Develop by Themesbrand
+                </div>
+            </div>
         </div>
     </div>
+</footer>
+@endsection
+
+@section('js-content')
+<script src="{{ asset('admin/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('admin/libs/simplebar/simplebar.min.js') }}"></script>
+<script src="{{ asset('admin/libs/node-waves/waves.min.js') }}"></script>
+<script src="{{ asset('admin/libs/feather-icons/feather.min.js') }}"></script>
+<script src="{{ asset('admin/js/pages/plugins/lord-icon-2.1.0.js') }}"></script>
+<script src="{{ asset('admin/js/plugins.js') }}"></script>
+
+<!--jquery cdn-->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+<!-- App js -->
+<script src="{{ asset('admin/js/app.js') }}"></script>
 @endsection
