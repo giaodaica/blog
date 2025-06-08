@@ -13,24 +13,20 @@ class Products extends Model
 
     protected $fillable = [
         'name',
-        'dsc',
-        'meta_title',
-        'meta_dsc',
-        'meta_keyword',
-        'category_id',
-        'status',
         'slug',
+        'image_url',
+        'category_id',
     ];
 
-    // Quan hệ: Một sản phẩm có nhiều biến thể
-    public function variants()
-    {
-        return $this->hasMany(Product_variants::class, 'product_id', 'id');
-    }
-
-    // (Gợi ý) Nếu bạn muốn lấy category của sản phẩm
+    // Quan hệ: Một sản phẩm thuộc một danh mục
     public function category()
     {
         return $this->belongsTo(Categories::class, 'category_id');
+    }
+
+    // Nếu vẫn còn bảng product_variants thì giữ
+    public function variants()
+    {
+        return $this->hasMany(Product_variants::class, 'product_id');
     }
 }

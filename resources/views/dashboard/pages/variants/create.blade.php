@@ -1,124 +1,97 @@
 @extends('dashboard.layouts.layout')
 
 @section('main-content')
-<div class="page-content">
-    <div class="container-fluid">
-
-        <!-- Tiêu đề -->
-        <div class="row">
-            <div class="col-12">
-                <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                    <h4 class="mb-sm-0">Create Variant for Product: {{ $product->name }}</h4>
-                    <div class="page-title-right">
-                        <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="#">Ecommerce</a></li>
-                            <li class="breadcrumb-item active">Create Variant</li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Form tạo biến thể -->
-        <form id="createvariant-form" class="needs-validation" method="POST"
-              action="{{ route('variants.store', $product->id) }}" novalidate>
-            @csrf
-
+    <div class="page-content">
+        <div class="container-fluid">
+            <!-- start page title -->
             <div class="row">
-                <div class="col-lg-8">
-                    <div class="card">
-                        <div class="card-body">
-
-                            <!-- Tên biến thể -->
-                            <div class="mb-2">
-                                <label>Tên biến thể</label>
-                                <input type="text" name="name" class="form-control" value="{{ old('name') }}">
-                                @error('name')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-
-                            <!-- SKU -->
-                            <div class="mb-2">
-                                <label>SKU</label>
-                                <input type="text" name="sku" class="form-control" value="{{ old('sku') }}" required>
-                                @error('sku')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-
-                            <!-- Giá -->
-                            <div class="mb-2">
-                                <label>Giá</label>
-                                <input type="number" name="price" class="form-control" value="{{ old('price') }}" step="0.01" required>
-                                @error('price')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-
-                            <!-- Số lượng -->
-                            <div class="mb-2">
-                                <label>Số lượng</label>
-                                <input type="number" name="quantity" class="form-control" value="{{ old('quantity') }}" required>
-                                @error('quantity')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-
-                            <!-- Kích cỡ -->
-                            <div class="mb-2">
-                                <label>Kích cỡ</label>
-                                <select name="size" class="form-select">
-                                    <option value="">-- Chọn kích cỡ --</option>
-                                    @foreach (['S', 'M', 'L', 'XL', 'XXL'] as $size)
-                                        <option value="{{ $size }}" {{ old('size') == $size ? 'selected' : '' }}>{{ $size }}</option>
-                                    @endforeach
-                                </select>
-                                @error('size')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-
-                            <!-- Màu sắc -->
-                            <div class="mb-2">
-                                <label>Màu sắc</label>
-                                <select name="color" class="form-select">
-                                    <option value="">-- Chọn màu sắc --</option>
-                                    @foreach (['red' => 'Đỏ', 'blue' => 'Xanh dương', 'green' => 'Xanh lá', 'black' => 'Đen', 'white' => 'Trắng'] as $value => $label)
-                                        <option value="{{ $value }}" {{ old('color') == $value ? 'selected' : '' }}>{{ $label }}</option>
-                                    @endforeach
-                                </select>
-                                @error('color')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-
-                            <!-- Trạng thái -->
-                            <div class="mb-2">
-                                <label>Trạng thái</label>
-                                <select name="status" class="form-select">
-                                    <option value="active" {{ old('status', 'active') == 'active' ? 'selected' : '' }}>Hiện</option>
-                                    <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Ẩn</option>
-                                </select>
-                                @error('status')
-                                    <small class="text-danger">{{ $message }}</small>
-                                @enderror
-                            </div>
-
+                <div class="col-12">
+                    <div class="page-title-box d-sm-flex align-items-center justify-content-between">
+                        <h4 class="mb-sm-0">Tạo biến thể sản phẩm</h4>
+                        <div class="page-title-right">
+                            <ol class="breadcrumb m-0">
+                                <li class="breadcrumb-item"><a href="#">Sản phẩm</a></li>
+                                <li class="breadcrumb-item active">Biến thể</li>
+                            </ol>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- end page title -->
 
-            <!-- Nút lưu -->
-            <div class="d-flex justify-content-end mb-5">
-                <button type="submit" class="btn btn-primary">Lưu biến thể</button>
-            </div>
-        </form>
+            <form action="{{ route('variants.store', ['productId' => $product->id]) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+
+                <div class="row g-4">
+                    <!-- Sản phẩm đang chọn -->
+                    <div class="col-lg-12">
+                        <h6 class="fw-semibold">Sản phẩm</h6>
+                        <input type="text" class="form-control" value="{{ $product->name }}" disabled>
+                        <input type="hidden" name="product_id" value="{{ $product->id }}">
+                    </div>
+
+                    <!-- Multi select Size -->
+                    <div class="col-lg-6">
+                        <h6 class="fw-semibold">Chọn Size</h6>
+                        <select class="js-example-basic-multiple form-select" name="size_ids[]" multiple required>
+                            @foreach ($sizes as $size)
+                                <option value="{{ $size->id }}">{{ $size->size_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Multi select Color -->
+                    <div class="col-lg-6">
+                        <h6 class="fw-semibold">Chọn Màu</h6>
+                        <select class="js-example-basic-multiple form-select" name="color_ids[]" multiple required>
+                            @foreach ($colors as $color)
+                                <option value="{{ $color->id }}">{{ $color->color_name }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Các trường áp dụng chung cho mỗi biến thể -->
+                    <div class="col-lg-4">
+                        <h6 class="fw-semibold">Giá nhập</h6>
+                        <input type="number" name="import_price" class="form-control" required min="0">
+                    </div>
+                    <div class="col-lg-4">
+                        <h6 class="fw-semibold">Giá niêm yết</h6>
+                        <input type="number" name="listed_price" class="form-control" required min="0">
+                    </div>
+                    <div class="col-lg-4">
+                        <h6 class="fw-semibold">Giá bán</h6>
+                        <input type="number" name="sale_price" class="form-control" required min="0">
+                    </div>
+                    <div class="col-lg-4">
+                        <h6 class="fw-semibold">Số lượng kho</h6>
+                        <input type="number" name="stock" class="form-control" required min="0">
+                    </div>
+                    <div class="col-lg-4">
+                        <h6 class="fw-semibold">Ảnh biến thể</h6>
+                        <input type="file" name="variant_image_url" class="form-control" required accept="image/*">
+                    </div>
+
+                    <div class="col-lg-12 mt-3">
+                        <p class="text-muted fst-italic">(*) Mỗi tổ hợp màu + size sẽ tạo ra một biến thể tự động với tên dạng: <strong>Tên sản phẩm + Màu + Size</strong></p>
+                        <button type="submit" class="btn btn-primary">Tạo các biến thể</button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
-</div>
+@endsection
 
+@section('js-content')
+    <script src="{{ asset('admin/libs/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('admin/libs/simplebar/simplebar.min.js') }}"></script>
+    <script src="{{ asset('admin/libs/node-waves/waves.min.js') }}"></script>
+    <script src="{{ asset('admin/libs/feather-icons/feather.min.js') }}"></script>
+    <script src="{{ asset('admin/js/pages/plugins/lord-icon-2.1.0.js') }}"></script>
+    <script src="{{ asset('admin/js/plugins.js') }}"></script>
 
-
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="{{ asset('admin/js/pages/select2.init.js') }}"></script>
+    <script src="{{ asset('admin/js/app.js') }}"></script>
 @endsection
