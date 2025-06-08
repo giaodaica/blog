@@ -536,10 +536,16 @@
                                     data-key="t-horizontal">Biến thể sản phẩm</a>
                             </li>
                         </ul>
-                           <ul class="nav nav-sm flex-column">
+                          <ul class="nav nav-sm flex-column">
                             <li class="nav-item">
-                                <a href="{{ url("dashboard/images") }}"  class="nav-link"
-                                    data-key="t-horizontal">Hình ảnh</a>
+                                <a href="{{ url("dashboard/sizes") }}"  class="nav-link"
+                                    data-key="t-horizontal">Biến thể kích thước</a>
+                            </li>
+                        </ul>
+                          <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="{{ url("dashboard/colors") }}"  class="nav-link"
+                                    data-key="t-horizontal">Biến thể màu</a>
                             </li>
                         </ul>
                     </div>
