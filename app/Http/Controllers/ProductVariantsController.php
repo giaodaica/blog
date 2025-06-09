@@ -48,7 +48,7 @@ class ProductVariantsController extends Controller
 
     // Ảnh biến thể cho từng màu
     'variant_images' => 'required|array|min:1',
-    'variant_images.*' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+    'variant_images.*' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
 
     'is_show' => 'nullable|boolean',
 ], [
@@ -83,7 +83,7 @@ class ProductVariantsController extends Controller
     'variant_images.array' => 'Ảnh biến thể phải là mảng.',
     'variant_images.min' => 'Bạn phải chọn ít nhất một ảnh cho biến thể.',
     'variant_images.*.image' => 'Mỗi ảnh phải là file ảnh hợp lệ.',
-    'variant_images.*.mimes' => 'Ảnh chỉ được chấp nhận định dạng jpg, jpeg, png.',
+    'variant_images.*.mimes' => 'Ảnh chỉ được chấp nhận định dạng jpg, jpeg, png, webp.',
     'variant_images.*.max' => 'Kích thước ảnh không được vượt quá 2MB.',
 
     'is_show.boolean' => 'Trạng thái hiển thị không hợp lệ.',
@@ -182,7 +182,7 @@ foreach ($request->color_ids as $colorId) {
             'listed_price' => 'required|numeric|min:0',
             'sale_price' => 'required|numeric|min:0|lte:listed_price',
             'stock' => 'required|integer|min:0',
-            'variant_image_url' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'variant_image_url' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'is_show' => 'nullable|boolean',
         ], [
             'name.required' => 'Tên biến thể không được để trống.',
@@ -216,7 +216,7 @@ foreach ($request->color_ids as $colorId) {
             'stock.min' => 'Số lượng kho không được nhỏ hơn 0.',
 
             'variant_image_url.image' => 'Ảnh phải là file ảnh hợp lệ.',
-            'variant_image_url.mimes' => 'Ảnh chỉ được chấp nhận định dạng jpg, jpeg, png.',
+            'variant_image_url.mimes' => 'Ảnh chỉ được chấp nhận định dạng jpg, jpeg, png, webp.',
             'variant_image_url.max' => 'Kích thước ảnh không được vượt quá 2MB.',
 
             'is_show.boolean' => 'Trạng thái hiển thị không hợp lệ.',
