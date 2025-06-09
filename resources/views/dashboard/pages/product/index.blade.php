@@ -95,7 +95,9 @@
                                     <thead class="table-light">
                                         <tr>
                                             <th scope="col">#</th>
+                        
                                             <th scope="col">Tên sản phẩm</th>
+                                            
                                             <th scope="col">Slug</th>
                                             <th scope="col">Danh mục</th>
                                             <th scope="col">Hành động</th>
@@ -109,9 +111,9 @@
                                                 <td>
                                                     <div class="d-flex align-items-center">
                                                         <div class="flex-shrink-0 me-3">
-                                                            <div class="avatar-sm bg-light rounded p-1 mb-3">
+                                                            <div class="avatar-sm bg-light rounded p-1" style="width: 100px; height: 100px; overflow: hidden;">
                                                                 <img src="{{ asset( $product->image_url) }}"
-                                                                    alt="{{ $product->name }}" class="img-fluid d-block">
+                                                                    alt="{{ $product->name }}" class="img-fluid d-block" >
                                                             </div>
                                                         </div>
                                                         <div class="flex-grow-1">

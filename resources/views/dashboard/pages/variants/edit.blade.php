@@ -92,7 +92,7 @@
                     <div class="col-lg-4">
                         <h6 class="fw-semibold">Giá nhập</h6>
                         <input type="number" name="import_price" class="form-control" min="0"
-                            value="{{ old('import_price', number_format($variant->import_price, 0)) }}">
+                            value="{{ old('import_price', intval($variant->import_price)) }}">
                         @error('import_price')
                             <div class="text-danger mt-1">{{ $message }}</div>
                         @enderror
@@ -101,7 +101,7 @@
                     <div class="col-lg-4">
                         <h6 class="fw-semibold">Giá niêm yết</h6>
                         <input type="number" name="listed_price" class="form-control" min="0"
-                            value="{{ old('listed_price', number_format($variant->listed_price, 0)) }}">
+                            value="{{ old('listed_price', intval($variant->listed_price)) }}">
                         @error('listed_price')
                             <div class="text-danger mt-1">{{ $message }}</div>
                         @enderror
@@ -110,7 +110,7 @@
                     <div class="col-lg-4">
                         <h6 class="fw-semibold">Giá bán</h6>
                         <input type="number" name="sale_price" class="form-control" min="0"
-                            value="{{ old('sale_price', number_format($variant->sale_price)) }}">
+                            value="{{ old('sale_price', intval($variant->sale_price)) }}">
                         @error('sale_price')
                             <div class="text-danger mt-1">{{ $message }}</div>
                         @enderror
