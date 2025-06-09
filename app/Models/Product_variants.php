@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\ProductVariantsFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product_variants extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes; use HasFactory;
 
     protected $fillable = [
         'product_id',
@@ -36,18 +38,6 @@ class Product_variants extends Model
     {
         return $this->belongsTo(Size::class, 'size_id');
     }
-    public function getFormattedImportPriceAttribute()
-    {
-        return number_format($this->import_price, 0);
-    }
 
-    public function getFormattedListedPriceAttribute()
-    {
-        return number_format($this->listed_price, 0);
-    }
-
-    public function getFormattedSalePriceAttribute()
-    {
-        return number_format($this->sale_price, 0);
-    }
 }
+

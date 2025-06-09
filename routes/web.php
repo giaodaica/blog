@@ -52,6 +52,8 @@ Route::get('auth/callback/google', [GoogleController::class, 'handleGoogleCallba
 // client voucher
 Route::post('accept_voucher/{id}', [VouchersController::class, 'accept_voucher'])->middleware('auth');
 
+Route::post('change-password', [ChangepasswordController::class, 'changePassword'])->name('change-password');
+Route::put('update-profile', [InfoController::class, 'updateProfile'])->name('update-profile');
 
 
 
