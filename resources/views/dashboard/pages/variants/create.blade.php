@@ -19,7 +19,8 @@
             </div>
             <!-- end page title -->
 
-            <form action="{{ route('variants.store', ['productId' => $product->id]) }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('variants.store', ['productId' => $product->id]) }}" method="POST"
+                enctype="multipart/form-data">
                 @csrf
 
                 <!-- Hiển thị lỗi chung -->
@@ -46,7 +47,8 @@
                         <h6 class="fw-semibold">Chọn Size</h6>
                         <select class="js-example-basic-multiple form-select" name="size_ids[]" multiple>
                             @foreach ($sizes as $size)
-                                <option value="{{ $size->id }}" {{ (collect(old('size_ids'))->contains($size->id)) ? 'selected' : '' }}>
+                                <option value="{{ $size->id }}"
+                                    {{ collect(old('size_ids'))->contains($size->id) ? 'selected' : '' }}>
                                     {{ $size->size_name }}
                                 </option>
                             @endforeach
@@ -61,7 +63,8 @@
                         <h6 class="fw-semibold">Chọn Màu</h6>
                         <select class="js-example-basic-multiple form-select" name="color_ids[]" multiple>
                             @foreach ($colors as $color)
-                                <option value="{{ $color->id }}" {{ (collect(old('color_ids'))->contains($color->id)) ? 'selected' : '' }}>
+                                <option value="{{ $color->id }}"
+                                    {{ collect(old('color_ids'))->contains($color->id) ? 'selected' : '' }}>
                                     {{ $color->color_name }}
                                 </option>
                             @endforeach
@@ -74,7 +77,8 @@
                     <!-- Các trường áp dụng chung cho mỗi biến thể -->
                     <div class="col-lg-4">
                         <h6 class="fw-semibold">Giá nhập</h6>
-                        <input type="number" name="import_price" class="form-control" min="0" value="{{ old('import_price') }}">
+                        <input type="number" name="import_price" class="form-control" min="0"
+                            value="{{ old('import_price') }}">
                         @error('import_price')
                             <div class="text-danger mt-1">{{ $message }}</div>
                         @enderror
@@ -82,7 +86,8 @@
 
                     <div class="col-lg-4">
                         <h6 class="fw-semibold">Giá niêm yết</h6>
-                        <input type="number" name="listed_price" class="form-control" min="0" value="{{ old('listed_price') }}">
+                        <input type="number" name="listed_price" class="form-control" min="0"
+                            value="{{ old('listed_price') }}">
                         @error('listed_price')
                             <div class="text-danger mt-1">{{ $message }}</div>
                         @enderror
@@ -90,7 +95,8 @@
 
                     <div class="col-lg-4">
                         <h6 class="fw-semibold">Giá bán</h6>
-                        <input type="number" name="sale_price" class="form-control" min="0" value="{{ old('sale_price') }}">
+                        <input type="number" name="sale_price" class="form-control" min="0"
+                            value="{{ old('sale_price') }}">
                         @error('sale_price')
                             <div class="text-danger mt-1">{{ $message }}</div>
                         @enderror
@@ -98,24 +104,30 @@
 
                     <div class="col-lg-4">
                         <h6 class="fw-semibold">Số lượng kho</h6>
-                        <input type="number" name="stock" class="form-control" min="0" value="{{ old('stock') }}">
+                        <input type="number" name="stock" class="form-control" min="0"
+                            value="{{ old('stock') }}">
                         @error('stock')
                             <div class="text-danger mt-1">{{ $message }}</div>
                         @enderror
                     </div>
 
                     <div class="col-lg-12">
-                        <h6 class="fw-semibold">Ảnh biến thể theo màu</h6>
+                        <h6 class="fw-semibold">Ảnh biến thể theo Màu</h6>
+
                         @foreach ($colors as $color)
                             <div class="mb-3">
-                                <label for="variant_images_{{ $color->id }}">Ảnh cho màu: {{ $color->color_name }}</label>
-                                <input type="file" name="variant_images[{{ $color->id }}]" class="form-control" accept="image/*" id="variant_images_{{ $color->id }}">
+                                <label for="variant_images_{{ $color->id }}">
+                                    Ảnh cho màu: {{ $color->color_name }}
+                                </label>
+                                <input type="file" name="variant_images[{{ $color->id }}]" class="form-control"
+                                    accept="image/*" id="variant_images_{{ $color->id }}">
                                 @error('variant_images.' . $color->id)
                                     <div class="text-danger mt-1">{{ $message }}</div>
                                 @enderror
                             </div>
                         @endforeach
                     </div>
+
 
                     <div class="col-lg-12 mt-3">
                         <p class="text-muted fst-italic">(*) Mỗi tổ hợp màu + size sẽ tạo ra một biến thể tự động với tên

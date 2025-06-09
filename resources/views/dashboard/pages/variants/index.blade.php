@@ -114,10 +114,10 @@
                                                 <td>{{ $index + 1 }}</td>
                                                 <td class="fw-semibold">{{ $variant->name }}</td>
                                                 <td>
-                                                    <div class="avatar-sm bg-light rounded p-1">
+                                                    <div class="avatar-sm bg-light rounded p-1 mb-3">
                                                         <img src="{{ $variant->variant_image_url ? asset($variant->variant_image_url) : asset('storage/no-image.png') }}"
                                                             alt="{{ $variant->name }}" class="img-fluid d-block rounded"
-                                                            width="50" height="50">
+                                                            width="50" height="50" >
                                                     </div>
                                                 </td>
                                                 <td>{{ number_format($variant->import_price, 0, ',', '.') }} đ</td>
