@@ -18,99 +18,117 @@ class CategoriesController extends Controller
         return view('dashboard.pages.categories.create');
     }
 
-public function store(Request $request)
-{
-    $request->validate([
-        'name' => 'required|unique:categories,name',
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
-        'status' => 'required|in:0,1',
-    ]);
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|unique:categories,name',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'status' => 'required|in:0,1',
+        ], [
+            'name.required' => 'Tên danh mục không được để trống.',
+            'name.unique' => 'Tên danh mục đã tồn tại.',
 
-    $data = $request->only('name', 'status');
+            'image.image' => 'Ảnh phải là file ảnh hợp lệ.',
+            'image.mimes' => 'Ảnh chỉ được chấp nhận định dạng jpeg, png, jpg, gif, svg, webp.',
+            'image.max' => 'Kích thước ảnh không được vượt quá 2MB.',
 
-    if ($request->hasFile('image')) {
-        $file = $request->file('image');
-        $filename = time() . '.' . $file->getClientOriginalExtension();
-        $file->move(public_path('uploads/categories'), $filename);
-        $data['image'] = 'uploads/categories/' . $filename;
-    }
+            'status.required' => 'Trạng thái không được để trống.',
+            'status.in' => 'Trạng thái không hợp lệ. Chỉ được chọn 0 hoặc 1.',
+        ]);
 
-    Categories::create($data);
+        $data = $request->only('name', 'status');
 
-    return redirect()->route('categories.index')->with('success', 'Thêm danh mục thành công!');
-}
-
-public function update(Request $request, $id)
-{
-    $category = Categories::findOrFail($id);
-
-    $request->validate([
-        'name' => 'required|unique:categories,name,' . $id,
-        'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
-        'status' => 'required|in:0,1',
-    ]);
-
-    $data = $request->only('name', 'status');
-
-    if ($request->hasFile('image')) {
-        if ($category->image && file_exists(public_path($category->image))) {
-            unlink(public_path($category->image));
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/categories'), $filename);
+            $data['image'] = 'uploads/categories/' . $filename;
         }
 
-        $file = $request->file('image');
-        $filename = time() . '.' . $file->getClientOriginalExtension();
-        $file->move(public_path('uploads/categories'), $filename);
-        $data['image'] = 'uploads/categories/' . $filename;
+        Categories::create($data);
+
+        return redirect()->route('categories.index')->with('success', 'Thêm danh mục thành công!');
     }
 
-    $category->update($data);
+    public function update(Request $request, $id)
+    {
+        $category = Categories::findOrFail($id);
 
-    return redirect()->route('categories.index')->with('success', 'Cập nhật danh mục thành công!');
-}
+        $request->validate([
+            'name' => 'required|unique:categories,name,' . $id,
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg,webp|max:2048',
+            'status' => 'required|in:0,1',
+        ], [
+            'name.required' => 'Tên danh mục không được để trống.',
+            'name.unique' => 'Tên danh mục đã tồn tại.',
 
-// {
-//     $category = Categories::findOrFail($id);
+            'image.image' => 'Ảnh phải là file ảnh hợp lệ.',
+            'image.mimes' => 'Ảnh chỉ được chấp nhận định dạng jpeg, png, jpg, gif, svg, webp.',
+            'image.max' => 'Kích thước ảnh không được vượt quá 2MB.',
 
-//     $request->validate([
-//         'name' => 'required|unique:categories,name,' . $id,
-//         'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-//         'status' => 'required|in:0,1',
-//     ]);
+            'status.required' => 'Trạng thái không được để trống.',
+            'status.in' => 'Trạng thái không hợp lệ. Chỉ được chọn 0 hoặc 1.',
+        ]);
 
-//     $data = $request->all();
+        $data = $request->only('name', 'status');
 
-//     if ($request->hasFile('image')) {
-//         // Xóa ảnh cũ nếu có
-//         if ($category->image && \Storage::disk('public')->exists($category->image)) {
-//             \Storage::disk('public')->delete($category->image);
-//         }
+        if ($request->hasFile('image')) {
+            if ($category->image && file_exists(public_path($category->image))) {
+                unlink(public_path($category->image));
+            }
 
-//         // Lưu ảnh mới
-//         $path = $request->file('image')->store('categories', 'public');
-//         $data['image'] = $path;
-//     }
+            $file = $request->file('image');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/categories'), $filename);
+            $data['image'] = 'uploads/categories/' . $filename;
+        }
 
-//     $category->update($data);
+        $category->update($data);
 
-//     return redirect()->route('categories.index')->with('success', 'Cập nhật danh mục thành công!');
-// }
+        return redirect()->route('categories.index')->with('success', 'Cập nhật danh mục thành công!');
+    }
+
+    // {
+    //     $category = Categories::findOrFail($id);
+
+    //     $request->validate([
+    //         'name' => 'required|unique:categories,name,' . $id,
+    //         'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+    //         'status' => 'required|in:0,1',
+    //     ]);
+
+    //     $data = $request->all();
+
+    //     if ($request->hasFile('image')) {
+    //         // Xóa ảnh cũ nếu có
+    //         if ($category->image && \Storage::disk('public')->exists($category->image)) {
+    //             \Storage::disk('public')->delete($category->image);
+    //         }
+
+    //         // Lưu ảnh mới
+    //         $path = $request->file('image')->store('categories', 'public');
+    //         $data['image'] = $path;
+    //     }
+
+    //     $category->update($data);
+
+    //     return redirect()->route('categories.index')->with('success', 'Cập nhật danh mục thành công!');
+    // }
 
 
     public function show($id)
     {
         $category = Categories::findOrFail($id);
         return view('dashboard.pages.categories.show', compact('category'));
-    
     }
 
     public function edit($id)
     {
         $category = Categories::findOrFail($id);
         return view('dashboard.pages.categories.edit', compact('category'));
- 
     }
 
-   
+
 
     public function destroy($id)
     {

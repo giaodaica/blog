@@ -533,19 +533,19 @@
                         <ul class="nav nav-sm flex-column">
                             <li class="nav-item">
                                 <a href="{{ url("dashboard/variants") }}"  class="nav-link"
-                                    data-key="t-horizontal">Biến thể sản phẩm</a>
+                                    data-key="t-horizontal">Sản phẩm</a>
                             </li>
                         </ul>
                           <ul class="nav nav-sm flex-column">
                             <li class="nav-item">
                                 <a href="{{ url("dashboard/sizes") }}"  class="nav-link"
-                                    data-key="t-horizontal">Biến thể kích thước</a>
+                                    data-key="t-horizontal">Kích thước</a>
                             </li>
                         </ul>
                           <ul class="nav nav-sm flex-column">
                             <li class="nav-item">
                                 <a href="{{ url("dashboard/colors") }}"  class="nav-link"
-                                    data-key="t-horizontal">Biến thể màu</a>
+                                    data-key="t-horizontal">Màu</a>
                             </li>
                         </ul>
                     </div>

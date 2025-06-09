@@ -22,6 +22,17 @@
             <form action="{{ route('variants.store', ['productId' => $product->id]) }}" method="POST" enctype="multipart/form-data">
                 @csrf
 
+                <!-- Hiển thị lỗi chung -->
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <div class="row g-4">
                     <!-- Sản phẩm đang chọn -->
                     <div class="col-lg-12">
@@ -33,50 +44,86 @@
                     <!-- Multi select Size -->
                     <div class="col-lg-6">
                         <h6 class="fw-semibold">Chọn Size</h6>
-                        <select class="js-example-basic-multiple form-select" name="size_ids[]" multiple required>
+                        <select class="js-example-basic-multiple form-select" name="size_ids[]" multiple>
                             @foreach ($sizes as $size)
-                                <option value="{{ $size->id }}">{{ $size->size_name }}</option>
+                                <option value="{{ $size->id }}" {{ (collect(old('size_ids'))->contains($size->id)) ? 'selected' : '' }}>
+                                    {{ $size->size_name }}
+                                </option>
                             @endforeach
                         </select>
+                        @error('size_ids')
+                            <div class="text-danger mt-1">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <!-- Multi select Color -->
                     <div class="col-lg-6">
                         <h6 class="fw-semibold">Chọn Màu</h6>
-                        <select class="js-example-basic-multiple form-select" name="color_ids[]" multiple required>
+                        <select class="js-example-basic-multiple form-select" name="color_ids[]" multiple>
                             @foreach ($colors as $color)
-                                <option value="{{ $color->id }}">{{ $color->color_name }}</option>
+                                <option value="{{ $color->id }}" {{ (collect(old('color_ids'))->contains($color->id)) ? 'selected' : '' }}>
+                                    {{ $color->color_name }}
+                                </option>
                             @endforeach
                         </select>
+                        @error('color_ids')
+                            <div class="text-danger mt-1">{{ $message }}</div>
+                        @enderror
                     </div>
 
                     <!-- Các trường áp dụng chung cho mỗi biến thể -->
                     <div class="col-lg-4">
                         <h6 class="fw-semibold">Giá nhập</h6>
-                        <input type="number" name="import_price" class="form-control" required min="0">
+                        <input type="number" name="import_price" class="form-control" min="0" value="{{ old('import_price') }}">
+                        @error('import_price')
+                            <div class="text-danger mt-1">{{ $message }}</div>
+                        @enderror
                     </div>
+
                     <div class="col-lg-4">
                         <h6 class="fw-semibold">Giá niêm yết</h6>
-                        <input type="number" name="listed_price" class="form-control" required min="0">
+                        <input type="number" name="listed_price" class="form-control" min="0" value="{{ old('listed_price') }}">
+                        @error('listed_price')
+                            <div class="text-danger mt-1">{{ $message }}</div>
+                        @enderror
                     </div>
+
                     <div class="col-lg-4">
                         <h6 class="fw-semibold">Giá bán</h6>
-                        <input type="number" name="sale_price" class="form-control" required min="0">
+                        <input type="number" name="sale_price" class="form-control" min="0" value="{{ old('sale_price') }}">
+                        @error('sale_price')
+                            <div class="text-danger mt-1">{{ $message }}</div>
+                        @enderror
                     </div>
+
                     <div class="col-lg-4">
                         <h6 class="fw-semibold">Số lượng kho</h6>
-                        <input type="number" name="stock" class="form-control" required min="0">
+                        <input type="number" name="stock" class="form-control" min="0" value="{{ old('stock') }}">
+                        @error('stock')
+                            <div class="text-danger mt-1">{{ $message }}</div>
+                        @enderror
                     </div>
-                    <div class="col-lg-4">
-                        <h6 class="fw-semibold">Ảnh biến thể</h6>
-                        <input type="file" name="variant_image_url" class="form-control" required accept="image/*">
+
+                    <div class="col-lg-12">
+                        <h6 class="fw-semibold">Ảnh biến thể theo màu</h6>
+                        @foreach ($colors as $color)
+                            <div class="mb-3">
+                                <label for="variant_images_{{ $color->id }}">Ảnh cho màu: {{ $color->color_name }}</label>
+                                <input type="file" name="variant_images[{{ $color->id }}]" class="form-control" accept="image/*" id="variant_images_{{ $color->id }}">
+                                @error('variant_images.' . $color->id)
+                                    <div class="text-danger mt-1">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        @endforeach
                     </div>
 
                     <div class="col-lg-12 mt-3">
-                        <p class="text-muted fst-italic">(*) Mỗi tổ hợp màu + size sẽ tạo ra một biến thể tự động với tên dạng: <strong>Tên sản phẩm + Màu + Size</strong></p>
+                        <p class="text-muted fst-italic">(*) Mỗi tổ hợp màu + size sẽ tạo ra một biến thể tự động với tên
+                            dạng: <strong>Tên sản phẩm + Màu + Size</strong></p>
                         <button type="submit" class="btn btn-primary">Tạo các biến thể</button>
                     </div>
                 </div>
+
             </form>
         </div>
     </div>
