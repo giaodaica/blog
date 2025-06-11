@@ -62,7 +62,7 @@ class HomeController extends Controller
     {
         return view('dashboard.index');
     }
-    public function shop(){
-        return view('pages.shop.shop');
-    }
+    // public function shop(){
+    //     return view('pages.shop.shop');
+    // }
 }

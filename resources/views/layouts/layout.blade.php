@@ -7,6 +7,7 @@
     }
 </style>
     @yield('cdn-custom')
+    @stack('styles')
 
 {{-- @vite(['resources/js/app.js']) --}}
     <body data-mobile-nav-style="classic">
@@ -89,6 +90,7 @@
         <!-- end scroll progress -->
         <!-- javascript libraries -->
         @include('card.js')
+        @stack('scripts')
 @yield('js-page-custom')
     </body>
 </html>
