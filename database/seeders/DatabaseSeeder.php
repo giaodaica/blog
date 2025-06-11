@@ -29,12 +29,11 @@ class DatabaseSeeder extends Seeder
         //     'answer' => 'Shop hoạt động từ 8h đến 17h, từ thứ 2 đến thứ 7.'
         // ]);
         $this->call([
-        ColorsSeeder::class,
-    SizesSeeder::class,
-    CategoriesSeeder::class,
-    ProductsSeeder::class,
-    ProductVariantsSeeder::class,
-    ]);
-
+            ColorsSeeder::class,
+            SizesSeeder::class,
+            CategoriesSeeder::class,
+            ProductsSeeder::class,
+            ProductVariantsSeeder::class,
+        ]);
     }
 }

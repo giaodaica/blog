@@ -7,7 +7,7 @@
                     <div class="container h-100">
                         <div class="row align-items-center h-100 justify-content-start">
                             <div class="col-md-10 position-relative text-white d-flex flex-column justify-content-center h-100">
-                                <div data-anime='{ "opacity": [0, 1], "translateY": [50, 0], "easing": "easeOutQuad", "duration": 500, "delay": 300 }' class="alt-font text-dark-gray mb-25px fs-20 sm-mb-15px"><span class="text-highlight">Discount on selected collection!<span class="bg-base-color h-8px bottom-0px"></span></span></div>
+                                <div data-anime='{ "opacity": [0, 1], "translateY": [50, 0], "easing": "easeOutQuad", "duration": 500, "delay": 300 }' class="alt-font text-dark-gray mb-25px fs-20 sm-mb-15px"><span class="text-highlight">Giảm giá cho bộ sưu tập đã chọn!<span class="bg-base-color h-8px bottom-0px"></span></span></div>
                                 <div class="alt-font fs-120 xs-fs-95 lh-100 mb-40px text-dark-gray fw-600 transform-origin-right ls-minus-5px sm-mb-25px" data-anime='{ "el": "childs", "rotateX": [90, 0], "opacity": [0,1], "staggervalue": 150, "easing": "easeOutQuad" }'>
                                     <span class="d-block">Women's</span>
                                     <span class="d-block fw-300">collection</span>
@@ -27,7 +27,7 @@
                     <div class="container h-100">
                         <div class="row align-items-center h-100 justify-content-start">
                             <div class="col-md-10 position-relative text-white d-flex flex-column justify-content-center h-100">
-                                <div data-anime='{ "opacity": [0, 1], "translateY": [50, 0], "easing": "easeOutQuad", "duration": 500, "delay": 300 }' class="alt-font text-dark-gray mb-25px fs-20 sm-mb-15px"><span class="text-highlight">Discount on selected collection!<span class="bg-base-color h-8px bottom-0px"></span></span></div>
+                                <div data-anime='{ "opacity": [0, 1], "translateY": [50, 0], "easing": "easeOutQuad", "duration": 500, "delay": 300 }' class="alt-font text-dark-gray mb-25px fs-20 sm-mb-15px"><span class="text-highlight">Giảm giá cho bộ sưu tập đã chọn!<span class="bg-base-color h-8px bottom-0px"></span></span></div>
                                 <div class="alt-font fs-120 xs-fs-95 lh-100 mb-40px text-dark-gray fw-600 transform-origin-right ls-minus-5px sm-mb-25px" data-anime='{ "el": "childs", "rotateX": [90, 0], "opacity": [0,1], "staggervalue": 150, "easing": "easeOutQuad" }'>
                                     <span class="d-block">Men's</span>
                                     <span class="d-block fw-300">collection</span>
@@ -47,7 +47,7 @@
                     <div class="container h-100">
                         <div class="row align-items-center h-100 justify-content-start">
                             <div class="col-md-10 position-relative text-white d-flex flex-column justify-content-center h-100">
-                                <div data-anime='{ "opacity": [0, 1], "translateY": [50, 0], "easing": "easeOutQuad", "duration": 500, "delay": 300 }' class="alt-font text-dark-gray mb-25px fs-20 sm-mb-15px"><span class="text-highlight">Discount on selected collection!<span class="bg-base-color h-8px bottom-0px"></span></span></div>
+                                <div data-anime='{ "opacity": [0, 1], "translateY": [50, 0], "easing": "easeOutQuad", "duration": 500, "delay": 300 }' class="alt-font text-dark-gray mb-25px fs-20 sm-mb-15px"><span class="text-highlight">Giảm giá cho bộ sưu tập đã chọn!<span class="bg-base-color h-8px bottom-0px"></span></span></div>
                                 <div class="alt-font fs-120 xs-fs-95 lh-100 mb-40px text-dark-gray fw-600 transform-origin-right ls-minus-5px sm-mb-25px" data-anime='{ "el": "childs", "rotateX": [90, 0], "opacity": [0,1], "staggervalue": 150, "easing": "easeOutQuad" }'>
                                     <span class="d-block">Children's</span>
                                     <span class="d-block fw-300">collection</span>
