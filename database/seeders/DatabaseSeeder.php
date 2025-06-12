@@ -48,12 +48,14 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->call([
+
         ColorsSeeder::class,
     SizesSeeder::class,
     CategoriesSeeder::class,
     ProductsSeeder::class,
     ProductVariantsSeeder::class,
     ]);
+
 
 
     }
