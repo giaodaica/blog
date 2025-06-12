@@ -126,4 +126,6 @@ return [
     'verification' => [
         'expire' => 5, 
     ],
+
+    
 ];

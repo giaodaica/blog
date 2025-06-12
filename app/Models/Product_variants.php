@@ -12,9 +12,16 @@ class Product_variants extends Model
     use SoftDeletes; use HasFactory;
 
     protected $fillable = [
-        'product_id', 'color_id', 'size_id', 'name',
-        'variant_image_url', 'import_price', 'listed_price',
-        'sale_price', 'stock', 'is_show'
+        'product_id',
+        'color_id',
+        'size_id',
+        'name',
+        'variant_image_url',
+        'import_price',
+        'listed_price',
+        'sale_price',
+        'stock',
+        'is_show'
     ];
 
     public function product()

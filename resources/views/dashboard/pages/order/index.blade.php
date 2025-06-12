@@ -185,7 +185,7 @@
                                                             class="fw-medium link-primary">{{ $render_order->code_order }}</a>
                                                     </td>
                                                     <td class="product_name">{{ $render_order->name }}</td>
-                                                    <td class="date">{{ $render_order->created_at }}</small></td>
+                                                    <td class="date">{{ formatDate($render_order->created_at) }}</small></td>
                                                     <td class="amount">{{ number_format($render_order->final_amount) }}
                                                     </td>
                                                     <td class="payment">{{ $render_order->pay_method }}</td>
