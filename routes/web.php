@@ -13,6 +13,9 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ProductVariantsController;
 use App\Http\Controllers\SizeController;
+use App\Http\Controllers\Spatie\PermissionController;
+use App\Http\Controllers\Spatie\RoleController;
+use App\Http\Controllers\Spatie\UserRoleController;
 use App\Http\Controllers\VouchersController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -88,4 +91,15 @@ Route::prefix('dashboard')->group(function () {
     Route::get('variants/{id}/edit', [ProductVariantsController::class, 'edit'])->name('variants.edit');
     Route::put('variants/{id}/update', [ProductVariantsController::class, 'update'])->name('variants.update');
     Route::delete('variants/{id}', [ProductVariantsController::class, 'destroy'])->name('variants.destroy');
+
+
+    
+});
+
+Route::prefix('dashboard')->name('dashboard.')->group(function () {
+// Phân quyền
+    Route::resource('roles', RoleController::class);
+    Route::resource('permissions', PermissionController::class);
+    Route::post('roles/order', [RoleController::class, 'order'])->name('roles.order');
+    //  Route::post('permission/order', [RoleController::class, 'order'])->name('permission.order');
 });

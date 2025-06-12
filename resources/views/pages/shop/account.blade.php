@@ -172,7 +172,7 @@
                                                 <div class="card border-0 shadow-sm">
                                                     <div class="card-body">
                                                         <h6 class="text-primary text-uppercase fs-5 mb-4">Đổi mật khẩu</h6>
-                                                        <form action="{{ route('change-password') }}" method="POST">
+                                                        <form action="" method="POST">
                                                             @csrf
                                                             
                                                             <div class="row g-3">

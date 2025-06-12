@@ -6,6 +6,8 @@ use App\Models\BotQA;
 use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class DatabaseSeeder extends Seeder
 {
@@ -28,6 +30,23 @@ class DatabaseSeeder extends Seeder
         //     'keywords' => 'giờ,làm việc,thời gian',
         //     'answer' => 'Shop hoạt động từ 8h đến 17h, từ thứ 2 đến thứ 7.'
         // ]);
+
+        $role=  Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
+        $user = User::create([
+            'name' => 'Minh Dang',
+            'email' => 'minhdang15092002@gmail.com',
+            'password' => Hash::make('12345678'), 
+            'default_address' => 'Hà Nội',
+            'default_phone' => '0912345678',
+            'role' => 'guest',
+            'status' => 'active',
+        ]);
+
+        // Gán vai trò cho user
+        if (!$user->hasRole('admin')) {
+            $user->assignRole($role);
+        }
+
         $this->call([
         ColorsSeeder::class,
     SizesSeeder::class,
@@ -35,6 +54,7 @@ class DatabaseSeeder extends Seeder
     ProductsSeeder::class,
     ProductVariantsSeeder::class,
     ]);
+
 
     }
 }

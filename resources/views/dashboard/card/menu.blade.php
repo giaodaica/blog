@@ -2,7 +2,7 @@
     <!-- LOGO -->
     <div class="navbar-brand-box">
         <!-- Dark Logo-->
-        <a href="{{url('dashboard')}}" class="logo logo-dark">
+        <a href="{{ url('dashboard') }}" class="logo logo-dark">
             <span class="logo-sm">
                 <img src="{{ asset('admin/images/logo-sm.png') }}" alt="" height="22">
             </span>
@@ -11,7 +11,7 @@
             </span>
         </a>
         <!-- Light Logo-->
-        <a href="{{url('dashboard')}}" class="logo logo-light">
+        <a href="{{ url('dashboard') }}" class="logo logo-light">
             <span class="logo-sm">
                 <img src="{{ asset('admin/images/logo-sm.png') }}" alt="" height="22">
             </span>
@@ -40,14 +40,15 @@
                     <div class="collapse menu-dropdown" id="sidebarDashboards">
                         <ul class="nav nav-sm flex-column">
                             <li class="nav-item">
-                                <a href="{{route('dashboard.order')}}" class="nav-link" data-key="t-analytics"> Danh sách
+                                <a href="{{ route('dashboard.order') }}" class="nav-link" data-key="t-analytics"> Danh
+                                    sách
                                 </a>
                             </li>
                             <li class="nav-item">
                                 <a href="dashboard-crm.html" class="nav-link" data-key="t-crm"> CRM </a>
                             </li>
                             <li class="nav-item">
-                                <a href="{{url('dashboard')}}" class="nav-link" data-key="t-ecommerce"> Ecommerce </a>
+                                <a href="{{ url('dashboard') }}" class="nav-link" data-key="t-ecommerce"> Ecommerce </a>
                             </li>
                             <li class="nav-item">
                                 <a href="dashboard-crypto.html" class="nav-link" data-key="t-crypto"> Crypto </a>
@@ -509,46 +510,60 @@
                     </ul>
                 </div>
                 <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Product</span></li>
-                 <a class="nav-link menu-link" href="#sidebarProducts" data-bs-toggle="collapse" role="button"
-                        aria-expanded="false" aria-controls="sidebarProducts">
-                        <i class="ri-layout-3-line"></i> <span data-key="t-layouts">Danh sách</span>
-                    </a>
-                    <div class="collapse menu-dropdown" id="sidebarProducts">
-                        <ul class="nav nav-sm flex-column">
-                            <li class="nav-item">
-                                <a href="{{ url("dashboard/products") }}"  class="nav-link"
-                                    data-key="t-horizontal">Quản lý sản phẩm</a>
-                            </li>
-                          <li class="nav-item">
-                                <a href="{{ url("dashboard/categories") }}"  class="nav-link"
-                                    data-key="t-horizontal">Quản lý danh mục</a>
-                            </li>
-                        </ul>
-                    </div>
-                   <a class="nav-link menu-link" href="#sidebarAttributes" data-bs-toggle="collapse" role="button"
-                        aria-expanded="false" aria-controls="sidebarAttributes">
-                        <i class="ri-layout-3-line"></i> <span data-key="t-layouts">Biến thể</span>
-                    </a>
-                    <div class="collapse menu-dropdown" id="sidebarAttributes">
-                        <ul class="nav nav-sm flex-column">
-                            <li class="nav-item">
-                                <a href="{{ url("dashboard/variants") }}"  class="nav-link"
-                                    data-key="t-horizontal">Biến thể sản phẩm</a>
-                            </li>
-                        </ul>
-                          <ul class="nav nav-sm flex-column">
-                            <li class="nav-item">
-                                <a href="{{ url("dashboard/sizes") }}"  class="nav-link"
-                                    data-key="t-horizontal">Biến thể kích thước</a>
-                            </li>
-                        </ul>
-                          <ul class="nav nav-sm flex-column">
-                            <li class="nav-item">
-                                <a href="{{ url("dashboard/colors") }}"  class="nav-link"
-                                    data-key="t-horizontal">Biến thể màu</a>
-                            </li>
-                        </ul>
-                    </div>
+                <a class="nav-link menu-link" href="#sidebarProducts" data-bs-toggle="collapse" role="button"
+                    aria-expanded="false" aria-controls="sidebarProducts">
+                    <i class="ri-layout-3-line"></i> <span data-key="t-layouts">Danh sách</span>
+                </a>
+                <div class="collapse menu-dropdown" id="sidebarProducts">
+                    <ul class="nav nav-sm flex-column">
+                        <li class="nav-item">
+                            <a href="{{ url('dashboard/products') }}" class="nav-link" data-key="t-horizontal">Quản
+                                lý sản phẩm</a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="{{ url('dashboard/categories') }}" class="nav-link"
+                                data-key="t-horizontal">Quản lý danh mục</a>
+                        </li>
+                    </ul>
+                </div>
+                <a class="nav-link menu-link" href="#sidebarAttributes" data-bs-toggle="collapse" role="button"
+                    aria-expanded="false" aria-controls="sidebarAttributes">
+                    <i class="ri-layout-3-line"></i> <span data-key="t-layouts">Biến thể</span>
+                </a>
+                <div class="collapse menu-dropdown" id="sidebarAttributes">
+                    <ul class="nav nav-sm flex-column">
+                        <li class="nav-item">
+                            <a href="{{ url('dashboard/variants') }}" class="nav-link" data-key="t-horizontal">Biến
+                                thể sản phẩm</a>
+                        </li>
+                    </ul>
+                    <ul class="nav nav-sm flex-column">
+                        <li class="nav-item">
+                            <a href="{{ url('dashboard/sizes') }}" class="nav-link" data-key="t-horizontal">Biến thể
+                                kích thước</a>
+                        </li>
+                    </ul>
+                    <ul class="nav nav-sm flex-column">
+                        <li class="nav-item">
+                            <a href="{{ url('dashboard/colors') }}" class="nav-link" data-key="t-horizontal">Biến
+                                thể màu</a>
+                        </li>
+                    </ul>
+                </div>
+
+
+                {{-- Phân quyền --}}
+                <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Phân quyền</span></li>
+                <a class="nav-link menu-link" href="{{ route('dashboard.roles.index') }}" role="button"
+                    >
+                    <i class="ri-layout-3-line"></i> <span>Vai trò người dùng</span>
+                </a>
+                <a class="nav-link menu-link" href="{{ route('dashboard.permissions.index') }}" role="button"
+                    >
+                    <i class="ri-layout-3-line"></i> <span>Quyền truy cập</span>
+                </a>
+
+
 
 
                 <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-components">Components</span>
@@ -661,6 +676,7 @@
                         </div>
                     </div>
                 </li>
+
 
                 <li class="nav-item">
                     <a class="nav-link menu-link" href="#sidebarAdvanceUI" data-bs-toggle="collapse" role="button"
@@ -970,8 +986,8 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link menu-link" href="#sidebarMultilevel" data-bs-toggle="collapse" role="button"
-                        aria-expanded="false" aria-controls="sidebarMultilevel">
+                    <a class="nav-link menu-link" href="#sidebarMultilevel" data-bs-toggle="collapse"
+                        role="button" aria-expanded="false" aria-controls="sidebarMultilevel">
                         <i class="ri-share-line"></i> <span data-key="t-multi-level">Multi Level</span>
                     </a>
                     <div class="collapse menu-dropdown" id="sidebarMultilevel">
@@ -980,8 +996,9 @@
                                 <a href="#" class="nav-link" data-key="t-level-1.1"> Level 1.1 </a>
                             </li>
                             <li class="nav-item">
-                                <a href="#sidebarAccount" class="nav-link" data-bs-toggle="collapse" role="button"
-                                    aria-expanded="false" aria-controls="sidebarAccount" data-key="t-level-1.2">
+                                <a href="#sidebarAccount" class="nav-link" data-bs-toggle="collapse"
+                                    role="button" aria-expanded="false" aria-controls="sidebarAccount"
+                                    data-key="t-level-1.2">
                                     Level
                                     1.2
                                 </a>
@@ -1025,7 +1042,8 @@
 
     <div class="sidebar-background"></div>
 </div>
-<div class="modal fade" id="showModalAds" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="showModalAds" tabindex="-1" aria-labelledby="exampleModalLabel"
+    aria-hidden="true">
 
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
@@ -1072,65 +1090,61 @@
         </div>
     </div>
 </div>
- <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const form = document.querySelector('#myFormAds');
-    const nameInput = document.querySelector('#name');
-    const slugInput = document.querySelector('#slug');
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('#myFormAds');
+        const nameInput = document.querySelector('#name');
+        const slugInput = document.querySelector('#slug');
 
-    // Tự động tạo slug khi gõ tên chiến dịch
-    if (nameInput && slugInput) {
-        nameInput.addEventListener('input', function () {
-            let slug = nameInput.value
-                .toLowerCase()
-                .normalize('NFD')                     // chuyển tiếng Việt có dấu thành không dấu
-                .replace(/[\u0300-\u036f]/g, '')      // xóa ký tự dấu
-                .replace(/[^a-z0-9 -]/g, '')          // xóa ký tự đặc biệt
-                .replace(/\s+/g, '-')                 // thay khoảng trắng thành dấu -
-                .replace(/-+/g, '-')                  // loại bỏ dấu - liên tiếp
-                .replace(/^-+|-+$/g, '');             // xóa - ở đầu hoặc cuối
+        // Tự động tạo slug khi gõ tên chiến dịch
+        if (nameInput && slugInput) {
+            nameInput.addEventListener('input', function() {
+                let slug = nameInput.value
+                    .toLowerCase()
+                    .normalize('NFD') // chuyển tiếng Việt có dấu thành không dấu
+                    .replace(/[\u0300-\u036f]/g, '') // xóa ký tự dấu
+                    .replace(/[^a-z0-9 -]/g, '') // xóa ký tự đặc biệt
+                    .replace(/\s+/g, '-') // thay khoảng trắng thành dấu -
+                    .replace(/-+/g, '-') // loại bỏ dấu - liên tiếp
+                    .replace(/^-+|-+$/g, ''); // xóa - ở đầu hoặc cuối
 
-            slugInput.value = slug;
-        });
-    }
+                slugInput.value = slug;
+            });
+        }
 
-    // Validate form nếu form tồn tại
-    if (form) {
-        const validation = new JustValidate('#myFormAds');
+        // Validate form nếu form tồn tại
+        if (form) {
+            const validation = new JustValidate('#myFormAds');
 
-        validation
-            .addField('#name', [
-                {
-                    rule: 'required',
-                    errorMessage: 'Vui lòng nhập tên chiến dịch',
-                },
-                {
-                    rule: 'minLength',
-                    value: 10,
-                    errorMessage: 'Tên chiến dịch ít nhất 10 ký tự',
-                },
-                {
-                    rule: 'maxLength',
-                    value: 50,
-                    errorMessage: 'Tên chiến dịch tối đa 50 ký tự',
-                },
-            ])
-            .addField('#slug', [
-                {
+            validation
+                .addField('#name', [{
+                        rule: 'required',
+                        errorMessage: 'Vui lòng nhập tên chiến dịch',
+                    },
+                    {
+                        rule: 'minLength',
+                        value: 10,
+                        errorMessage: 'Tên chiến dịch ít nhất 10 ký tự',
+                    },
+                    {
+                        rule: 'maxLength',
+                        value: 50,
+                        errorMessage: 'Tên chiến dịch tối đa 50 ký tự',
+                    },
+                ])
+                .addField('#slug', [{
                     rule: 'required',
                     errorMessage: 'Vui lòng nhập slug',
-                }
-            ])
-            .onSuccess((event) => {
-                event.target.submit();
-            });
-    }
+                }])
+                .onSuccess((event) => {
+                    event.target.submit();
+                });
+        }
 
-    // Hiển thị modal nếu có lỗi từ server
-    @if ($errors->any() && old('_form') === 'ads')
-        var myModal = new bootstrap.Modal(document.getElementById('showModalAds'));
-        myModal.show();
-    @endif
-});
+        // Hiển thị modal nếu có lỗi từ server
+        @if ($errors->any() && old('_form') === 'ads')
+            var myModal = new bootstrap.Modal(document.getElementById('showModalAds'));
+            myModal.show();
+        @endif
+    });
 </script>
-
