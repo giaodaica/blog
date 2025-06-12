@@ -119,8 +119,10 @@
                     </tbody>
                 </table>
                 <div>
+                    @if($action != 's')
                     <a href="{{ url("dashboard/voucher/$action") }}" class="btn btn-secondary mt-3"> <i
                             class="ri-arrow-left-line me-1"></i> Quay lại danh sách</a>
+                    @endif
                     <button type="button" class="btn btn-secondary mt-3" data-bs-toggle="modal" id="create-btn"
                         data-bs-target="#showModal"
                         @if ($data_voucher->status !== 'draft') {
