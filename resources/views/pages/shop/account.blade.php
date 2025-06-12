@@ -2,7 +2,7 @@
 @section('cdn-custom')
     <link rel="stylesheet" href="{{ asset('assets/css/info.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
-   
+
 @endsection
 @section('js-page-custom')
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -24,8 +24,8 @@
             </div>
         </div>
     </section>
-   
-    
+
+
     <!-- end page title -->
     <!-- start section -->
     <section class="position-relative">
@@ -105,7 +105,7 @@
                                     </a>
                                 </form>
                             </li>
-                            
+
                         </ul>
                     </div>
                 </div>
@@ -174,7 +174,7 @@
                                                         <h6 class="text-primary text-uppercase fs-5 mb-4">Đổi mật khẩu</h6>
                                                         <form action="{{ route('change-password') }}" method="POST">
                                                             @csrf
-                                                            
+
                                                             <div class="row g-3">
                                                                 <div class="col-md-12">
                                                                     <div class="mb-3">

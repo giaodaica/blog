@@ -54,7 +54,7 @@ class OrderController extends Controller
                     return abort(403, "Bạn không thể đổi sang trạng thái đã xác nhận khi đơn hàng không ở trạng thái chưa xác nhận ");
                 } else {
                     $present->status = 'confirmed';
-                    $note = 'Đã gọi xác nhận đặt hàng';
+                    $note = 'Đơn hàng đã được xác nhận';
                 }
                 break;
             case 'confirmed':
@@ -62,7 +62,7 @@ class OrderController extends Controller
                     return abort(403, 'Bạn không thể đổi sang trạng thái giao hàng khi đơn hàng không ở trạng thái đã xác nhận ');
                 } else {
                     $present->status = 'shipping';
-                    $note = 'không có vấn đề gì ';
+                    $note = 'Đơn vị vận chuyển đã lấy hàng, chuẩn bị giao hàng';
                 }
                 break;
             case 'shipping':
@@ -70,7 +70,7 @@ class OrderController extends Controller
                     return abort(403, 'Bạn không thể đổi sang trạng thái đã giao hàng khi đơn hàng không ở trạng thái đang giao hàng ');
                 } else {
                     $present->status = 'success';
-                    $note = 'không có vấn đề gì ';
+                    $note = 'Đơn hàng đã được giao thành công';
                 }
                 break;
             case 'failed':
@@ -78,7 +78,7 @@ class OrderController extends Controller
                     return abort(403, 'Bạn không thể đổi sang trạng thái giao hàng thất bại khi đơn hàng không ở trạng thái đang giao hàng ');
                 } else {
                     $present->status = 'failed';
-                    $note = 'không có vấn đề gì ';
+                    $note = 'Giao hàng thất bại';
                 }
                 break;
             case 'return':
@@ -86,19 +86,19 @@ class OrderController extends Controller
                     return abort(403, 'Bạn không thể đổi sang trạng thái giao lại khi đơn hàng không ở trạng thái giao hàng thất bại ');
                 } else {
                     $present->status = 'shipping';
-                    $note = 'không có vấn đề gì ';
+                    $note = 'Đơn vị vận chuyển đã lấy hàng , chuẩn bị giao hàng';
                 }
                 break;
             case 'cancelled':
                 if ($present->status == 'failed' || $present->status == 'pending' || $present->status == 'confirmed') {
                     $present->status = 'cancelled';
-                    $note = 'Khách yêu cầu hủy đơn ';
+                    $note = 'Đơn hàng đã được hủy theo yêu cầu của khách hàng';
                 } else {
                     return abort(403, 'Đơn chỉ được hủy khi ở trạng thái chưa xác nhận , đã xác nhận hoặc đơn giao thất bại');
                 }
                 break;
         }
-        try {
+
             $present->save();
             OrderHistories::create([
                 'users' => Auth::user()->id,
@@ -106,11 +106,9 @@ class OrderController extends Controller
                 'from_status' => $old_status->status,
                 'to_status' => $present->status,
                 'note' => $note
+
             ]);
-        } catch (\Exception $e) {
-            Log::error('Lỗi khi cập nhật trạng thái đơn hàng: ' . $e->getMessage());
-            return redirect()->back()->withErrors('Cập nhật trạng thái đơn hàng thất bại, vui lòng thử lại sau.');
-        }
+
 
         return redirect()->back()->with('success', 'Cập nhật trạng thái đơn hàng thành công!');
     }
@@ -118,11 +116,16 @@ class OrderController extends Controller
     {
         $data_order = Order::join('vouchers','vouchers.id','orders.voucher_id')->
         join('address_books','address_books.id','orders.address_books_id')->
+        join('users','users.id','orders.user_id')->
         select(
             'orders.*',
-            
-        )
-        ->get();
+            'vouchers.code',
+            'address_books.name as ad_name',
+            'address_books.address as ad_address',
+            'address_books.phone as ad_phone',
+            'users.email',
+        )->where('orders.id',$id)
+        ->first();
         $data_order_items = OrderItem::join('orders', 'orders.id', 'order_items.order_id')->
         join('product_variants', 'product_variants.id', 'order_items.product_variant_id')->
         join('sizes', 'sizes.id', 'product_variants.size_id')->
@@ -133,7 +136,14 @@ class OrderController extends Controller
                 'sizes.size_name',
                 'colors.color_name',
             )->get();
-        dd($data_order);
+            $history_1 = OrderHistories::where('from_status','pending')->where('to_status','confirmed')->where('order_id',$id)->first();
+            $history_2 = OrderHistories::where('from_status','confirmed')->where('to_status','shipping')->where('order_id',$id)->first();
+            $history_3 = OrderHistories::where('from_status','shipping')->where('to_status','failed')->where('order_id',$id)->first();
+            $history_4 = OrderHistories::where('from_status','failed')->where('to_status','shipping')->where('order_id',$id)->first();
+            $history_5 = OrderHistories::where('from_status','shipping')->where('to_status','success')->where('order_id',$id)->first();
+        // $historyItems = OrderHistories::where('order_id', $id)->get()->keyBy('from_status');
+        // dd($historyItems);
+        // dd($data_order);
         // dd($data_order_items);
 
         return view('dashboard.pages.order.detail', compact('data_order', 'data_order_items'));

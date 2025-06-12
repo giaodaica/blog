@@ -76,7 +76,7 @@
                                                 <td class="created_at">{{ $color->created_at->format('d/m/Y') }}</td>
                                                 <td>
                                                     <ul class="list-inline hstack gap-2 mb-0">
-                                                    
+
                                                         <li class="list-inline-item edit" data-bs-toggle="tooltip"
                                                             data-bs-trigger="hover" data-bs-placement="top"
                                                             title="Chỉnh sửa">

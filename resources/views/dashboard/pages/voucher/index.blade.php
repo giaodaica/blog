@@ -515,18 +515,7 @@
                 }
             ])
 
-            .addField('#max_discount', [{
-                validator: (value, fields) => {
-                    const type = document.querySelector('#type_discount').value;
-                    if (type === 'percent') {
-
-                        const num = parseFloat(value);
-                        return !isNaN(num) && num >= 0;
-                    }
-                    return true;
-                },
-                errorMessage: 'Giá trị giảm giá tối đa phải là số dương',
-            }])
+        
             .addField('#category_id', [{
                 rule: 'required',
                 errorMessage: 'Vui lòng chọn danh mục',

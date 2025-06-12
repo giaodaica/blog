@@ -36,5 +36,8 @@ class HomeController extends Controller
     public function admin(){
         return view('dashboard.index');
     }
+    public function shop(){
+        return view('pages.shop.index');
+    }
 
 }
