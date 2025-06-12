@@ -24,7 +24,12 @@ class ColorController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'color_name' => 'required|unique:colors,color_name|max:50',
+            'color_name' => ['required', 'unique:colors,color_name', 'max:50', 'regex:/^[\pL\s]+$/u'],
+        ], [
+            'color_name.required' => 'Tên màu không được để trống.',
+            'color_name.unique' => 'Tên màu đã tồn tại, vui lòng chọn tên khác.',
+            'color_name.max' => 'Tên màu không được dài quá 50 ký tự.',
+            'color_name.regex' => 'Tên màu chỉ được chứa chữ và khoảng trắng.',
         ]);
 
         Color::create([
@@ -47,7 +52,12 @@ class ColorController extends Controller
         $color = Color::findOrFail($id);
 
         $request->validate([
-            'color_name' => 'required|unique:colors,color_name,' . $id . '|max:50',
+            'color_name' => ['required', 'unique:colors,color_name,' . $id, 'max:50', 'regex:/^[\pL\s]+$/u'],
+        ], [
+            'color_name.required' => 'Tên màu không được để trống.',
+            'color_name.unique' => 'Tên màu đã tồn tại, vui lòng chọn tên khác.',
+            'color_name.max' => 'Tên màu không được dài quá 50 ký tự.',
+            'color_name.regex' => 'Tên màu chỉ được chứa chữ và khoảng trắng.',
         ]);
 
         $color->update([

@@ -36,7 +36,7 @@
                                             </div>
                                         @else
                                             <div class="swiper-slide">
-                                                <img src="{{ asset('storage/no-image.png') }}" alt="No Image" class="img-fluid d-block" />
+                                                <img src="{{ asset('storage/no-image.png') }}" alt="Không có hình" class="img-fluid d-block" />
                                             </div>
                                         @endif
                                         <div class="swiper-button-next"></div>
@@ -53,12 +53,12 @@
                                     <div class="row">
                                         <div class="col-md-4">
                                             <p><strong>Màu sắc:</strong> 
-                                                <span style="display:inline-block; width:20px; height:20px; background-color: {{ $variant->color->code ?? '#000' }}; border: 1px solid #ddd;"></span> 
-                                                {{ $variant->color->name ?? 'N/A' }}
+                                              
+                                                {{ $variant->color->color_name ?? 'N/A' }}
                                             </p>
                                         </div>
                                         <div class="col-md-4">
-                                            <p><strong>Size:</strong> {{ $variant->size->name ?? 'N/A' }}</p>
+                                            <p><strong>Size:</strong> {{ $variant->size->size_name ?? 'N/A' }}</p>
                                         </div>
                                         <div class="col-md-4">
                                             <p><strong>Trạng thái:</strong> 
@@ -91,10 +91,7 @@
 
                                     <hr>
 
-                                    <div class="mt-3">
-                                        <h5>Mô tả sản phẩm cha:</h5>
-                                        <p>{{ $variant->product->description ?? 'Chưa có mô tả.' }}</p>
-                                    </div>
+                               
 
                                     <a href="{{ route('variants.edit', $variant->id) }}" class="btn btn-primary mt-3">Chỉnh sửa biến thể</a>
                                     <a href="{{ route('variants.index') }}" class="btn btn-secondary mt-3">Quay lại danh sách</a>

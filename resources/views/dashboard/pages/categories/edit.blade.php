@@ -67,7 +67,11 @@
                                 @enderror
                             </div>
                         </div>
+                        
                     </div>
+                     <div class="col-lg-4">
+                   
+                     </div>
                 </div>
 
                 <div class="col-lg-4">
@@ -77,17 +81,18 @@
                             <label class="form-label">Ảnh danh mục hiện tại</label>
                             <div>
                                 @if ($category->image)
-                                    <img src="{{ asset($category->image) }}" alt="{{ $category->name }}" class="img-fluid rounded" style="max-height: 150px; object-fit: cover;">
+                                    <img src="{{ asset($category->image) }}" alt="{{ $category->name }}" class="img-fluid rounded" style="max-height: 235px; object-fit: cover;">
                                 @else
                                     <img src="https://via.placeholder.com/150?text=No+Image" alt="Không có ảnh" class="img-fluid rounded">
                                 @endif
                             </div>
                         </div>
                     </div>
-
-                    <a href="{{ route('categories.index') }}" class="btn btn-secondary mt-3 w-100">Quay lại</a>
+ <a href="{{ route('categories.index') }}" class="btn btn-secondary mt-3 w-100">Quay lại</a>
                     <button type="submit" class="btn btn-primary mt-2 w-100">Cập nhật</button>
+                   
                 </div>
+              
             </div>
         </form>
     </div>
