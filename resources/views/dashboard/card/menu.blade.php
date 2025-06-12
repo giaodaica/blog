@@ -510,6 +510,48 @@
                     </ul>
                 </div>
                 <li class="menu-title"><i class="ri-more-fill"></i> <span data-key="t-pages">Product</span></li>
+
+                 <a class="nav-link menu-link" href="#sidebarProducts" data-bs-toggle="collapse" role="button"
+                        aria-expanded="false" aria-controls="sidebarProducts">
+                        <i class="ri-layout-3-line"></i> <span data-key="t-layouts">Danh sách</span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarProducts">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="{{ url("dashboard/products") }}"  class="nav-link"
+                                    data-key="t-horizontal">Quản lý sản phẩm</a>
+                            </li>
+                          <li class="nav-item">
+                                <a href="{{ url("dashboard/categories") }}"  class="nav-link"
+                                    data-key="t-horizontal">Quản lý danh mục</a>
+                            </li>
+                        </ul>
+                    </div>
+                   <a class="nav-link menu-link" href="#sidebarAttributes" data-bs-toggle="collapse" role="button"
+                        aria-expanded="false" aria-controls="sidebarAttributes">
+                        <i class="ri-layout-3-line"></i> <span data-key="t-layouts">Biến thể</span>
+                    </a>
+                    <div class="collapse menu-dropdown" id="sidebarAttributes">
+                        <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="{{ url("dashboard/variants") }}"  class="nav-link"
+                                    data-key="t-horizontal">Sản phẩm</a>
+                            </li>
+                        </ul>
+                          <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="{{ url("dashboard/sizes") }}"  class="nav-link"
+                                    data-key="t-horizontal">Kích thước</a>
+                            </li>
+                        </ul>
+                          <ul class="nav nav-sm flex-column">
+                            <li class="nav-item">
+                                <a href="{{ url("dashboard/colors") }}"  class="nav-link"
+                                    data-key="t-horizontal">Màu</a>
+                            </li>
+                        </ul>
+                    </div>
+
                 <a class="nav-link menu-link" href="#sidebarProducts" data-bs-toggle="collapse" role="button"
                     aria-expanded="false" aria-controls="sidebarProducts">
                     <i class="ri-layout-3-line"></i> <span data-key="t-layouts">Danh sách</span>
@@ -562,6 +604,7 @@
                     >
                     <i class="ri-layout-3-line"></i> <span>Quyền truy cập</span>
                 </a>
+
 
 
 

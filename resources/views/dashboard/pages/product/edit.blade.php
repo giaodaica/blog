@@ -8,12 +8,12 @@
         <div class="row">
             <div class="col-12">
                 <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                    <h4 class="mb-sm-0">Edit Product</h4>
+                    <h4 class="mb-sm-0">Chỉnh sửa sản phẩm</h4>
 
                     <div class="page-title-right">
                         <ol class="breadcrumb m-0">
                             <li class="breadcrumb-item"><a href="#">Ecommerce</a></li>
-                            <li class="breadcrumb-item active">Edit Product</li>
+                            <li class="breadcrumb-item active">Chỉnh sửa sản phẩm</li>
                         </ol>
                     </div>
                 </div>
@@ -56,7 +56,7 @@
                                 <div class="mb-3">
                                     <label class="form-label">Hình ảnh hiện tại:</label>
                                     <div>
-                                        <img src="{{ asset($product->image_url) }}" alt="{{ $product->name }}" class="img-thumbnail" style="max-height: 200px;">
+                                        <img src="{{ asset($product->image_url) }}" alt="{{ $product->name }}" class="img-thumbnail" style="max-height: 300px;">
                                     </div>
                                 </div>
                             @endif

@@ -24,9 +24,13 @@ class SizeController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'size_name' => 'required|unique:sizes,size_name|max:50'
+            'size_name' => ['required', 'unique:sizes,size_name', 'max:10', 'regex:/^[\pL\s]+$/u'],
+        ], [
+            'size_name.required' => 'Tên kích cỡ không được để trống.',
+            'size_name.unique' => 'Tên kích cỡ đã tồn tại, vui lòng chọn tên khác.',
+            'size_name.max' => 'Tên kích cỡ không được vượt quá 10 ký tự.',
+            'size_name.regex' => 'Tên kích cỡ chỉ được chứa chữ và khoảng trắng.',
         ]);
-
         Size::create([
             'size_name' => $request->size_name,
         ]);
@@ -47,7 +51,12 @@ class SizeController extends Controller
         $size = Size::findOrFail($id);
 
         $request->validate([
-            'size_name' => 'required|unique:sizes,size_name,' . $id . '|max:50'
+            'size_name' => ['required', 'unique:sizes,size_name,' . $id, 'max:10', 'regex:/^[\pL\s]+$/u'],
+        ], [
+            'size_name.required' => 'Tên kích cỡ không được để trống.',
+            'size_name.unique' => 'Tên kích cỡ đã tồn tại, vui lòng chọn tên khác.',
+            'size_name.max' => 'Tên kích cỡ không được vượt quá 50 ký tự.',
+            'size_name.regex' => 'Tên kích cỡ chỉ được chứa chữ và khoảng trắng.',
         ]);
 
         $size->update([

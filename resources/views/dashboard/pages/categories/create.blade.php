@@ -76,10 +76,7 @@
                                 @error('image')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
-                                <div class="mt-3">
-                                    <img id="preview-image" src="https://via.placeholder.com/150" alt="Ảnh danh mục"
-                                        class="img-fluid rounded">
-                                </div>
+                          
                             </div>
                         </div>
                     </div>
