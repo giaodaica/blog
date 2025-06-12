@@ -46,11 +46,11 @@
                                                 {{-- <del class="text-muted">{{ number_format($variant->listed_price, 3) }}đ</del>
                                                 <span class="text-danger">{{ number_format($variant->sale_price, 3) }}đ</span> --}}
                                                 <div class="product-price">
-                                                    {{ number_format($variant->sale_price, 3) }} ₫
-                                                    <span class="product-old-price">{{ number_format($variant->listed_price, 3) }} ₫</span>
+                                                    {{ number_format($variant->sale_price) }} ₫
+                                                    <span class="product-old-price">{{ number_format($variant->listed_price) }} ₫</span>
                                                 </div>
                                             @elseif($variant)
-                                                <span>{{ number_format($variant->listed_price, 0) }}₫</span>
+                                                <span>{{ number_format($variant->listed_price) }}₫</span>
                                             @endif
                                         </div>
                                         <div class="rating">
@@ -139,11 +139,11 @@
                                 @php
                                     $priceRanges = [
                                         '' => 'Tất cả',
-                                        '0-100' => 'Dưới 100k',
-                                        '100-300' => '100K - 300k',
-                                        '300-500' => '300k - 500k',
-                                        '500-1000' => '500k - 1 triệu',
-                                        '1000-999999' => 'Trên 1 triệu',
+                                        '0-100000' => 'Dưới 100k',
+                                        '100000-300000' => '100K - 300k',
+                                        '300000-500000' => '300k - 500k',
+                                        '500000-1000000' => '500k - 1 triệu',
+                                        '1000000-999999999' => 'Trên 1 triệu',
                                     ];
                                     $selectedPriceRange = request('price_range', ''); // Default to empty string
                                 @endphp

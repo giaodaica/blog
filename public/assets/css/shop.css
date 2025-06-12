@@ -112,7 +112,7 @@
 }
 .product-price {
     color: #ff6b35;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
     margin-bottom: 5px;
 }
@@ -120,7 +120,7 @@
 .product-old-price {
     color: #999;
     text-decoration: line-through;
-    font-size: 14px;
+    font-size: 13px;
     margin-right: 10px;
 }
 .rating-text {
