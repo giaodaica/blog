@@ -38,19 +38,30 @@
                 @csrf
                 @method('PUT')
 
+                @if ($isProductDeleted)
+                    <div class="alert alert-warning mb-3">
+                        Sản phẩm liên quan đã bị xóa, bạn không thể chỉnh sửa biến thể này.
+                    </div>
+                @endif
+
                 <div class="row g-4">
+
                     <!-- Sản phẩm (không sửa được) -->
                     <div class="col-lg-12">
                         <h6 class="fw-semibold">Sản phẩm</h6>
                         <select class="form-select" disabled>
-                            <option value="{{ $variant->product->id }}" selected>{{ $variant->product->name }}</option>
+                            @if ($product)
+                                <option value="{{ $product->id }}" selected>{{ $product->name }}</option>
+                            @else
+                                <option value="" selected>Sản phẩm đã bị xóa</option>
+                            @endif
                         </select>
                     </div>
 
                     <!-- Chọn Size -->
                     <div class="col-lg-6">
                         <h6 class="fw-semibold">Size</h6>
-                        <select class="form-select" name="size_id" required>
+                        <select class="form-select" name="size_id" {{ $isProductDeleted ? 'disabled' : 'required' }}>
                             @foreach ($sizes as $size)
                                 <option value="{{ $size->id }}"
                                     {{ old('size_id', $variant->size_id) == $size->id ? 'selected' : '' }}>
@@ -66,7 +77,7 @@
                     <!-- Chọn Color -->
                     <div class="col-lg-6">
                         <h6 class="fw-semibold">Màu</h6>
-                        <select class="form-select" name="color_id" required>
+                        <select class="form-select" name="color_id" {{ $isProductDeleted ? 'disabled' : 'required' }}>
                             @foreach ($colors as $color)
                                 <option value="{{ $color->id }}"
                                     {{ old('color_id', $variant->color_id) == $color->id ? 'selected' : '' }}>
@@ -82,8 +93,8 @@
                     <!-- Các trường khác -->
                     <div class="col-lg-4">
                         <h6 class="fw-semibold">Tên biến thể</h6>
-                        <input type="text" name="name" class="form-control"
-                            value="{{ old('name', $variant->name) }}">
+                        <input type="text" name="name" class="form-control" value="{{ old('name', $variant->name) }}"
+                            {{ $isProductDeleted ? 'disabled' : '' }}>
                         @error('name')
                             <div class="text-danger mt-1">{{ $message }}</div>
                         @enderror
@@ -92,7 +103,8 @@
                     <div class="col-lg-4">
                         <h6 class="fw-semibold">Giá nhập</h6>
                         <input type="number" name="import_price" class="form-control" min="0"
-                            value="{{ old('import_price', intval($variant->import_price)) }}">
+                            value="{{ old('import_price', intval($variant->import_price)) }}"
+                            {{ $isProductDeleted ? 'disabled' : '' }}>
                         @error('import_price')
                             <div class="text-danger mt-1">{{ $message }}</div>
                         @enderror
@@ -101,7 +113,8 @@
                     <div class="col-lg-4">
                         <h6 class="fw-semibold">Giá niêm yết</h6>
                         <input type="number" name="listed_price" class="form-control" min="0"
-                            value="{{ old('listed_price', intval($variant->listed_price)) }}">
+                            value="{{ old('listed_price', intval($variant->listed_price)) }}"
+                            {{ $isProductDeleted ? 'disabled' : '' }}>
                         @error('listed_price')
                             <div class="text-danger mt-1">{{ $message }}</div>
                         @enderror
@@ -110,7 +123,8 @@
                     <div class="col-lg-4">
                         <h6 class="fw-semibold">Giá bán</h6>
                         <input type="number" name="sale_price" class="form-control" min="0"
-                            value="{{ old('sale_price', intval($variant->sale_price)) }}">
+                            value="{{ old('sale_price', intval($variant->sale_price)) }}"
+                            {{ $isProductDeleted ? 'disabled' : '' }}>
                         @error('sale_price')
                             <div class="text-danger mt-1">{{ $message }}</div>
                         @enderror
@@ -119,7 +133,7 @@
                     <div class="col-lg-4">
                         <h6 class="fw-semibold">Số lượng kho</h6>
                         <input type="number" name="stock" class="form-control" min="0"
-                            value="{{ old('stock', $variant->stock) }}">
+                            value="{{ old('stock', $variant->stock) }}" {{ $isProductDeleted ? 'disabled' : '' }}>
                         @error('stock')
                             <div class="text-danger mt-1">{{ $message }}</div>
                         @enderror
@@ -127,7 +141,8 @@
 
                     <div class="col-lg-8">
                         <h6 class="fw-semibold">Ảnh biến thể (bạn có thể chọn ảnh mới để thay thế)</h6>
-                        <input type="file" name="variant_image_url" class="form-control" accept="image/*">
+                        <input type="file" name="variant_image_url" class="form-control" accept="image/*"
+                            {{ $isProductDeleted ? 'disabled' : '' }}>
                         @error('variant_image_url')
                             <div class="text-danger mt-1">{{ $message }}</div>
                         @enderror
@@ -137,22 +152,33 @@
                                 style="max-width: 300px; margin-top: 10px;">
                         @endif
                     </div>
+
                     <div class="col-lg-12 mt-3">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" id="is_show" name="is_show" value="1"
-                                {{ old('is_show', $variant->is_show) ? 'checked' : '' }}>
+                                {{ old('is_show', $variant->is_show) ? 'checked' : '' }}
+                                {{ $isProductDeleted ? 'disabled' : '' }}>
                             <label class="form-check-label" for="is_show">Hiển thị biến thể</label>
                         </div>
                         @error('is_show')
                             <div class="text-danger mt-1">{{ $message }}</div>
                         @enderror
                     </div>
-                    <div class="col-lg-12 mt-3">
-                        <button type="submit" class="btn btn-primary">Cập nhật biến thể</button>
-                        <a href="{{ route('variants.index') }}" class="btn btn-secondary">Hủy</a>
-                    </div>
+
+                    @if (!$isProductDeleted)
+                        <div class="col-lg-12 mt-3">
+                            <button type="submit" class="btn btn-primary">Cập nhật biến thể</button>
+                            <a href="{{ route('variants.index') }}" class="btn btn-secondary">Hủy</a>
+                        </div>
+                    @else
+                        <div class="col-lg-12 mt-3">
+                            <a href="{{ route('variants.index') }}" class="btn btn-secondary">Quay lại danh sách</a>
+                        </div>
+                    @endif
+
                 </div>
             </form>
+
 
         </div>
         <!-- container-fluid -->

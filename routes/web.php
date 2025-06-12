@@ -12,8 +12,15 @@ use App\Http\Controllers\InfoController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ProductVariantsController;
+
+use App\Http\Controllers\web\SearchController;
 use App\Http\Controllers\SizeController;
+use App\Http\Controllers\Spatie\PermissionController;
+use App\Http\Controllers\Spatie\RoleController;
+use App\Http\Controllers\Spatie\UserRoleController;
 use App\Http\Controllers\VouchersController;
+use App\Http\Controllers\web\ProductController;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -22,7 +29,9 @@ Route::middleware(['cache'])->group(function () {
     Auth::routes();
 });
 Route::get('/', [HomeController::class, 'index'])->name('home');
-Route::get('shop', [HomeController::class, 'shop'])->name('home.shop');
+Route::get('shop', [ProductController::class, 'index'])->name('home.shop');
+Route::get('/search', [SearchController::class, 'index'])->name('search');
+Route::get('/search/suggestions', [SearchController::class, 'suggestions']);
 
 
 Route::get('info', [HomeController::class, 'info_customer'])->name('home.info')->middleware('auth', 'cache');
@@ -88,4 +97,17 @@ Route::prefix('dashboard')->group(function () {
     Route::get('variants/{id}/edit', [ProductVariantsController::class, 'edit'])->name('variants.edit');
     Route::put('variants/{id}/update', [ProductVariantsController::class, 'update'])->name('variants.update');
     Route::delete('variants/{id}', [ProductVariantsController::class, 'destroy'])->name('variants.destroy');
+
+
+    
 });
+
+
+Route::prefix('dashboard')->name('dashboard.')->group(function () {
+// Phân quyền
+    Route::resource('roles', RoleController::class);
+    Route::resource('permissions', PermissionController::class);
+    Route::post('roles/order', [RoleController::class, 'order'])->name('roles.order');
+    //  Route::post('permission/order', [RoleController::class, 'order'])->name('permission.order');
+});
+

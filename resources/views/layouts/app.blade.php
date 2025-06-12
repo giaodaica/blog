@@ -15,6 +15,9 @@
 
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+
+    <!-- Add before closing head tag -->
+    
 </head>
 <body>
     <div id="app">
@@ -76,5 +79,8 @@
             @yield('content')
         </main>
     </div>
+
+    <!-- Add before closing body tag -->
+    <script src="{{ asset('assets/js/search-suggestions.js') }}"></script>
 </body>
 </html>

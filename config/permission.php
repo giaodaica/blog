@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\User;
+
 return [
 
     'models' => [
@@ -25,6 +27,7 @@ return [
          */
 
         'role' => Spatie\Permission\Models\Role::class,
+        'user' => App\Models\User::class,
 
     ],
 

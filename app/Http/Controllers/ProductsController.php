@@ -28,7 +28,7 @@ class ProductsController extends Controller
             'name' => 'required|unique:products,name',
             'slug' => 'required|unique:products,slug',
             'category_id' => 'required|exists:categories,id',
-            'image_url' => 'required|image|mimes:jpg,png,jpeg|max:2048',  // Ảnh bắt buộc
+            'image_url' => 'required|image|mimes:jpg,png,jpeg,webp|max:2048',  // Ảnh bắt buộc
         ], [
             'name.required' => 'Tên sản phẩm không được để trống',
             'name.unique' => 'Tên sản phẩm đã tồn tại',
@@ -38,7 +38,7 @@ class ProductsController extends Controller
             'category_id.exists' => 'Danh mục không hợp lệ',
             'image_url.required' => 'Bạn phải chọn ảnh sản phẩm',
             'image_url.image' => 'File tải lên phải là ảnh',
-            'image_url.mimes' => 'Ảnh phải có định dạng: jpg, jpeg hoặc png',
+            'image_url.mimes' => 'Ảnh phải có định dạng: jpg, jpeg, webp hoặc png',
             'image_url.max' => 'Kích thước ảnh tối đa là 2MB',
         ]);
 
@@ -64,7 +64,7 @@ class ProductsController extends Controller
             'name' => 'required|unique:products,name,' . $id,
             'slug' => 'required|unique:products,slug,' . $id,
             'category_id' => 'required|exists:categories,id',
-            'image_url' => 'nullable|image|mimes:jpg,png,jpeg|max:2048',  // Ảnh có thể không có
+            'image_url' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:2048',  // Ảnh có thể không có
         ], [
             'name.required' => 'Tên sản phẩm không được để trống',
             'name.unique' => 'Tên sản phẩm đã tồn tại',
@@ -73,7 +73,7 @@ class ProductsController extends Controller
             'category_id.required' => 'Bạn chưa chọn danh mục',
             'category_id.exists' => 'Danh mục không hợp lệ',
             'image_url.image' => 'File tải lên phải là ảnh',
-            'image_url.mimes' => 'Ảnh phải có định dạng: jpg, jpeg hoặc png',
+            'image_url.mimes' => 'Ảnh phải có định dạng: jpg, webp, jpeg hoặc png',
             'image_url.max' => 'Kích thước ảnh tối đa là 2MB',
         ]);
 
