@@ -5,12 +5,13 @@ document.addEventListener('DOMContentLoaded', function() {
     const clearHistoryBtn = document.querySelector('.btn-clear-history');
     const closeSuggestionsBtn = document.querySelector('.btn-close-suggestions');
     const trendingList = document.querySelector('.trending-list');
+    const autocompleteResults = document.getElementById('autocomplete-results');
     const MAX_HISTORY_ITEMS = 5;
 
     // Dummy data for trending searches (replace with API calls)
     const trendingSearches = [
-        "iPhone 16 Pro Max", "iPhone 15", "Laptop", "Carseat",
-        "Điện thoại Samsung", "Robot hút bụi"
+        "Áo thun nam", "Quần jean nữ", "Váy liền thân", "Giày thể thao", 
+        "Túi xách", "Đồng hồ", "Kính mát", "Phụ kiện"
     ];
 
     // Lấy lịch sử tìm kiếm từ localStorage
@@ -58,6 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 li.querySelector('.text-content').addEventListener('click', () => {
                     searchInput.value = keyword;
                     searchSuggestions.style.display = 'none';
+                    performSearch(keyword);
                 });
                 li.querySelector('.remove-history-item').addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -92,9 +94,56 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 searchInput.value = keyword;
                 searchSuggestions.style.display = 'none';
+                performSearch(keyword);
             });
             trendingList.appendChild(tag);
         });
+    }
+
+    // Thực hiện tìm kiếm
+    function performSearch(keyword) {
+        saveSearchHistory(keyword);
+        // Lưu giá trị tìm kiếm hiện tại vào localStorage
+        localStorage.setItem('currentSearch', keyword);
+        window.location.href = `/search?q=${encodeURIComponent(keyword)}`;
+    }
+
+    // Hiển thị gợi ý tìm kiếm
+    async function showSuggestions(term) {
+        if (!term) {
+            autocompleteResults.style.display = 'none';
+            return;
+        }
+
+        try {
+            const response = await fetch(`/search/suggestions?q=${encodeURIComponent(term)}`);
+            const suggestions = await response.json();
+
+            autocompleteResults.innerHTML = '';
+            if (suggestions.length > 0) {
+                suggestions.forEach(suggestion => {
+                    const div = document.createElement('div');
+                    div.className = 'p-2 border-bottom suggestion-item';
+                    div.innerHTML = `
+                        <div class="d-flex align-items-center">
+                            <i class="fa fa-search text-muted me-2"></i>
+                            <span>${suggestion.name}</span>
+                        </div>
+                    `;
+                    div.addEventListener('click', () => {
+                        searchInput.value = suggestion.name;
+                        performSearch(suggestion.name);
+                    });
+                    autocompleteResults.appendChild(div);
+                });
+                autocompleteResults.style.display = 'block';
+            } else {
+                autocompleteResults.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Error fetching suggestions:', error);
+            autocompleteResults.style.display = 'none';
+        }
     }
 
     // Xử lý sự kiện focus vào ô tìm kiếm
@@ -105,12 +154,17 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Xử lý sự kiện nhập liệu
+    let debounceTimer;
     searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
         if (this.value.length > 0) {
-            // Thêm logic tìm kiếm gợi ý ở đây
+            debounceTimer = setTimeout(() => {
+                showSuggestions(this.value);
+            }, 300); // Debounce 300ms
         } else {
             displaySearchHistory();
             displayTrendingSearches();
+            autocompleteResults.style.display = 'none';
         }
     });
 
@@ -119,10 +173,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.key === 'Enter') {
             const keyword = this.value.trim();
             if (keyword.length > 0) {
-                saveSearchHistory(keyword);
-                searchSuggestions.style.display = 'none';
-                // Thêm logic submit form tìm kiếm ở đây
-                console.log('Tìm kiếm:', keyword);
+                performSearch(keyword);
             }
         }
     });
@@ -134,14 +185,13 @@ document.addEventListener('DOMContentLoaded', function() {
         updateClearHistoryButton();
     });
 
-   
-
     // Ẩn suggestions khi click ra ngoài
     document.addEventListener('click', function(e) {
         if (!searchInput.contains(e.target) && !searchSuggestions.contains(e.target)) {
             searchSuggestions.style.display = 'none';
         }
     });
+
     const clearInput = document.getElementById('clearInput');
 
     searchInput.addEventListener('input', function () {
@@ -154,11 +204,20 @@ document.addEventListener('DOMContentLoaded', function() {
         clearInput.style.display = 'none';
         displaySearchHistory();
         displayTrendingSearches();
+        autocompleteResults.style.display = 'none';
     });
     
     // Khởi tạo hiển thị lịch sử và xu hướng khi tải trang
     displaySearchHistory();
     displayTrendingSearches();
+    
+    // Khôi phục giá trị tìm kiếm từ localStorage nếu có
+    const savedSearch = localStorage.getItem('currentSearch');
+    if (savedSearch) {
+        searchInput.value = savedSearch;
+        // Xóa giá trị đã lưu sau khi khôi phục
+        localStorage.removeItem('currentSearch');
+    }
 });
 
 document.addEventListener('DOMContentLoaded', function() {

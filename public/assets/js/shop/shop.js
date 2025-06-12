@@ -16,13 +16,26 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function filterProducts() {
         const formData = new FormData(filterForm);
-        const queryString = new URLSearchParams(formData).toString();
+        
+        // Create URLSearchParams and filter out empty values
+        const params = new URLSearchParams();
+        
+        for (let [key, value] of formData.entries()) {
+            // Only add parameter if value is not empty
+            if (value && value.trim() !== '') {
+                params.append(key, value);
+            }
+        }
+        
+        const queryString = params.toString();
         
         // Show loading state
         loadingOverlay.style.display = 'flex';
         
         // Make AJAX request
-        fetch(`${filterForm.action}?${queryString}`, {
+        const url = queryString ? `${filterForm.action}?${queryString}` : filterForm.action;
+        
+        fetch(url, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
             }
@@ -30,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.text())
         .then(html => {
             // Update URL without reload
-            const newUrl = `${window.location.pathname}?${queryString}`;
+            const newUrl = queryString ? `${window.location.pathname}?${queryString}` : window.location.pathname;
             window.history.pushState({ path: newUrl }, '', newUrl);
             
             // Update products grid
@@ -117,6 +130,52 @@ document.addEventListener('DOMContentLoaded', function() {
         .finally(() => {
             // Hide loading state
             loadingOverlay.style.display = 'none';
+        });
+    }
+});
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleButtons = document.querySelectorAll('.toggle-filter');
+
+    toggleButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const filterSection = this.closest('.mb-30px').querySelector('ul');
+            const isHidden = filterSection.style.display === 'none';
+            
+            // Toggle the section
+            filterSection.style.display = isHidden ? 'block' : 'none';
+            
+            // Toggle the arrow icon
+            this.classList.toggle('fa-chevron-down');
+            this.classList.toggle('fa-chevron-up');
+        });
+    });
+
+    // Handle show more/collapse categories
+    const showMoreBtn = document.querySelector('.show-more-categories');
+    const collapseBtn = document.querySelector('.collapse-categories');
+    const hiddenCategories = document.querySelectorAll('.hidden-category');
+
+    if (showMoreBtn) {
+        showMoreBtn.addEventListener('click', function() {
+            hiddenCategories.forEach(category => {
+                category.classList.remove('hidden-category');
+            });
+            this.classList.add('hidden');
+            if (collapseBtn) {
+                collapseBtn.classList.add('visible');
+            }
+        });
+    }
+
+    if (collapseBtn) {
+        collapseBtn.addEventListener('click', function() {
+            hiddenCategories.forEach(category => {
+                category.classList.add('hidden-category');
+            });
+            this.classList.remove('visible');
+            if (showMoreBtn) {
+                showMoreBtn.classList.remove('hidden');
+            }
         });
     }
 });

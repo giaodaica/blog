@@ -111,6 +111,7 @@
                 </ul>
 
             </div>
+            {{-- search --}}
             <div class="header-search-icon">
                 <input type="text" name="search" id="search" class="rounded-pill px-3 py-2"
                     placeholder="Tìm kiếm..." autocomplete="off">
@@ -128,6 +129,10 @@
                             style="background: none; border: none; color: #007bff; font-size: 14px; cursor: pointer; display: non; te;">Xóa
                             tất cả</button>
                     </div>
+                    <div class="autocomplete-results bg-white border rounded shadow mt-2 position-absolute w-100" id="autocomplete-results" style="z-index: 999; display: none;">
+                        <!-- Sản phẩm gợi ý sẽ được thêm bằng JS -->
+                    </div>
+                    
                     <div class="trending-searches mb-3">
                         <h6 class="mb-2 fw-bold text-dark" style="font-size: 16px;">Xu hướng tìm kiếm</h6>
                         <div class="d-flex flex-wrap gap-2 trending-list">
@@ -136,6 +141,7 @@
                     </div>
                 </div>
             </div>
+
         </div>
 
         {{-- Cart --}}

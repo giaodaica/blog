@@ -18,7 +18,7 @@ class ProductController extends Controller
         $colors = Color::whereHas('productVariants', function ($query) {
             $query->where('stock', '>', 0)->where('is_show', 1)->whereNull('deleted_at');
         })->withCount(['productVariants' => function ($query) {
-            $query->where('stock', '>', 0)->where('is_show', 1)->whereNull('deleted_at');
+            $query->where('stock', '>', 0)->where('is_show', 1)->whereNull('deleted_at');   
         }])->get();
         $sizes = Size::withCount('productVariants')->get();
 
@@ -32,13 +32,16 @@ class ProductController extends Controller
     private function getFilteredProducts()
     {
         $query = Products::with(['category', 'variants.color', 'variants.size'])
-            ->whereHas('category', function ($query) {
-                $query->where('status', '1');
-            })
-            ->whereHas('variants', function ($query) {
-                $query->where('is_show', 1)->whereNull('deleted_at');
-            })
-            ->whereNull('deleted_at');
+        ->whereHas('category', function ($query) {
+            $query->where('status', '1');
+        })
+        ->whereHas('variants', function ($query) {
+            $query->where('is_show', 1)
+                  ->where('stock', '>', 0) // ✅ chỉ lấy biến thể còn hàng
+                  ->whereNull('deleted_at');
+        })
+        ->whereNull('deleted_at');
+    
 
         // Filter by categories
         if ($categories = request('categories')) {
@@ -60,13 +63,16 @@ class ProductController extends Controller
         }
 
         // Filter by price range
-        if ($priceRange = request('price_range')) {
-            list($min, $max) = explode('-', $priceRange);
+        $priceRange = request('price_range');
+
+        if (!empty($priceRange) && str_contains($priceRange, '-')) {
+            [$min, $max] = explode('-', $priceRange);
             $query->whereHas('variants', function ($q) use ($min, $max) {
-                $q->whereBetween('sale_price', [$min, $max]);
+                $q->whereBetween('sale_price', [(int)$min, (int)$max]);
             });
         }
 
-        return $query->orderBy('created_at', 'desc')->paginate(10);
+
+        return $query->orderBy('created_at', 'desc')->paginate(5);
     }
 }

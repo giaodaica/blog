@@ -95,3 +95,35 @@
     color: #999;
     font-size: 14px;
 } 
+.hidden-category {
+    display: none !important;
+}
+.show-more-categories {
+    display: block !important;
+}
+.collapse-categories {
+    display: none !important;
+}
+.show-more-categories.hidden {
+    display: none !important;
+}
+.collapse-categories.visible {
+    display: block !important;
+}
+.product-price {
+    color: #ff6b35;
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.product-old-price {
+    color: #999;
+    text-decoration: line-through;
+    font-size: 14px;
+    margin-right: 10px;
+}
+.rating-text {
+    color: #666;
+    font-size: 14px;
+}
