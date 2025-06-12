@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Color extends Model
 {
+
     protected $fillable = ['color_name'];
 
     // Nếu có liên kết với bảng product_variants
@@ -13,4 +15,5 @@ class Color extends Model
     {
         return $this->hasMany(Product_variants::class, 'color_id');
     }
+
 }

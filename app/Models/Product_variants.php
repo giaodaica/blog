@@ -2,12 +2,14 @@
 
 namespace App\Models;
 
+use Database\Factories\ProductVariantsFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Product_variants extends Model
 {
-    use SoftDeletes;
+    use SoftDeletes; use HasFactory;
 
     protected $fillable = [
         'product_id', 'color_id', 'size_id', 'name',
@@ -29,4 +31,6 @@ class Product_variants extends Model
     {
         return $this->belongsTo(Size::class, 'size_id');
     }
+
 }
+

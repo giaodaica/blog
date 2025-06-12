@@ -30,6 +30,7 @@ class DatabaseSeeder extends Seeder
         //     'keywords' => 'giờ,làm việc,thời gian',
         //     'answer' => 'Shop hoạt động từ 8h đến 17h, từ thứ 2 đến thứ 7.'
         // ]);
+
         $role=  Role::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
         $user = User::create([
             'name' => 'Minh Dang',
@@ -45,5 +46,15 @@ class DatabaseSeeder extends Seeder
         if (!$user->hasRole('admin')) {
             $user->assignRole($role);
         }
+
+        $this->call([
+        ColorsSeeder::class,
+    SizesSeeder::class,
+    CategoriesSeeder::class,
+    ProductsSeeder::class,
+    ProductVariantsSeeder::class,
+    ]);
+
+
     }
 }
