@@ -80,7 +80,5 @@
         </main>
     </div>
 
-    <!-- Add before closing body tag -->
-    <script src="{{ asset('assets/js/search-suggestions.js') }}"></script>
 </body>
 </html>

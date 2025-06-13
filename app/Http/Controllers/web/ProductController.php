@@ -33,14 +33,15 @@ class ProductController extends Controller
     {
         $query = Products::with(['category', 'variants.color', 'variants.size'])
         ->whereHas('category', function ($query) {
-            $query->where('status', '1');
+            $query->where('status', '1')
+                  ->whereNull('categories.deleted_at');
         })
         ->whereHas('variants', function ($query) {
             $query->where('is_show', 1)
-                  ->where('stock', '>', 0) // ✅ chỉ lấy biến thể còn hàng
-                  ->whereNull('deleted_at');
+                  ->where('stock', '>', 0)
+                  ->whereNull('product_variants.deleted_at');
         })
-        ->whereNull('deleted_at');
+        ->whereNull('products.deleted_at');
     
 
         // Filter by categories
@@ -72,7 +73,32 @@ class ProductController extends Controller
             });
         }
 
+        // Handle sorting using JOINs
+        $sort = request('sort');
+        if (in_array($sort, ['price_asc', 'price_desc'])) {
+            $query->join('product_variants', 'products.id', '=', 'product_variants.product_id')
+                  ->where('product_variants.is_show', 1)
+                  ->where('product_variants.stock', '>', 0)
+                  ->whereNull('product_variants.deleted_at')
+                  ->whereNull('products.deleted_at')
+                  ->select('products.*', 'product_variants.sale_price')
+                  ->distinct();
+        }
+    
+        // Xử lý sắp xếp
+        switch ($sort) {
+            case 'price_asc':
+                $query->orderBy('product_variants.sale_price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('product_variants.sale_price', 'desc');
+                break;
+            case 'newest':
+            default:
+                $query->orderBy('products.created_at', 'desc');
+                break;
+        }
 
-        return $query->orderBy('created_at', 'desc')->paginate(5);
+        return $query->paginate(5);
     }
 }
