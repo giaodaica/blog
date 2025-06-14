@@ -37,7 +37,7 @@ class SearchController extends Controller
                 })
                 ->where('name', 'LIKE', "%{$query}%")
                 ->whereNull('products.deleted_at')
-                ->paginate(10);
+                ->paginate(5);
 
             // Lấy dữ liệu cho sidebar
             $categories = Categories::withCount('products')->get();
@@ -45,7 +45,7 @@ class SearchController extends Controller
             $sizes = Size::withCount('productVariants')->get();
 
             if ($request->ajax()) {
-                $view = view('pages.shop.shop', [
+                $view = view('pages.shop.search-results', [
                     'products' => $products,
                     'categories' => $categories,
                     'colors' => $colors,

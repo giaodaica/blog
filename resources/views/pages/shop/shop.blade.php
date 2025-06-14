@@ -24,14 +24,9 @@
                 <div class="col-xxl-10 col-lg-9 ps-5 md-ps-15px md-mb-60px">
                     <div class="row align-items-center">
                         <div class="col-md-6">
-                            @if(request('q'))
-                                <p class="text-muted fs-15 mb-0">
-                                    Tìm thấy 
-                                    <span class="fw-bold text-dark">{{ $products->total() }}</span> 
-                                    kết quả với từ khoá 
-                                    "<span class="fw-bold text-dark">{{ request('q') }}</span>"
-                                </p>
-                            @endif
+                            <div id="search-summary" class="text-muted fs-15 mb-0"></div>
+
+                        
                         </div>
                     
                         <div class="col-md-6 text-md-end">
@@ -47,9 +42,9 @@
                                     @endif
                                 @endforeach
                     
-                                <label for="sort" class="fw-500 mb-0">Sắp xếp:</label>
-                                <select name="sort" id="sort" class="form-select form-select-sm w-auto border-0 bg-light" onchange="this.form.submit()">
-                                    <option value="">-- Chọn --</option>
+                                
+                                <select name="sort" id="sort" class="form-select form-select-sm w-auto border-0 bg-light">
+                                    <option value="">Sắp xếp</option>
                                     <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Mới nhất</option>
                                     <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Giá tăng dần</option>
                                     <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Giá giảm dần</option>
@@ -68,7 +63,7 @@
                     
                         <ul class="shop-modern shop-wrapper grid-loading grid grid-5col lg-grid-4col md-grid-3col sm-grid-2col xs-grid-1col gutter-extra-large text-center">
                             <li class="grid-sizer"></li>
-                            
+                            @if (!request('q'))
                             @foreach ($products as $product)
                                 <!-- start shop item -->
                                 <li class="grid-item">
@@ -104,6 +99,7 @@
                                 </li>
                                 <!-- end shop item -->
                             @endforeach
+                            @endif
                         </ul>
                         
                         <div class="w-100 d-flex mt-4 justify-content-center md-mt-30px">
@@ -387,5 +383,5 @@
 
 @push('scripts')
     <script src="{{ asset('assets/js/shop/shop.js') }}"></script>
-    
+    <script src="{{ asset('assets/js/shop/sort.js') }}"></script>
 @endpush

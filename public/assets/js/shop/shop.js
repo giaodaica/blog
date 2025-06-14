@@ -6,15 +6,57 @@ document.addEventListener('DOMContentLoaded', function() {
     loadingOverlay.innerHTML = '<div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>';
     document.body.appendChild(loadingOverlay);
 
+    // State Management
+    const state = {
+        currentPage: 1,
+        currentSort: 'default',
+        isLoading: false
+    };
+
+    // Get URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const page = urlParams.get('page') || 1;
+    const sort = urlParams.get('sort') || 'default';
+
+    // Initialize state from URL parameters
+    state.currentPage = parseInt(page);
+    state.currentSort = sort;
+
     // Handle all filter changes
     const filterInputs = document.querySelectorAll('input[type="checkbox"], input[type="radio"]');
     filterInputs.forEach(input => {
         input.addEventListener('change', function() {
+            state.currentPage = 1; // Reset to first page when filter changes
             filterProducts();
         });
     });
 
+    // Handle pagination clicks
+    document.addEventListener('click', function(e) {
+        const paginationLink = e.target.closest('.pagination a');
+        if (paginationLink) {
+            e.preventDefault();
+            const newPage = paginationLink.getAttribute('href').match(/page=(\d+)/)?.[1] || 1;
+            state.currentPage = parseInt(newPage);
+            filterProducts();
+        }
+    });
+
+    // Handle sorting changes
+    const sortSelect = document.querySelector('select[name="sort"]');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', function(e) {
+            e.preventDefault();
+            state.currentSort = e.target.value;
+            state.currentPage = 1; // Reset to first page when sort changes
+            filterProducts();
+        });
+    }
+
     function filterProducts() {
+        if (state.isLoading) return;
+        state.isLoading = true;
+
         const formData = new FormData(filterForm);
         
         // Create URLSearchParams and filter out empty values
@@ -26,6 +68,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 params.append(key, value);
             }
         }
+
+        // Add pagination and sorting parameters
+        params.set('page', state.currentPage);
+        params.set('sort', state.currentSort);
         
         const queryString = params.toString();
         
@@ -97,6 +143,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
 
+            // Update pagination
+            const newPagination = doc.querySelector('.pagination');
+            const currentPagination = document.querySelector('.pagination');
+            if (newPagination && currentPagination) {
+                currentPagination.innerHTML = newPagination.innerHTML;
+            }
+
             // Update category counts
             const newCategoryCounts = doc.querySelectorAll('.category-filter .item-qty');
             const currentCategoryCounts = document.querySelectorAll('.category-filter .item-qty');
@@ -130,6 +183,7 @@ document.addEventListener('DOMContentLoaded', function() {
         .finally(() => {
             // Hide loading state
             loadingOverlay.style.display = 'none';
+            state.isLoading = false;
         });
     }
 });

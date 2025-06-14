@@ -1,41 +1,13 @@
-<div id="search-result-container">
-<div class="col-xxl-10 col-lg-9 ps-5 md-ps-15px md-mb-60px">
-    <div class="row align-items-center">
-        <div class="col-md-6">
-            @if(request('q'))
-                <p class="text-muted fs-15 mb-0">
-                    Tìm thấy 
-                    <span class="fw-bold text-dark">{{ $products->total() }}</span> 
-                    kết quả với từ khoá 
-                    "<span class="fw-bold text-dark">{{ request('q') }}</span>"
-                </p>
-            @endif
-        </div>
-    
-        <div class="col-md-6 text-md-end">
-            <form action="{{ route('home.shop') }}" method="GET" class="d-flex justify-content-md-end align-items-center gap-2">
-                {{-- Preserve all existing filters --}}
-                @foreach(request()->except('sort') as $key => $value)
-                    @if(is_array($value))
-                        @foreach($value as $v)
-                            <input type="hidden" name="{{ $key }}[]" value="{{ $v }}">
-                        @endforeach
-                    @else
-                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
-                    @endif
-                @endforeach
-    
-                <label for="sort" class="fw-500 mb-0">Sắp xếp:</label>
-                <select name="sort" id="sort" class="form-select form-select-sm w-auto border-0 bg-light" onchange="this.form.submit()">
-                    <option value="">-- Chọn --</option>
-                    <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Mới nhất</option>
-                    <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Giá tăng dần</option>
-                    <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Giá giảm dần</option>
-                </select>
-            </form>
-        </div>
-    </div>
-    
+<div class="col-md-6">
+    @if(request('q'))
+        <p class="text-muted fs-15 mb-0">
+            Tìm thấy 
+            <span class="fw-bold text-dark">{{ $products->total() }}</span> 
+            kết quả với từ khoá 
+            "<span class="fw-bold text-dark">{{ request('q') }}</span>"
+        </p>
+    @endif
+</div>
     @if($products->isEmpty())
         <div class="text-center py-5">
             <h6 class="alt-font fw-500 text-dark-gray mb-3">Rất tiếc, chúng tôi không tìm thấy sản phẩm nào phù hợp.</h6>
@@ -109,5 +81,4 @@
             </ul>
         </div>
     @endif
-</div>
-</div>
+
