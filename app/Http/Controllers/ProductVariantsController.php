@@ -54,12 +54,10 @@ class ProductVariantsController extends Controller
         ], [
             'size_ids.required' => 'Vui lòng chọn ít nhất 1 size.',
             'size_ids.array' => 'Dữ liệu size không hợp lệ.',
-            'size_ids.*.integer' => 'Mỗi size phải là số nguyên.',
             'size_ids.*.exists' => 'Size được chọn không tồn tại.',
 
             'color_ids.required' => 'Vui lòng chọn ít nhất 1 màu.',
             'color_ids.array' => 'Dữ liệu màu không hợp lệ.',
-            'color_ids.*.integer' => 'Mỗi màu phải là số nguyên.',
             'color_ids.*.exists' => 'Màu được chọn không tồn tại.',
 
             'import_price.required' => 'Giá nhập không được để trống.',
