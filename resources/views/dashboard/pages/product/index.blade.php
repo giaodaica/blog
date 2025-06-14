@@ -34,7 +34,8 @@
                                     <div class="col-sm-auto">
                                         <div>
                                             <a href="{{ route('products.create') }}" class="btn btn-success"
-                                                id="addproduct-btn"><i class="ri-add-line align-bottom me-1"></i> Thêm sản phẩm </a>
+                                                id="addproduct-btn"><i class="ri-add-line align-bottom me-1"></i> Thêm sản
+                                                phẩm </a>
                                         </div>
                                     </div>
                                     <div class="col-sm">
@@ -95,9 +96,9 @@
                                     <thead class="table-light">
                                         <tr>
                                             <th scope="col">#</th>
-                        
+
                                             <th scope="col">Tên sản phẩm</th>
-                                            
+
                                             <th scope="col">Slug</th>
                                             <th scope="col">Danh mục</th>
                                             <th scope="col">Hành động</th>
@@ -111,9 +112,10 @@
                                                 <td>
                                                     <div class="d-flex align-items-center">
                                                         <div class="flex-shrink-0 me-3">
-                                                            <div class="avatar-sm bg-light rounded p-1" style="width: 100px; height: 100px; overflow: hidden;">
-                                                                <img src="{{ asset( $product->image_url) }}"
-                                                                    alt="{{ $product->name }}" class="img-fluid d-block" >
+                                                            <div class="avatar-sm bg-light rounded p-1"
+                                                                style="width: 100px; height: 100px; overflow: hidden;">
+                                                                <img src="{{ asset($product->image_url) }}"
+                                                                    alt="{{ $product->name }}" class="img-fluid d-block">
                                                             </div>
                                                         </div>
                                                         <div class="flex-grow-1">
@@ -154,7 +156,7 @@
                                                                     Sửa
                                                                 </a>
                                                             </li>
-                                                           
+
                                                             <li>
                                                                 <form
                                                                     action="{{ route('products.destroy', $product->id) }}"
@@ -176,6 +178,14 @@
                                                                     <i
                                                                         class="ri-add-fill align-bottom me-2 text-muted"></i>
                                                                     Thêm biến thể
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="dropdown-item"
+                                                                    href="{{ route('variants.index', ['product_id' => $product->id]) }}">
+                                                                    <i
+                                                                        class="ri-file-list-3-line align-bottom me-2 text-muted"></i>
+                                                                    Xem biến thể
                                                                 </a>
                                                             </li>
                                                         </ul>

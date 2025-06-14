@@ -14,11 +14,25 @@ use App\Models\Sizes;
 class ProductVariantsController extends Controller
 {
     // Hiển thị danh sách biến thể
-    public function index()
-    {
+public function index(Request $request)
+{
+    // Nếu có tham số product_id => Chỉ lấy biến thể của sản phẩm đó
+    if ($request->has('product_id')) {
+        $productId = $request->product_id;
+        $product = Products::findOrFail($productId);
+
+        $variants = Product_variants::with('product', 'color', 'size')
+            ->where('product_id', $productId)
+            ->get();
+    } else {
+        // Nếu không có => Hiển thị tất cả biến thể
+        $product = null;
+
         $variants = Product_variants::with('product', 'color', 'size')->get();
-        return view('dashboard.pages.variants.index', compact('variants'));
     }
+
+    return view('dashboard.pages.variants.index', compact('variants', 'product'));
+}
 
     // Form tạo biến thể mới
     public function create($productId)
@@ -265,4 +279,15 @@ class ProductVariantsController extends Controller
 
         return redirect()->route('variants.index')->with('success', 'Xóa biến thể thành công!');
     }
+
+    public function showVariants($productId)
+{
+    $product = Products::findOrFail($productId);
+
+    $variants = Product_variants::with(['color', 'size'])
+                ->where('product_id', $productId)
+                ->get();
+
+    return view('variants.index', compact('product', 'variants'));
+}
 }

@@ -97,7 +97,7 @@ Route::prefix('dashboard')->group(function () {
     Route::get('variants/{id}/edit', [ProductVariantsController::class, 'edit'])->name('variants.edit');
     Route::put('variants/{id}/update', [ProductVariantsController::class, 'update'])->name('variants.update');
     Route::delete('variants/{id}', [ProductVariantsController::class, 'destroy'])->name('variants.destroy');
-
+    Route::get('products/{product}/variants', [ProductVariantsController::class, 'showVariants'])->name('products.variants');
 
     
 });
