@@ -78,36 +78,33 @@ Route::prefix('dashboard')->group(function () {
     Route::post('voucher/active/{id}', [VouchersController::class, 'active']);
     Route::resource('products', ProductsController::class);
     Route::resource('categories', CategoriesController::class);
- 
-        // phần order
-    Route::get('order',[OrderController::class,'db_order'])->name('dashboard.order');
-    Route::post('order/change/{id}',[OrderController::class,'db_order_change']);
-    Route::get('order/{id}',[OrderController::class,'db_order_show']);
 
- 
-       // Route resource cho color và size
+    // phần order
+    Route::get('order', [OrderController::class, 'db_order'])->name('dashboard.order');
+    Route::post('order/change/{id}', [OrderController::class, 'db_order_change']);
+    Route::get('order/{id}', [OrderController::class, 'db_order_show']);
+
+
+    // Route resource cho color và size
     Route::resource('colors', ColorController::class);
     Route::resource('sizes', SizeController::class);
 
 
-     Route::get('variants', [ProductVariantsController::class, 'index'])->name('variants.index');
-    Route::get('variants/create/{productId}', [ProductVariantsController::class, 'create'])->name('variants.create');
-    Route::post('variants/store/{productId}', [ProductVariantsController::class, 'store'])->name('variants.store');
+    Route::get('variants', [ProductVariantsController::class, 'index'])->name('variants.index');
+    Route::get('variants/create', [ProductVariantsController::class, 'create'])->name('variants.create');
+    Route::post('variants/store', [ProductVariantsController::class, 'store'])->name('variants.store');
     Route::get('variants/{id}', [ProductVariantsController::class, 'show'])->name('variants.show');
     Route::get('variants/{id}/edit', [ProductVariantsController::class, 'edit'])->name('variants.edit');
     Route::put('variants/{id}/update', [ProductVariantsController::class, 'update'])->name('variants.update');
     Route::delete('variants/{id}', [ProductVariantsController::class, 'destroy'])->name('variants.destroy');
     Route::get('products/{product}/variants', [ProductVariantsController::class, 'showVariants'])->name('products.variants');
-
-    
 });
 
 
 Route::prefix('dashboard')->name('dashboard.')->group(function () {
-// Phân quyền
+    // Phân quyền
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
     Route::post('roles/order', [RoleController::class, 'order'])->name('roles.order');
     //  Route::post('permission/order', [RoleController::class, 'order'])->name('permission.order');
 });
-

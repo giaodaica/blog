@@ -33,8 +33,8 @@
                                 <div class="row g-4">
                                     <div class="col-sm-auto">
                                         <div>
-                                            <a href="{{ route('products.index') }}" class="btn btn-info"
-                                                id="addproduct-btn"> Quản lý sản phẩm</a>
+                                            <a href="{{ route('variants.create') }}" class="btn btn-info"
+                                                id="addproduct-btn"> Thêm biến thể</a>
                                         </div>
                                     </div>
                                     <div class="col-sm">

@@ -18,48 +18,78 @@
                 action="{{ route('products.store') }}" enctype="multipart/form-data">
                 @csrf
 
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach ($errors->all() as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <div class="row">
 
                     <!-- Left column: Product Info -->
-                    <div class="col-lg-8">
+                    <div class="col-lg-12">
                         <div class="card">
                             <div class="card-body">
 
                                 <!-- Tên sản phẩm -->
                                 <div class="mb-3">
                                     <label class="form-label">Tên sản phẩm</label>
-                                    <input type="text" class="form-control" name="name"
-                                        placeholder="Nhập tên sản phẩm" required>
+                                    <input type="text" class="form-control @error('name') is-invalid @enderror"
+                                        name="name" placeholder="Nhập tên sản phẩm" value="{{ old('name') }}" required>
+                                    @error('name')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <!-- Thương hiệu -->
                                 <div class="mb-3">
-                                    <label class="form-label">Thương hiệu</label>
-                                    <input type="text" class="form-control" name="brand"
-                                        placeholder="Nhập thương hiệu">
+                                    <label class="form-label">Slug</label>
+                                    <input type="text" class="form-control @error('brand') is-invalid @enderror"
+                                        name="brand" placeholder="Nhập thương hiệu" value="{{ old('brand') }}">
+                                    @error('brand')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <!-- Mô tả -->
                                 <div class="mb-3">
                                     <label class="form-label">Mô tả</label>
-                                    <textarea class="form-control" name="description" rows="4"></textarea>
+                                    <textarea class="form-control @error('description') is-invalid @enderror" name="description" rows="4">{{ old('description') }}</textarea>
+                                    @error('description')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <!-- Danh mục -->
                                 <div class="mb-3">
                                     <label class="form-label">Danh mục sản phẩm</label>
-                                    <select class="form-select" name="category_id" required>
+                                    <select class="form-select @error('category_id') is-invalid @enderror"
+                                        name="category_id" required>
                                         <option value="">-- Chọn danh mục --</option>
                                         @foreach ($categories as $category)
-                                            <option value="{{ $category->id }}">{{ $category->name }}</option>
+                                            <option value="{{ $category->id }}"
+                                                {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                                {{ $category->name }}
+                                            </option>
                                         @endforeach
                                     </select>
+                                    @error('category_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                                 <!-- Ảnh đại diện -->
                                 <div class="mb-3">
                                     <label class="form-label">Hình ảnh</label>
-                                    <input type="file" class="form-control" name="image_url" accept="image/*">
+                                    <input type="file" class="form-control @error('image_url') is-invalid @enderror"
+                                        name="image_url" accept="image/*">
+                                    @error('image_url')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
                                 </div>
 
                             </div>
@@ -77,57 +107,87 @@
                                 <div id="variant-container">
                                     <div class="row variant-item mb-3">
                                         <!-- Size -->
-                                        <div class="col-lg-2">
-                                            <select class="form-select" name="variants[0][size_id]" required>
-                                                <option value="">Size</option>
-                                                @foreach ($sizes as $size)
-                                                    <option value="{{ $size->id }}">{{ $size->size_name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+                                        <select class="form-select @error('variants.0.size_id') is-invalid @enderror"
+                                            name="variants[0][size_id]" required>
+                                            <option value="">Size</option>
+                                            @foreach ($sizes as $size)
+                                                <option value="{{ $size->id }}"
+                                                    {{ old('variants.0.size_id') == $size->id ? 'selected' : '' }}>
+                                                    {{ $size->size_name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
 
                                         <!-- Color -->
-                                        <div class="col-lg-2">
-                                            <select class="form-select" name="variants[0][color_id]" required>
-                                                <option value="">Color</option>
-                                                @foreach ($colors as $color)
-                                                    <option value="{{ $color->id }}">{{ $color->color_name }}</option>
-                                                @endforeach
-                                            </select>
-                                        </div>
+                                        <select class="form-select @error('variants.0.color_id') is-invalid @enderror"
+                                            name="variants[0][color_id]" required>
+                                            <option value="">Color</option>
+                                            @foreach ($colors as $color)
+                                                <option value="{{ $color->id }}"
+                                                    {{ old('variants.0.color_id') == $color->id ? 'selected' : '' }}>
+                                                    {{ $color->color_name }}
+                                                </option>
+                                            @endforeach
+                                        </select>
 
                                         <!-- Giá nhập -->
                                         <div class="col-lg-2">
-                                            <input type="number" class="form-control" name="variants[0][import_price]"
-                                                placeholder="Giá nhập" min="0" required>
+                                            <input type="number"
+                                                class="form-control @error('variants.0.import_price') is-invalid @enderror"
+                                                name="variants[0][import_price]"
+                                                value="{{ old('variants.0.import_price') }}" placeholder="Giá nhập"
+                                                required>
+                                            @error('variants.0.import_price')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
 
                                         <!-- Giá niêm yết -->
                                         <div class="col-lg-2">
-                                            <input type="number" class="form-control" name="variants[0][listed_price]"
-                                                placeholder="Giá niêm yết" min="0" required>
+                                            <input type="number"
+                                                class="form-control @error('variants.0.listed_price') is-invalid @enderror"
+                                                name="variants[0][listed_price]" placeholder="Giá niêm yết" min="0"
+                                                required>
+                                            @error('variants.0.listed_price')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
 
                                         <!-- Giá khuyến mãi -->
                                         <div class="col-lg-2">
-                                            <input type="number" class="form-control" name="variants[0][sale_price]"
-                                                placeholder="Giá khuyến mãi" min="0">
+                                            <input type="number"
+                                                class="form-control @error('variants.0.sale_price') is-invalid @enderror"
+                                                name="variants[0][sale_price]" placeholder="Giá khuyến mãi" min="0">
+                                            @error('variants.0.sale_price')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
 
                                         <!-- Số lượng -->
                                         <div class="col-lg-2">
-                                            <input type="number" class="form-control" name="variants[0][stock]"
-                                                placeholder="Số lượng" min="0" required>
+                                            <input type="number"
+                                                class="form-control @error('variants.0.stock') is-invalid @enderror"
+                                                name="variants[0][stock]" placeholder="Số lượng" min="0" required>
+                                            @error('variants.0.stock')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
 
                                         <!-- Ảnh biến thể -->
                                         <div class="col-lg-2 mt-2">
-                                           <input type="file" class="form-control" name="variants[0][variant_image]" accept="image/*">
+                                            <input type="file"
+                                                class="form-control @error('variants.0.variant_image') is-invalid @enderror"
+                                                name="variants[0][variant_image]" accept="image/*">
+                                            @error('variants.0.variant_image')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
                                         </div>
                                     </div>
 
                                 </div>
-
+                                <p class="text-muted fst-italic">(*) Mỗi tổ hợp màu + size sẽ tạo ra một biến thể tự động
+                                    với tên
+                                    dạng: <strong>Tên sản phẩm + Màu + Size</strong></p>
                                 <!-- Nút thêm biến thể -->
                                 <div class="text-center">
                                     <button type="button" id="add-variant" class="btn btn-success btn-sm">+ Thêm biến
