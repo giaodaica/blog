@@ -20,6 +20,12 @@
                     </div>
                 </div>
             </div>
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
             <!-- end page title -->
 
             <div class="row">
@@ -29,6 +35,7 @@
                 <div class="col-xl-12 col-lg-8">
                     <div>
                         <div class="card">
+
                             <div class="card-header border-0">
                                 <div class="row g-4">
                                     <div class="col-sm-auto">
@@ -160,8 +167,7 @@
                                                             <li>
                                                                 <form
                                                                     action="{{ route('products.destroy', $product->id) }}"
-                                                                    method="POST"
-                                                                    onsubmit="return confirm('Bạn có chắc muốn xóa sản phẩm này?');">
+                                                                    method="POST" class="delete-form">
                                                                     @csrf
                                                                     @method('DELETE')
                                                                     <button type="submit"
@@ -243,8 +249,43 @@
     <!-- nouisliderribute js -->
     <script src="{{ asset('admin/libs/nouislider/nouislider.min.js') }}"></script>
     <script src="{{ asset('admin/libs/wnumb/wNumb.min.js') }}"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- gridjs js -->
     <script src="{{ asset('admin/libs/gridjs/gridjs.umd.js') }}"></script>
     <script src="https://unpkg.com/gridjs/plugins/selection/dist/selection.umd.js"></script>
+
+    <script>
+        setTimeout(function() {
+            let alert = document.querySelector('.alert');
+            if (alert) {
+                alert.classList.remove('show');
+                alert.classList.add('hide');
+            }
+        }, 3000);
+
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteForms = document.querySelectorAll('.delete-form');
+            deleteForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault(); // Chặn submit form ngay lập tức
+
+                    Swal.fire({
+                        title: 'Bạn có chắc chắn?',
+                        text: "Hành động này sẽ không thể hoàn tác!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Xóa!',
+                        cancelButtonText: 'Hủy'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit(); // Nếu xác nhận thì submit form
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 @endsection

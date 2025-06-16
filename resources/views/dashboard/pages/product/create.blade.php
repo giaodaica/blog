@@ -85,10 +85,14 @@
                                 <!-- Ảnh đại diện -->
                                 <div class="mb-3">
                                     <label class="form-label">Hình ảnh</label>
-                                    <input type="file" class="form-control @error('image_url') is-invalid @enderror"
-                                        name="image_url" accept="image/*">
+                                    <div class="input-group">
+                                        <input type="file" class="form-control @error('image_url') is-invalid @enderror"
+                                            name="image_url" accept="image/*" id="product-image">
+                                        <label class="input-group-text" for="product-image">Thêm ảnh</label>
+                                    </div>
+                                    <small id="product-image-name" class="form-text text-muted"></small>
                                     @error('image_url')
-                                        <div class="invalid-feedback">{{ $message }}</div>
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
                                     @enderror
                                 </div>
 
@@ -106,37 +110,47 @@
 
                                 <div id="variant-container">
                                     <div class="row variant-item mb-3">
+
                                         <!-- Size -->
-                                        <select class="form-select @error('variants.0.size_id') is-invalid @enderror"
-                                            name="variants[0][size_id]" required>
-                                            <option value="">Size</option>
-                                            @foreach ($sizes as $size)
-                                                <option value="{{ $size->id }}"
-                                                    {{ old('variants.0.size_id') == $size->id ? 'selected' : '' }}>
-                                                    {{ $size->size_name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
+                                        <div class="col-lg-2">
+                                            <select class="form-select @error('variants.0.size_id') is-invalid @enderror"
+                                                name="variants[0][size_id]" required>
+                                                <option value="">Size</option>
+                                                @foreach ($sizes as $size)
+                                                    <option value="{{ $size->id }}"
+                                                        {{ old('variants.0.size_id') == $size->id ? 'selected' : '' }}>
+                                                        {{ $size->size_name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('variants.0.size_id')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
 
                                         <!-- Color -->
-                                        <select class="form-select @error('variants.0.color_id') is-invalid @enderror"
-                                            name="variants[0][color_id]" required>
-                                            <option value="">Color</option>
-                                            @foreach ($colors as $color)
-                                                <option value="{{ $color->id }}"
-                                                    {{ old('variants.0.color_id') == $color->id ? 'selected' : '' }}>
-                                                    {{ $color->color_name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
+                                        <div class="col-lg-2">
+                                            <select class="form-select @error('variants.0.color_id') is-invalid @enderror"
+                                                name="variants[0][color_id]" required>
+                                                <option value="">Color</option>
+                                                @foreach ($colors as $color)
+                                                    <option value="{{ $color->id }}"
+                                                        {{ old('variants.0.color_id') == $color->id ? 'selected' : '' }}>
+                                                        {{ $color->color_name }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                            @error('variants.0.color_id')
+                                                <div class="invalid-feedback">{{ $message }}</div>
+                                            @enderror
+                                        </div>
 
                                         <!-- Giá nhập -->
                                         <div class="col-lg-2">
                                             <input type="number"
                                                 class="form-control @error('variants.0.import_price') is-invalid @enderror"
-                                                name="variants[0][import_price]"
-                                                value="{{ old('variants.0.import_price') }}" placeholder="Giá nhập"
-                                                required>
+                                                name="variants[0][import_price]" value="{{ old('variants.0.import_price') }}"
+                                                placeholder="Giá nhập" min="0" required>
                                             @error('variants.0.import_price')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -146,7 +160,7 @@
                                         <div class="col-lg-2">
                                             <input type="number"
                                                 class="form-control @error('variants.0.listed_price') is-invalid @enderror"
-                                                name="variants[0][listed_price]" placeholder="Giá niêm yết" min="0"
+                                                name="variants[0][listed_price]" value="{{ old('variants.0.listed_price') }}" placeholder="Giá niêm yết" min="0"
                                                 required>
                                             @error('variants.0.listed_price')
                                                 <div class="invalid-feedback">{{ $message }}</div>
@@ -157,7 +171,7 @@
                                         <div class="col-lg-2">
                                             <input type="number"
                                                 class="form-control @error('variants.0.sale_price') is-invalid @enderror"
-                                                name="variants[0][sale_price]" placeholder="Giá khuyến mãi" min="0">
+                                                name="variants[0][sale_price]" value="{{ old('variants.0.sale_price') }}" placeholder="Giá khuyến mãi" min="0">
                                             @error('variants.0.sale_price')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -167,7 +181,7 @@
                                         <div class="col-lg-2">
                                             <input type="number"
                                                 class="form-control @error('variants.0.stock') is-invalid @enderror"
-                                                name="variants[0][stock]" placeholder="Số lượng" min="0" required>
+                                                name="variants[0][stock]" value="{{ old('variants.0.stock') }}" placeholder="Số lượng" min="0" required>
                                             @error('variants.0.stock')
                                                 <div class="invalid-feedback">{{ $message }}</div>
                                             @enderror
@@ -175,23 +189,24 @@
 
                                         <!-- Ảnh biến thể -->
                                         <div class="col-lg-2 mt-2">
-                                            <input type="file"
-                                                class="form-control @error('variants.0.variant_image') is-invalid @enderror"
-                                                name="variants[0][variant_image]" accept="image/*">
+                                            <div class="input-group">
+                                                <input type="file"
+                                                    class="form-control @error('variants.0.variant_image') is-invalid @enderror"
+                                                    name="variants[0][variant_image]" accept="image/*" id="variant-image-0">
+                                              
+                                            </div>
+                                            <small id="variant-image-name-0" class="form-text text-muted"></small>
                                             @error('variants.0.variant_image')
-                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                <div class="invalid-feedback d-block">{{ $message }}</div>
                                             @enderror
                                         </div>
                                     </div>
-
                                 </div>
-                                <p class="text-muted fst-italic">(*) Mỗi tổ hợp màu + size sẽ tạo ra một biến thể tự động
-                                    với tên
-                                    dạng: <strong>Tên sản phẩm + Màu + Size</strong></p>
-                                <!-- Nút thêm biến thể -->
+
+                                <p class="text-muted fst-italic">(*) Mỗi tổ hợp màu + size sẽ tạo ra một biến thể tự động với tên dạng: <strong>Tên sản phẩm + Màu + Size</strong></p>
+
                                 <div class="text-center">
-                                    <button type="button" id="add-variant" class="btn btn-success btn-sm">+ Thêm biến
-                                        thể</button>
+                                    <button type="button" id="add-variant" class="btn btn-success btn-sm">+ Thêm biến thể</button>
                                 </div>
 
                             </div>
@@ -218,6 +233,7 @@
         $('#add-variant').on('click', function() {
             let variantHtml = `
     <div class="row variant-item mb-3">
+
         <div class="col-lg-2">
             <select class="form-select" name="variants[${index}][size_id]" required>
                 <option value="">Size</option>
@@ -226,6 +242,7 @@
                 @endforeach
             </select>
         </div>
+
         <div class="col-lg-2">
             <select class="form-select" name="variants[${index}][color_id]" required>
                 <option value="">Color</option>
@@ -234,26 +251,48 @@
                 @endforeach
             </select>
         </div>
+
         <div class="col-lg-2">
             <input type="number" class="form-control" name="variants[${index}][import_price]" placeholder="Giá nhập" min="0" required>
         </div>
+
         <div class="col-lg-2">
             <input type="number" class="form-control" name="variants[${index}][listed_price]" placeholder="Giá niêm yết" min="0" required>
         </div>
+
         <div class="col-lg-2">
             <input type="number" class="form-control" name="variants[${index}][sale_price]" placeholder="Giá khuyến mãi" min="0">
         </div>
+
         <div class="col-lg-2">
             <input type="number" class="form-control" name="variants[${index}][stock]" placeholder="Số lượng" min="0" required>
         </div>
+
         <div class="col-lg-2 mt-2">
-            <input type="file" class="form-control" name="variants[${index}][variant_image]" accept="image/*">
+            <div class="input-group">
+                <input type="file" class="form-control" name="variants[${index}][variant_image]" accept="image/*" id="variant-image-${index}">
+              
+            </div>
+            <small id="variant-image-name-${index}" class="form-text text-muted"></small>
         </div>
     </div>
 `;
 
             $('#variant-container').append(variantHtml);
             index++;
+        });
+
+        // Hiển thị tên file ảnh chính
+        $(document).on('change', '#product-image', function() {
+            let fileName = $(this).val().split('\\').pop();
+            $('#product-image-name').text(fileName);
+        });
+
+        // Hiển thị tên file ảnh biến thể
+        $(document).on('change', 'input[type="file"][name^="variants"]', function() {
+            let inputId = $(this).attr('id');
+            let fileName = $(this).val().split('\\').pop();
+            $('#variant-image-name-' + inputId.split('-').pop()).text(fileName);
         });
     </script>
 @endsection

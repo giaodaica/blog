@@ -89,7 +89,7 @@
                                                             data-bs-trigger="hover" data-bs-placement="top" title="Xóa">
                                                             <form action="{{ route('colors.destroy', $color->id) }}"
                                                                 method="POST"
-                                                                onsubmit="return confirm('Bạn có chắc muốn xóa màu này?');"
+                                                               class="delete-form"
                                                                 style="display:inline;">
                                                                 @csrf
                                                                 @method('DELETE')
@@ -150,4 +150,33 @@
             </div>
         </div>
     </footer>
+@endsection
+@section('js-content')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteForms = document.querySelectorAll('.delete-form');
+
+            deleteForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault(); // Chặn submit mặc định
+
+                    Swal.fire({
+                        title: 'Bạn có chắc chắn?',
+                        text: "Hành động này sẽ không thể hoàn tác!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Xóa',
+                        cancelButtonText: 'Hủy'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit(); // Chấp nhận xóa
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 @endsection

@@ -155,7 +155,7 @@
                                                                 <form
                                                                     action="{{ route('variants.destroy', $variant->id) }}"
                                                                     method="POST"
-                                                                    onsubmit="return confirm('Bạn có chắc muốn xóa biến thể này?');">
+                                                                   class="delete-form">
                                                                     @csrf
                                                                     @method('DELETE')
                                                                     <button type="submit"
@@ -207,4 +207,33 @@
             </div>
         </div>
     </footer>
+@endsection
+@section('js-content')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteForms = document.querySelectorAll('.delete-form');
+
+            deleteForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault(); // Chặn submit mặc định
+
+                    Swal.fire({
+                        title: 'Bạn có chắc chắn?',
+                        text: "Hành động này sẽ không thể hoàn tác!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Xóa',
+                        cancelButtonText: 'Hủy'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit(); // Chấp nhận xóa
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 @endsection
