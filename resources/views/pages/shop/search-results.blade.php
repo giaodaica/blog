@@ -4,7 +4,7 @@
             Tìm thấy 
             <span class="fw-bold text-dark">{{ $products->total() }}</span> 
             kết quả với từ khoá 
-            "<span class="fw-bold text-dark">{{ request('q') }}</span>"
+            "<span class="fw-bold text-dark">{{ Str::limit(request('q'), 30, '...') }}</span>"
         </p>
     @endif
 </div>
@@ -30,7 +30,7 @@
                             </a>
                         </div>
                         <div class="shop-footer text-start">
-                            <a href="{{ route('home.show', $product->id) }}" class="alt-font text-dark-gray fs-19 fw-500">{{ $product->name }}</a>
+                            <a href="{{ route('home.show', $product->id) }}" class="alt-font text-dark-gray fs-19 fw-500 product-name-truncate">{{ $product->name }}</a>
                             <div class="price lh-22 fs-16">
                                 @php
                                     $variant = $product->variants->first();

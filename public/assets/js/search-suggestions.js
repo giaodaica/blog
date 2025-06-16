@@ -28,7 +28,8 @@ document.addEventListener('DOMContentLoaded', function() {
         currentSort: 'default',
         currentKeyword: '',
         isLoading: false,
-        debounceTimer: null
+        debounceTimer: null,
+        lastRequestedTerm: null
     };
 
     // Get search parameters from URL
@@ -164,44 +165,27 @@ document.addEventListener('DOMContentLoaded', function() {
 
         display() {
             const history = this.get();
-            elements.historyList.innerHTML = '';
+            let historyHtml = '';
             
             if (history.length > 0) {
-                history.forEach(keyword => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-                        <div class="text-content">
+                historyHtml = history.map(keyword => `
+                    <div class="history-item p-2 border-bottom d-flex justify-content-between align-items-center" style="cursor: pointer;">
+                        <div class="d-flex align-items-center text-content">
                             <i class="fa fa-history"></i>
-                            <span>${keyword}</span>
+                            <span class="ms-2" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">${keyword}</span>
+                            
                         </div>
-                        <button class="remove-history-item" data-keyword="${keyword}">&times;</button>
-                    `;
-                    
-                    li.querySelector('.text-content').addEventListener('click', () => {
-                        elements.searchInput.value = keyword;
-                        if (elements.searchSuggestions) {
-                            elements.searchSuggestions.style.display = 'none';
-                        }
-                        state.currentKeyword = keyword;
-                        state.currentPage = 1;
-                        search.perform(keyword);
-                    });
-
-                    li.querySelector('.remove-history-item').addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        this.remove(e.target.dataset.keyword);
-                    });
-
-                    elements.historyList.appendChild(li);
-                });
+                        <button class="remove-history-item btn btn-sm btn-link p-0" data-keyword="${keyword}" style="line-height: 1;">&times;</button>
+                    </div>
+                `).join('');
             } else {
-                elements.historyList.innerHTML = '<li class="mb-2 fw-bold text-dark" style="font-size: 16px;">Chưa có lịch sử tìm kiếm</li>';
+                historyHtml = '<div class="p-2 fw-bold text-dark" style="font-size: 16px;">Chưa có lịch sử tìm kiếm</div>';
             }
+            return historyHtml;
         },
 
         updateClearButton() {
-            const history = this.get();
-            elements.clearHistoryBtn.style.display = history.length > 0 ? 'block' : 'none';
+            // The clear button is now dynamically rendered within showSuggestions
         }
     };
 
@@ -426,43 +410,195 @@ document.addEventListener('DOMContentLoaded', function() {
         },
 
         async showSuggestions(term) {
-            if (!elements.autocompleteResults || !term) {
-                if (elements.autocompleteResults) {
-                    elements.autocompleteResults.style.display = 'none';
+            if (!elements.searchSuggestions) return;
+
+            const trimmedTerm = term ? term.trim() : '';
+            elements.searchSuggestions.innerHTML = ''; // Clear previous content
+
+            // Cập nhật từ khóa cuối cùng được yêu cầu
+            state.lastRequestedTerm = trimmedTerm;
+
+            if (trimmedTerm === '') {
+                // Display history and trending
+                let contentHtml = `
+                    <div class="suggestions-section mb-3">
+                        <h6 class="mb-2 fw-bold text-dark" style="font-size: 16px;">
+                            <i class="fa fa-history text-danger me-2"></i>Lịch sử tìm kiếm
+                        </h6>
+                        <div class="history-list-dynamic">
+                            ${searchHistory.display()}
+                        </div>
+                        ${searchHistory.get().length > 0 ? `<button class="btn btn-sm btn-outline-danger btn-clear-history mt-2" style="border: none !important; color: #dc3545 !important; background: transparent !important;">Xóa lịch sử</button>` : ''}
+                    </div>
+                    <div class="products-section">
+                        <h6 class="mb-2 fw-bold text-dark" style="font-size: 16px;">
+                            <i class="fa fa-fire text-danger me-2"></i>Xu hướng tìm kiếm
+                        </h6>
+                        <div class="trending-list-dynamic">
+                            ${handlers.displayTrendingSearches()}
+                        </div>
+                    </div>
+                `;
+                elements.searchSuggestions.innerHTML = contentHtml;
+
+                // Re-attach event listeners for history and trending items
+                elements.searchSuggestions.querySelectorAll('.history-item .text-content').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const keyword = item.querySelector('span').textContent.trim();
+                        elements.searchInput.value = keyword;
+                        state.currentKeyword = keyword;
+                        state.currentPage = 1;
+                        elements.searchSuggestions.style.display = 'none'; // Hide dropdown
+                        this.perform(keyword);
+                    });
+                });
+                elements.searchSuggestions.querySelectorAll('.remove-history-item').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        searchHistory.remove(e.target.dataset.keyword);
+                        search.showSuggestions(''); // Re-render
+                    });
+                });
+                const clearBtn = elements.searchSuggestions.querySelector('.btn-clear-history');
+                if (clearBtn) {
+                    clearBtn.addEventListener('click', () => {
+                        searchHistory.clear();
+                        search.showSuggestions(''); // Re-render
+                    });
                 }
+                elements.searchSuggestions.querySelectorAll('.trend-tag').forEach(tag => {
+                    tag.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        const keyword = tag.querySelector('span').textContent.trim();
+                        elements.searchInput.value = keyword;
+                        elements.searchSuggestions.style.display = 'none'; // Hide dropdown
+                        state.currentKeyword = keyword;
+                        state.currentPage = 1;
+                        this.perform(keyword);
+                    });
+                });
+
+                elements.searchSuggestions.style.display = 'block';
+
                 return;
             }
 
+            // If there's a search term, proceed with fetching suggestions
             try {
-                const response = await fetch(`${CONFIG.API_ENDPOINTS.SUGGESTIONS}?q=${encodeURIComponent(term)}`);
-                const suggestions = await response.json();
+                // Lấy từ khóa cho yêu cầu hiện tại để so sánh sau này
+                const currentTermForRequest = trimmedTerm;
 
-                elements.autocompleteResults.innerHTML = '';
-                if (suggestions.length > 0) {
-                    suggestions.forEach(suggestion => {
-                        const div = document.createElement('div');
-                        div.className = 'p-2 border-bottom suggestion-item';
-                        div.innerHTML = `
-                            <div class="d-flex align-items-center">
-                                <i class="fa fa-search text-muted me-2"></i>
-                                <span>${suggestion.name}</span>
-                            </div>
-                        `;
-                        div.addEventListener('click', () => {
-                            elements.searchInput.value = suggestion.name;
-                            state.currentKeyword = suggestion.name;
-                            state.currentPage = 1;
-                            this.perform(suggestion.name);
-                        });
-                        elements.autocompleteResults.appendChild(div);
-                    });
-                    elements.autocompleteResults.style.display = 'block';
-                } else {
-                    elements.autocompleteResults.style.display = 'none';
+                // Gọi API lấy gợi ý
+                const response = await fetch(`${CONFIG.API_ENDPOINTS.SUGGESTIONS}?q=${encodeURIComponent(currentTermForRequest)}`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
                 }
+
+                const data = await response.json();
+
+                // QUAN TRỌNG: Chỉ cập nhật nếu đây là phản hồi cho yêu cầu gần nhất
+                if (state.lastRequestedTerm !== currentTermForRequest) {
+                    console.log(`Ignoring outdated suggestion response for term: ${currentTermForRequest}. Current term is: ${state.lastRequestedTerm}`);
+                    return; // Bỏ qua phản hồi cũ
+                }
+
+                const suggestions = data.suggestions || [];
+                const featuredProducts = data.featured_products || [];
+
+                // Cập nhật nội dung search-suggestions
+                elements.searchSuggestions.innerHTML = `
+                    <div class="suggestions-section mb-3">
+                        <h6 class="mb-2 fw-bold text-dark" style="font-size: 16px;">
+                            <i class="fa fa-search text-danger me-2"></i>Gợi ý tìm kiếm
+                        </h6>
+                        <div class="suggestions-list">
+                            ${suggestions.length > 0 ? suggestions.map(suggestion => `
+                                <div class="suggestion-item p-2 border-bottom" style="cursor: pointer;">
+                                    <div class="d-flex align-items-center">
+                                        <i class="fa fa-search text-muted"></i>
+                                        <span class="ms-2" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">${suggestion.name}</span>
+                                    </div>
+                                </div>
+                            `).join('') : `
+                                <div class="p-2 text-center text-muted">
+                                    Không tìm thấy gợi ý phù hợp
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                    <div class="products-section">
+                        <h6 class="mb-2 fw-bold text-dark" style="font-size: 16px;">
+                            <i class="fa fa-star text-danger me-2"></i>Sản phẩm nổi bật
+                        </h6>
+                        <div class="products-list">
+                            ${featuredProducts.length > 0 ? featuredProducts.map(product => `
+                                <div class="product-item p-2 border-bottom" style="cursor: pointer;" data-product-id="${product.id}">
+                                    <div class="d-flex align-items-center">
+                                        <div class="product-image" style="width: 60px; height: 60px; margin-right: 15px;">
+                                            <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+                                        </div>
+                                        <div class="product-info" style="flex: 1;">
+                                            <div class="product-name" style="font-size: 14px; margin-bottom: 2px; line-height: 2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">${product.name}</div>
+                                            <div class="product-price d-flex align-items-center gap-2" style="line-height: 1;">
+                                                <span class="current-price text-danger fw-bold">${product.price}</span>
+                                                ${product.old_price ? `
+                                                    <span class="old-price text-muted" style="text-decoration: line-through; font-size: 13px;">${product.old_price}</span>
+                                                ` : ''}
+                                                ${product.discount ? `
+                                                    <span class="discount" style="background: #f60; color: white; padding: 2px 6px; border-radius: 3px; font-size: 12px;">${product.discount}</span>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('') : `
+                                <div class="p-2 text-center text-muted">
+                                    Không có sản phẩm nổi bật
+                                </div>
+                            `}
+                        </div>
+                    </div>
+                `;
+
+                // Thêm event listeners cho các suggestion items
+                elements.searchSuggestions.querySelectorAll('.suggestion-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const keyword = item.querySelector('span').textContent.trim();
+                        elements.searchInput.value = keyword;
+                        state.currentKeyword = keyword;
+                        state.currentPage = 1;
+                        elements.searchSuggestions.style.display = 'none'; // Hide dropdown
+                        this.perform(keyword);
+                    });
+                });
+
+                // Thêm event listeners cho các product items
+                elements.searchSuggestions.querySelectorAll('.product-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const productId = item.dataset.productId;
+                        if (productId) {
+                            window.location.href = `/aonam/${productId}`;
+                        }
+                    });
+                });
+                elements.searchSuggestions.style.display = 'block';
+
             } catch (error) {
-                console.error('Error fetching suggestions:', error);
-                elements.autocompleteResults.style.display = 'none';
+                // Chỉ hiển thị lỗi nếu đây là lỗi cho yêu cầu gần nhất
+                if (state.lastRequestedTerm === trimmedTerm) {
+                    console.error('Error fetching suggestions:', error);
+                    elements.searchSuggestions.innerHTML = `
+                        <div class="p-2 text-center text-danger">
+                            <i class="fa fa-exclamation-circle me-2"></i>
+                            Có lỗi xảy ra khi tải gợi ý. Vui lòng thử lại sau.
+                        </div>
+                    `;
+                }
             }
         }
     };
@@ -475,9 +611,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
 
-            // Initialize search history and trending searches
-            searchHistory.updateUI();
-            this.displayTrendingSearches();
+            // No longer need to updateUI or displayTrendingSearches here directly
+            // searchHistory.updateUI(); // This will be handled by showSuggestions
+            // this.displayTrendingSearches(); // This will be handled by showSuggestions
 
             // Set up event listeners
             this.setupEventListeners();
@@ -492,23 +628,18 @@ document.addEventListener('DOMContentLoaded', function() {
         setupEventListeners() {
             // Search input events
             elements.searchInput.addEventListener('focus', () => {
-                if (elements.historyList) searchHistory.display();
-                if (elements.trendingList) this.displayTrendingSearches();
-                if (elements.searchSuggestions) {
-                    elements.searchSuggestions.style.display = 'block';
+                // When focused, always show the suggestions container
+                // Then, show history/trending if input is empty
+                const searchValue = elements.searchInput.value.trim();
+                if (searchValue.length === 0) {
+                    search.showSuggestions(''); // Show history/trending
+                } else {
+                    search.showSuggestions(searchValue); // Show current suggestions
                 }
             });
 
             elements.searchInput.addEventListener('input', utils.debounce(() => {
-                if (elements.searchInput.value.length > 0) {
-                    search.showSuggestions(elements.searchInput.value);
-                } else {
-                    if (elements.historyList) searchHistory.display();
-                    if (elements.trendingList) this.displayTrendingSearches();
-                    if (elements.autocompleteResults) {
-                        elements.autocompleteResults.style.display = 'none';
-                    }
-                }
+                search.showSuggestions(elements.searchInput.value);
             }, CONFIG.DEBOUNCE_DELAY));
 
             elements.searchInput.addEventListener('keypress', (e) => {
@@ -522,11 +653,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-            // Clear history button
+            // Clear history button is now dynamically added and handled in showSuggestions
             if (elements.clearHistoryBtn) {
-                elements.clearHistoryBtn.addEventListener('click', () => {
-                    searchHistory.clear();
-                });
+                // elements.clearHistoryBtn.addEventListener('click', () => { // Remove this
+                //     searchHistory.clear();
+                // });
             }
 
             // Clear input button
@@ -539,11 +670,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     elements.searchInput.value = '';
                     elements.searchInput.focus();
                     elements.clearInput.style.display = 'none';
-                    if (elements.historyList) searchHistory.display();
-                    if (elements.trendingList) this.displayTrendingSearches();
-                    if (elements.autocompleteResults) {
-                        elements.autocompleteResults.style.display = 'none';
-                    }
+                    search.showSuggestions(''); // Show history/trending after clearing
                 });
             }
 
@@ -558,29 +685,15 @@ document.addEventListener('DOMContentLoaded', function() {
         },
 
         displayTrendingSearches() {
-            if (!elements.trendingList) return;
+            // if (!elements.trendingList) return; // This will be removed
 
-            elements.trendingList.innerHTML = '';
-            trendingSearches.forEach(keyword => {
-                const tag = document.createElement('a');
-                tag.href = '#';
-                tag.className = 'trend-tag';
-                tag.innerHTML = `
+            // elements.trendingList.innerHTML = ''; // This will be removed
+            return trendingSearches.map(keyword => `
+                <a href="#" class="trend-tag">
                     <i class="fa fa-fire"></i>
                     <span>${keyword}</span>
-                `;
-                tag.addEventListener('click', (e) => {
-                    e.preventDefault();
-                    elements.searchInput.value = keyword;
-                    if (elements.searchSuggestions) {
-                        elements.searchSuggestions.style.display = 'none';
-                    }
-                    state.currentKeyword = keyword;
-                    state.currentPage = 1;
-                    search.perform(keyword);
-                });
-                elements.trendingList.appendChild(tag);
-            });
+                </a>
+            `).join('');
         }
     };
 
@@ -635,4 +748,5 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+    
     

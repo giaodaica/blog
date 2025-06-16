@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\web;
 
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductSuggestionResource;
 use App\Models\Categories;
 use App\Models\Color;
 use App\Models\Products;
 use App\Models\Size;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 
 class SearchController extends Controller
 {
@@ -79,15 +81,57 @@ class SearchController extends Controller
         }
     }
 
+
     public function suggestions(Request $request)
     {
-        $query = $request->get('q');
-        
-        $suggestions = Products::where('name', 'LIKE', "%{$query}%")
-            ->select('name')
-            ->limit(5)
-            ->get();
-
-        return response()->json($suggestions);
+        try {
+            $query = $request->get('q');
+    
+            if (!$query) {
+                return response()->json([
+                    'suggestions' => [],
+                    'featured_products' => []
+                ]);
+            }
+    
+            // Get keyword suggestions (5 distinct product names)
+            $suggestions = Products::where('name', 'LIKE', "%{$query}%")
+                ->whereNull('deleted_at')
+                ->select('name')
+                ->distinct()
+                ->limit(5)
+                ->get()
+                ->map(function($item) {
+                    return ['name' => $item->name];
+                });
+    
+            // Get featured products (3 active products)
+            $featuredProducts = Products::join('product_variants', 'products.id', '=', 'product_variants.product_id')
+                ->where('products.name', 'LIKE', "%{$query}%")
+                ->where('product_variants.is_show', 1)
+                ->where('product_variants.stock', '>', 0)
+                ->whereNull('product_variants.deleted_at')
+                ->whereNull('products.deleted_at')
+                ->select(
+                    'products.id',
+                    'products.name',
+                    'products.image_url as image',
+                    'product_variants.sale_price as price',
+                    'product_variants.listed_price as old_price'
+                )
+                ->limit(3)
+                ->get();
+                $featuredProducts = ProductSuggestionResource::collection($featuredProducts);
+    
+            return response()->json([
+                'suggestions' => $suggestions,
+                'featured_products' => $featuredProducts
+            ]);
+        } catch (\Throwable $e) {
+            Log::error('Suggestion error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
+    
+    
 }

@@ -75,7 +75,7 @@
                                             </a>
                                         </div>
                                         <div class="shop-footer text-start">
-                                            <a href="{{ route('home.show', $product->id) }}" class="alt-font text-dark-gray fs-19 fw-500">{{ $product->name }}</a>
+                                            <a href="{{ route('home.show', $product->id) }}" class="alt-font text-dark-gray fs-19 fw-500 product-name-truncate">{{ $product->name }}</a>
                                             <div class="price lh-22 fs-16">
                                                 @php
                                                     $variant = $product->variants->first();
