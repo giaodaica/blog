@@ -45,10 +45,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Handle sorting changes
     const sortSelect = document.querySelector('select[name="sort"]');
     if (sortSelect) {
-        sortSelect.addEventListener('change', function(e) {
-            e.preventDefault();
-            state.currentSort = e.target.value;
-            state.currentPage = 1; // Reset to first page when sort changes
+        sortSelect.addEventListener('change', function() {
+            state.currentSort = this.value;
+            state.currentPage = 1;
             filterProducts();
         });
     }
@@ -56,31 +55,27 @@ document.addEventListener('DOMContentLoaded', function() {
     function filterProducts() {
         if (state.isLoading) return;
         state.isLoading = true;
+        loadingOverlay.style.display = 'flex';
 
         const formData = new FormData(filterForm);
-        
-        // Create URLSearchParams and filter out empty values
-        const params = new URLSearchParams();
-        
+        const queryParams = new URLSearchParams();
+
+        // Add all form data to query params
         for (let [key, value] of formData.entries()) {
-            // Only add parameter if value is not empty
-            if (value && value.trim() !== '') {
-                params.append(key, value);
+            if (value) {
+                queryParams.append(key, value);
             }
         }
 
-        // Add pagination and sorting parameters
-        params.set('page', state.currentPage);
-        params.set('sort', state.currentSort);
-        
-        const queryString = params.toString();
-        
-        // Show loading state
-        loadingOverlay.style.display = 'flex';
-        
-        // Make AJAX request
-        const url = queryString ? `${filterForm.action}?${queryString}` : filterForm.action;
-        
+        // Add pagination and sorting
+        queryParams.append('page', state.currentPage);
+        if (state.currentSort !== 'default') {
+            queryParams.append('sort', state.currentSort);
+        }
+
+        const queryString = queryParams.toString();
+        const url = `${window.location.pathname}?${queryString}`;
+
         fetch(url, {
             headers: {
                 'X-Requested-With': 'XMLHttpRequest'
@@ -109,16 +104,33 @@ document.addEventListener('DOMContentLoaded', function() {
                     productGrid.appendChild(gridSizer);
                 }
                 
-                // Add new products
-                const newProductItems = newProducts.querySelectorAll('.grid-item');
-                newProductItems.forEach(item => {
-                    productGrid.appendChild(item.cloneNode(true));
-                });
-                
-                // Reinitialize Isotope layout after new items are added
-                if (typeof imagesLoaded === 'function' && typeof $.fn.isotope === 'function') {
-                    $(productGrid).imagesLoaded(function() {
-                        $(productGrid).removeClass('grid-loading');
+                // Check if there are any products
+                const noProductsMessage = newProducts.querySelector('.no-products-message');
+                if (noProductsMessage) {
+                    productGrid.appendChild(noProductsMessage.cloneNode(true));
+                } else {
+                    // Add new products
+                    const newProductItems = newProducts.querySelectorAll('.grid-item');
+                    newProductItems.forEach(item => {
+                        productGrid.appendChild(item.cloneNode(true));
+                    });
+                    
+                    // Reinitialize Isotope layout after new items are added
+                    if (typeof imagesLoaded === 'function' && typeof $.fn.isotope === 'function') {
+                        $(productGrid).imagesLoaded(function() {
+                            $(productGrid).removeClass('grid-loading');
+                            $(productGrid).isotope({
+                                layoutMode: 'masonry',
+                                itemSelector: '.grid-item',
+                                percentPosition: true,
+                                stagger: 0,
+                                masonry: {
+                                    columnWidth: '.grid-sizer',
+                                }
+                            });
+                        });
+                    } else if (typeof $.fn.isotope === 'function') {
+                        // Fallback if imagesLoaded is not available
                         $(productGrid).isotope({
                             layoutMode: 'masonry',
                             itemSelector: '.grid-item',
@@ -128,18 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 columnWidth: '.grid-sizer',
                             }
                         });
-                    });
-                } else if (typeof $.fn.isotope === 'function') {
-                    // Fallback if imagesLoaded is not available
-                    $(productGrid).isotope({
-                        layoutMode: 'masonry',
-                        itemSelector: '.grid-item',
-                        percentPosition: true,
-                        stagger: 0,
-                        masonry: {
-                            columnWidth: '.grid-sizer',
-                        }
-                    });
+                    }
                 }
             }
 
@@ -159,22 +160,53 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
 
-            // Update color counts
-            const newColorCounts = doc.querySelectorAll('.color-filter .item-qty');
-            const currentColorCounts = document.querySelectorAll('.color-filter .item-qty');
-            newColorCounts.forEach((newCount, index) => {
-                if (currentColorCounts[index]) {
-                    currentColorCounts[index].textContent = newCount.textContent;
-                }
-            });
+            // Update color filters
+            const newColorFilters = doc.querySelector('.color-filter');
+            const currentColorFilters = document.querySelector('.color-filter');
+            if (newColorFilters && currentColorFilters) {
+                // Store currently checked colors
+                const checkedColors = Array.from(currentColorFilters.querySelectorAll('input[type="checkbox"]:checked'))
+                    .map(input => input.value);
+                
+                // Update the color filter section
+                currentColorFilters.innerHTML = newColorFilters.innerHTML;
+                
+                // Re-check previously checked colors if they still exist
+                checkedColors.forEach(colorId => {
+                    const checkbox = currentColorFilters.querySelector(`input[value="${colorId}"]`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                });
+            }
 
-            // Update size counts
-            const newSizeCounts = doc.querySelectorAll('.size-filter .item-qty');
-            const currentSizeCounts = document.querySelectorAll('.size-filter .item-qty');
-            newSizeCounts.forEach((newCount, index) => {
-                if (currentSizeCounts[index]) {
-                    currentSizeCounts[index].textContent = newCount.textContent;
-                }
+            // Update size filters
+            const newSizeFilters = doc.querySelector('.size-filter');
+            const currentSizeFilters = document.querySelector('.size-filter');
+            if (newSizeFilters && currentSizeFilters) {
+                // Store currently checked sizes
+                const checkedSizes = Array.from(currentSizeFilters.querySelectorAll('input[type="checkbox"]:checked'))
+                    .map(input => input.value);
+                
+                // Update the size filter section
+                currentSizeFilters.innerHTML = newSizeFilters.innerHTML;
+                
+                // Re-check previously checked sizes if they still exist
+                checkedSizes.forEach(sizeId => {
+                    const checkbox = currentSizeFilters.querySelector(`input[value="${sizeId}"]`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                });
+            }
+
+            // Reattach event listeners to new filter inputs
+            const newFilterInputs = document.querySelectorAll('input[type="checkbox"], input[type="radio"]');
+            newFilterInputs.forEach(input => {
+                input.addEventListener('change', function() {
+                    state.currentPage = 1;
+                    filterProducts();
+                });
             });
         })
         .catch(error => {

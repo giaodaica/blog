@@ -10,9 +10,12 @@ use App\Models\Products;
 use App\Models\Size;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use App\Traits\ProductFilterTrait;
 
 class SearchController extends Controller
 {
+    use ProductFilterTrait;
+
     public function index(Request $request)
     {
         try {
@@ -133,5 +136,115 @@ class SearchController extends Controller
         }
     }
     
-    
+    public function search(Request $request)
+    {
+        $query = $request->input('q');
+        
+        if (empty($query)) {
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Please enter a search term'
+                ]);
+            }
+            return redirect()->route('shop');
+        }
+
+        // Get selected filters
+        $selectedCategories = $request->input('categories', []);
+        $selectedColors = $request->input('colors', []);
+        $selectedSizes = $request->input('sizes', []);
+
+        // Get filtered data using trait
+        $filteredData = $this->getFilteredData($query, $selectedCategories, $selectedColors, $selectedSizes);
+
+        // Get products with search query
+        $products = Products::with(['category', 'variants.color', 'variants.size'])
+            ->where(function($q) use ($query) {
+                $q->where('name', 'like', "%{$query}%");
+                  
+            })
+            ->whereHas('category', function ($q) {
+                $q->where('status', '1')
+                  ->whereNull('categories.deleted_at');
+            })
+            ->whereHas('variants', function ($q) {
+                $q->where('is_show', 1)
+                  ->where('stock', '>', 0)
+                  ->whereNull('product_variants.deleted_at');
+            })
+            ->whereNull('products.deleted_at');
+
+        // Apply filters only if they are selected
+        if (!empty($selectedCategories)) {
+            $products->whereIn('category_id', $selectedCategories);
+        }
+
+        if (!empty($selectedColors)) {
+            $products->whereHas('variants', function ($q) use ($selectedColors) {
+                $q->whereIn('color_id', $selectedColors);
+            });
+        }
+
+        if (!empty($selectedSizes)) {
+            $products->whereHas('variants', function ($q) use ($selectedSizes) {
+                $q->whereIn('size_id', $selectedSizes);
+            });
+        }
+
+        // Filter by price range
+        $priceRange = $request->input('price_range');
+        if (!empty($priceRange) && str_contains($priceRange, '-')) {
+            [$min, $max] = explode('-', $priceRange);
+            $products->whereHas('variants', function ($q) use ($min, $max) {
+                $q->whereBetween('sale_price', [(int)$min, (int)$max]);
+            });
+        }
+
+        // Handle sorting
+        $sort = $request->input('sort');
+        if (in_array($sort, ['price_asc', 'price_desc'])) {
+            $products->join('product_variants', 'products.id', '=', 'product_variants.product_id')
+                    ->where('product_variants.is_show', 1)
+                    ->where('product_variants.stock', '>', 0)
+                    ->whereNull('product_variants.deleted_at')
+                    ->whereNull('products.deleted_at')
+                    ->select('products.*', 'product_variants.sale_price')
+                    ->distinct();
+        }
+
+        switch ($sort) {
+            case 'price_asc':
+                $products->orderBy('product_variants.sale_price', 'asc');
+                break;
+            case 'price_desc':
+                $products->orderBy('product_variants.sale_price', 'desc');
+                break;
+            case 'newest':
+            default:
+                $products->orderBy('products.created_at', 'desc');
+                break;
+        }
+
+        $products = $products->paginate(12);
+
+        if ($request->ajax()) {
+            $view = view('pages.shop.search-results', array_merge(
+                ['products' => $products],
+                $filteredData
+            ))->render();
+
+            return response()->json([
+                'success' => true,
+                'html' => $view,
+                'query' => $query,
+                'total' => $products->total()
+            ]);
+        }
+
+        return view('pages.shop.search-results', array_merge(
+            ['products' => $products],
+            $filteredData
+        ));
+    }
 }

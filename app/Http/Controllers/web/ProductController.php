@@ -7,26 +7,36 @@ use App\Models\Products;
 use App\Models\Categories;
 use App\Models\Color;
 use App\Models\Size;
+use App\Traits\ProductFilterTrait;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+    use ProductFilterTrait;
+
     public function index()
     {
         $products = $this->getFilteredProducts();
-        $categories = Categories::withCount('products')->get();
-        $colors = Color::whereHas('productVariants', function ($query) {
-            $query->where('stock', '>', 0)->where('is_show', 1)->whereNull('deleted_at');
-        })->withCount(['productVariants' => function ($query) {
-            $query->where('stock', '>', 0)->where('is_show', 1)->whereNull('deleted_at');   
-        }])->get();
-        $sizes = Size::withCount('productVariants')->get();
+        
+        // Get selected filters
+        $selectedCategories = request('categories', []);
+        $selectedColors = request('colors', []);
+        $selectedSizes = request('sizes', []);
+
+        // Get filtered data using trait
+        $filteredData = $this->getFilteredData(null, $selectedCategories, $selectedColors, $selectedSizes);
 
         if (request()->ajax()) {
-            return view('pages.shop.shop', compact('products', 'categories', 'colors', 'sizes'))->render();
+            return view('pages.shop.shop', array_merge(
+                ['products' => $products],
+                $filteredData
+            ))->render();
         }
 
-        return view('pages.shop.shop', compact('products', 'categories', 'colors', 'sizes'));
+        return view('pages.shop.shop', array_merge(
+            ['products' => $products],
+            $filteredData
+        ));
     }
 
     private function getFilteredProducts()
@@ -99,6 +109,6 @@ class ProductController extends Controller
                 break;
         }
 
-        return $query->paginate(5);
+        return $query->paginate(12);
     }
 }

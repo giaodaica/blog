@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded', function() {
         DEBOUNCE_DELAY: 300,
         API_ENDPOINTS: {
             SEARCH: '/search',
-            SUGGESTIONS: '/search/suggestions'
+            SUGGESTIONS: '/search/suggestions',
+            FILTER: '/search/filter'
         }
     };
 
@@ -86,19 +87,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             });
         
-            const newURL = `/shop?${searchParams.toString()}`;
-        
-            // Nếu KHÔNG PHẢI đang ở trang /shop thì chuyển hướng
-            if (!currentPath.startsWith('/shop')) {
-                window.location.href = newURL;
-            } else {
-                // Nếu đang ở /shop thì cập nhật URL + gọi AJAX nếu có
-                history.pushState(null, null, newURL);
-                if (typeof fetchSearchResults === 'function') {
-                    const query = searchParams.get('q') || '';
-                    fetchSearchResults(query); // Gọi AJAX cập nhật kết quả
-                }
-            }
+            const newURL = `${currentPath}?${searchParams.toString()}`;
+            window.history.pushState(null, null, newURL);
         },
         
 
@@ -191,7 +181,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Search Functionality
     const search = {
-        async perform(keyword, page = 1, sort = 'default') {
+        async perform(keyword, page = 1, sort = 'default', additionalParams = '') {
             if (state.isLoading) return;
 
             searchHistory.save(keyword);
@@ -203,10 +193,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Performing search:', {
                     keyword,
                     page,
-                    sort
+                    sort,
+                    additionalParams
                 });
 
-                const url = `${CONFIG.API_ENDPOINTS.SEARCH}?q=${encodeURIComponent(keyword)}&page=${page}&sort=${sort}&t=${Date.now()}`;
+                const params = new URLSearchParams();
+
+                if (keyword) params.append('q', keyword);
+                if (page) params.append('page', page);
+                if (sort) params.append('sort', sort);
+                
+                // Nếu additionalParams là chuỗi, phân tách và thêm vào params
+                if (additionalParams) {
+                    const tempParams = new URLSearchParams(additionalParams);
+                    for (const [key, value] of tempParams.entries()) {
+                            params.append(key, value);
+                    }
+                }
+                
+                const url = `/search/filter?${params.toString()}&t=${Date.now()}`;
+                console.log('Search URL:', url);
+                
                 const response = await fetch(url, {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
@@ -305,6 +312,169 @@ document.addEventListener('DOMContentLoaded', function() {
                 `;
             }
 
+            // Update category counts
+            const newCategoryCounts = doc.querySelectorAll('.category-filter .item-qty');
+            const currentCategoryCounts = document.querySelectorAll('.category-filter .item-qty');
+            newCategoryCounts.forEach((newCount, index) => {
+                if (currentCategoryCounts[index]) {
+                    currentCategoryCounts[index].textContent = newCount.textContent;
+                }
+            });
+
+            // Get available sizes and colors from current products
+            const availableSizes = new Map();
+            const availableColors = new Map();
+            
+            const currentProducts = elements.productContainer.querySelectorAll('.grid-item');
+            currentProducts.forEach(product => {
+                // Get available sizes
+                const sizeElements = product.querySelectorAll('.product-sizes .size');
+                sizeElements.forEach(size => {
+                    if (size && size.dataset && size.dataset.size) {
+                        const sizeId = size.dataset.size;
+                        availableSizes.set(sizeId, (availableSizes.get(sizeId) || 0) + 1);
+                    }
+                });
+
+                // Get available colors
+                const colorElements = product.querySelectorAll('.product-colors .color');
+                colorElements.forEach(color => {
+                    if (color && color.dataset && color.dataset.color) {
+                        const colorId = color.dataset.color;
+                        availableColors.set(colorId, (availableColors.get(colorId) || 0) + 1);
+                    }
+                });
+            });
+
+            // Update color filters
+            const colorFilter = document.querySelector('.color-filter');
+            if (colorFilter) {
+                const colorCheckboxes = colorFilter.querySelectorAll('input[type="checkbox"]');
+                colorCheckboxes.forEach(checkbox => {
+                    if (!checkbox) return;
+                    
+                    const colorLabel = checkbox.closest('li');
+                    if (!colorLabel) return;
+
+                    const colorId = checkbox.value;
+                    const count = availableColors.get(colorId) || 0;
+                    const countElement = colorLabel.querySelector('.item-qty');
+                    
+                    if (count > 0) {
+                        colorLabel.style.display = 'block';
+                        checkbox.disabled = false;
+                        if (countElement) {
+                            countElement.textContent = count;
+                        }
+                    } else {
+                        colorLabel.style.display = 'none';
+                        checkbox.disabled = true;
+                        checkbox.checked = false;
+                        if (countElement) {
+                            countElement.textContent = '0';
+                        }
+                    }
+                });
+            }
+
+            // Update size filters
+            const sizeFilter = document.querySelector('.size-filter');
+            if (sizeFilter) {
+                const sizeCheckboxes = sizeFilter.querySelectorAll('input[type="checkbox"]');
+                sizeCheckboxes.forEach(checkbox => {
+                    if (!checkbox) return;
+                    
+                    const sizeLabel = checkbox.closest('li');
+                    if (!sizeLabel) return;
+
+                    const sizeId = checkbox.value;
+                    const count = availableSizes.get(sizeId) || 0;
+                    const countElement = sizeLabel.querySelector('.item-qty');
+                    
+                    if (count > 0) {
+                        sizeLabel.style.display = 'block';
+                        checkbox.disabled = false;
+                        if (countElement) {
+                            countElement.textContent = count;
+                        }
+                    } else {
+                        sizeLabel.style.display = 'none';
+                        checkbox.disabled = true;
+                        checkbox.checked = false;
+                        if (countElement) {
+                            countElement.textContent = '0';
+                        }
+                    }
+                });
+            }
+
+            // Reattach event listeners to new filter inputs
+            const newFilterInputs = document.querySelectorAll('input[type="checkbox"], input[type="radio"]');
+            newFilterInputs.forEach(input => {
+                if (!input) return;
+                
+                input.addEventListener('change', function() {
+                    // Get current URL parameters
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const currentKeyword = urlParams.get('q') || state.currentKeyword;
+
+                    // Build filter parameters
+                    const filterParams = new URLSearchParams();
+                    
+                    // Add search keyword
+                    if (currentKeyword) {
+                        filterParams.append('q', currentKeyword);
+                    }
+
+                    // Add size filters
+                    const selectedSizes = Array.from(document.querySelectorAll('.size-filter input[type="checkbox"]:checked')).map(cb => cb.value);
+                    if (selectedSizes.length > 0) {
+                        selectedSizes.forEach(size => {
+                            filterParams.append('sizes[]', size);
+                        });
+                    }
+
+                    // Add color filters
+                    const selectedColors = Array.from(document.querySelectorAll('.color-filter input[type="checkbox"]:checked')).map(cb => cb.value);
+                    if (selectedColors.length > 0) {
+                        selectedColors.forEach(color => {
+                            filterParams.append('colors[]', color);
+                        });
+                    }
+
+                    // Add category filters
+                    const selectedCategories = Array.from(document.querySelectorAll('.category-filter input[type="checkbox"]:checked')).map(cb => cb.value);
+                    if (selectedCategories.length > 0) {
+                        selectedCategories.forEach(category => {
+                            filterParams.append('categories[]', category);
+                        });
+                    }
+
+                    // Add price range
+                    const selectedPriceRange = document.querySelector('input[type="radio"][name="price_range"]:checked')?.value;
+                    if (selectedPriceRange) {
+                        filterParams.append('price_range', selectedPriceRange);
+                    }
+
+                    // Add sort
+                    const currentSort = document.querySelector('select[name="sort"]')?.value || 'default';
+                    filterParams.append('sort', currentSort);
+
+                    // Add page
+                    filterParams.append('page', '1'); // Reset to page 1 when filters change
+
+                    // Log for debugging
+                    console.log('Filter parameters:', filterParams.toString());
+
+                    // Update URL with new parameters
+                    const newUrl = `${window.location.pathname}?${filterParams.toString()}`;
+                    window.history.pushState({}, '', newUrl);
+
+                    // Perform search with filters
+                    search.perform(currentKeyword, 1, currentSort, filterParams.toString());
+                });
+            });
+
             // Reinitialize Isotope only if there are products
             if (newProducts && newProducts.querySelectorAll('.grid-item').length > 0) {
                 this.initializeIsotope();
@@ -316,18 +486,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 layoutMode: 'fitRows',
                 itemSelector: '.grid-item',
                 percentPosition: true,
-                stagger: 0
+                stagger: 0,
+                transitionDuration: '0.4s',
+                fitRows: {
+                    gutter: 30
+                }
             };
 
             if (typeof imagesLoaded === 'function' && typeof $.fn.isotope === 'function') {
                 $(elements.productContainer).imagesLoaded(function() {
                     $(elements.productContainer).removeClass('grid-loading');
                     $(elements.productContainer).isotope(isotopeConfig);
-                    $(elements.productContainer).isotope('layout');
+                    // Force layout update after images are loaded
+                    setTimeout(() => {
+                        $(elements.productContainer).isotope('layout');
+                    }, 100);
                 });
             } else if (typeof $.fn.isotope === 'function') {
                 $(elements.productContainer).isotope(isotopeConfig);
-                $(elements.productContainer).isotope('layout');
+                // Force layout update
+                setTimeout(() => {
+                    $(elements.productContainer).isotope('layout');
+                }, 100);
             }
         },
 
@@ -648,6 +828,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (keyword.length > 0) {
                         state.currentKeyword = keyword;
                         state.currentPage = 1;
+                        // Hide search suggestions dropdown
+                        if (elements.searchSuggestions) {
+                            elements.searchSuggestions.style.display = 'none';
+                        }
+                        // Remove focus from input
+                        elements.searchInput.blur();
                         search.perform(keyword);
                     }
                 }
@@ -699,54 +885,136 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Initialize the search functionality
     handlers.init();
-});
 
-document.addEventListener('DOMContentLoaded', function() {
-    const navbarToggler = document.querySelector('.navbar-toggler');
-    const navbarCollapse = document.querySelector('#navbarNav');
-    const body = document.body;
+    // Add filter change handler for search results
+    if (window.location.pathname.includes('/search')) {
+        const filterInputs = document.querySelectorAll('.filter-sidebar input[type="checkbox"], .filter-sidebar input[type="radio"]');
+        filterInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                // Get current URL parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                const currentKeyword = urlParams.get('q') || state.currentKeyword;
     
-    // Prevent menu from auto-closing
-    navbarToggler.addEventListener('click', function(e) {
-        e.stopPropagation();
-        
-        // Toggle body scroll lock
-        if (navbarCollapse.classList.contains('show')) {
-            body.classList.remove('menu-open');
-        } else {
-            body.classList.add('menu-open');
-        }
+                // Build filter parameters
+                const filterParams = new URLSearchParams();
+                
+                // Add search keyword
+                if (currentKeyword) {
+                    filterParams.append('q', currentKeyword);
+                }
+
+                // Add size filters
+                const selectedSizes = Array.from(document.querySelectorAll('.filter-sidebar .size-filter input[type="checkbox"]:checked')).map(cb => cb.value);
+                if (selectedSizes.length > 0) {
+                    selectedSizes.forEach(size => {
+                        filterParams.append('sizes[]', size);
+                    });
+                }
+
+                // Add color filters
+                const selectedColors = Array.from(document.querySelectorAll('.filter-sidebar .color-filter input[type="checkbox"]:checked')).map(cb => cb.value);
+                if (selectedColors.length > 0) {
+                    selectedColors.forEach(color => {
+                        filterParams.append('colors[]', color);
+                    });
+                }
+
+                // Add category filters
+                const selectedCategories = Array.from(document.querySelectorAll('.filter-sidebar .category-filter input[type="checkbox"]:checked')).map(cb => cb.value);
+                if (selectedCategories.length > 0) {
+                    selectedCategories.forEach(category => {
+                        filterParams.append('categories[]', category);
+                    });
+                }
+
+                // Add price range
+                const selectedPriceRange = document.querySelector('.filter-sidebar input[type="radio"][name="price_range"]:checked')?.value;
+                if (selectedPriceRange) {
+                    filterParams.append('price_range', selectedPriceRange);
+                }
+
+                // Add sort
+                const currentSort = document.querySelector('select[name="sort"]')?.value || 'default';
+                filterParams.append('sort', currentSort);
+
+                // Add page
+                filterParams.append('page', '1'); // Reset to page 1 when filters change
+
+                // Log for debugging
+                console.log('Filter parameters:', filterParams.toString());
+
+                // Update URL with new parameters
+                const newUrl = `${window.location.pathname}?${filterParams.toString()}`;
+                window.history.pushState({}, '', newUrl);
+
+                // Perform search with filters
+                search.perform(currentKeyword, 1, currentSort, filterParams.toString());
+            });
     });
     
-    // Close menu when clicking outside (optional)
-    document.addEventListener('click', function(e) {
-        if (!navbarCollapse.contains(e.target) && !navbarToggler.contains(e.target)) {
-            if (navbarCollapse.classList.contains('show')) {
-                navbarToggler.click();
-            }
-        }
+        // Add sort change handler for search results
+        const sortSelect = document.querySelector('select[name="sort"]');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', function() {
+                // Get current URL parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                const currentKeyword = urlParams.get('q') || state.currentKeyword;
+                const currentSort = this.value;
+
+                // Build filter parameters
+                const filterParams = new URLSearchParams();
+                
+                // Add search keyword
+                if (currentKeyword) {
+                    filterParams.append('q', currentKeyword);
+                }
+
+                // Add size filters
+                const selectedSizes = Array.from(document.querySelectorAll('.filter-sidebar .size-filter input[type="checkbox"]:checked')).map(cb => cb.value);
+                if (selectedSizes.length > 0) {
+                    selectedSizes.forEach(size => {
+                        filterParams.append('sizes[]', size);
     });
-    
-    // Handle Bootstrap collapse events
-    navbarCollapse.addEventListener('hidden.bs.collapse', function() {
-        body.classList.remove('menu-open');
-        navbarToggler.setAttribute('aria-expanded', 'false');
-    });
-    
-    navbarCollapse.addEventListener('shown.bs.collapse', function() {
-        body.classList.add('menu-open');
-        navbarToggler.setAttribute('aria-expanded', 'true');
-    });
-    
-    // Prevent dropdown clicks from closing mobile menu
-    const dropdownItems = document.querySelectorAll('.dropdown-item');
-    dropdownItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-            if (window.innerWidth < 992) {
-                e.stopPropagation();
-            }
+                }
+
+                // Add color filters
+                const selectedColors = Array.from(document.querySelectorAll('.filter-sidebar .color-filter input[type="checkbox"]:checked')).map(cb => cb.value);
+                if (selectedColors.length > 0) {
+                    selectedColors.forEach(color => {
+                        filterParams.append('colors[]', color);
+                    });
+                }
+
+                // Add category filters
+                const selectedCategories = Array.from(document.querySelectorAll('.filter-sidebar .category-filter input[type="checkbox"]:checked')).map(cb => cb.value);
+                if (selectedCategories.length > 0) {
+                    selectedCategories.forEach(category => {
+                        filterParams.append('categories[]', category);
+                    });
+                }
+
+                // Add price range
+                const selectedPriceRange = document.querySelector('.filter-sidebar input[type="radio"][name="price_range"]:checked')?.value;
+                if (selectedPriceRange) {
+                    filterParams.append('price_range', selectedPriceRange);
+                }
+
+                // Add sort
+                filterParams.append('sort', currentSort);
+
+                // Add page
+                filterParams.append('page', '1'); // Reset to page 1 when sort changes
+
+                // Log for debugging
+                console.log('Sort parameters:', filterParams.toString());
+
+                // Update URL with new parameters
+                const newUrl = `${window.location.pathname}?${filterParams.toString()}`;
+                window.history.pushState({}, '', newUrl);
+
+                // Perform search with filters
+                search.perform(currentKeyword, 1, currentSort, filterParams.toString());
         });
-    });
+        }
+    }
 });
-    
-    

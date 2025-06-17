@@ -25,8 +25,6 @@
                     <div class="row align-items-center">
                         <div class="col-md-6">
                             <div id="search-summary" class="text-muted fs-15 mb-0"></div>
-
-                        
                         </div>
                     
                         <div class="col-md-6 text-md-end">
@@ -64,41 +62,49 @@
                         <ul class="shop-modern shop-wrapper grid-loading grid grid-5col lg-grid-4col md-grid-3col sm-grid-2col xs-grid-1col gutter-extra-large text-center">
                             <li class="grid-sizer"></li>
                             @if (!request('q'))
-                            @foreach ($products as $product)
-                                <!-- start shop item -->
-                                <li class="grid-item">
-                                    <div class="shop-box mb-10px">
-                                        <div class="shop-image mb-20px">
-                                            <a href="{{ route('home.show', $product->id) }}">
-                                                <img src="{{ asset('assets/images/shop/demo-fashion-store-product-01.jpg') }}" alt="{{ $product->name }}">
-                                                <div class="shop-overlay bg-gradient-gray-light-dark-transparent"></div>
-                                            </a>
-                                        </div>
-                                        <div class="shop-footer text-start">
-                                            <a href="{{ route('home.show', $product->id) }}" class="alt-font text-dark-gray fs-19 fw-500 product-name-truncate">{{ $product->name }}</a>
-                                            <div class="price lh-22 fs-16">
-                                                @php
-                                                    $variant = $product->variants->first();
-                                                    $rating = $product->rating ?? 0;
-                                                    $reviewCount = $product->review_count ?? 0;
-                                                @endphp
-                                                @if ($variant && $variant->sale_price < $variant->listed_price)
-                                                    <div class="product-price">
-                                                        {{ number_format($variant->sale_price) }} ₫
-                                                        <span class="product-old-price">{{ number_format($variant->listed_price) }} ₫</span>
-                                                    </div>
-                                                @elseif($variant)
-                                                    <span>{{ number_format($variant->listed_price) }}₫</span>
-                                                @endif
-                                            </div>
-                                            <div class="rating">
-                                                <span class="text-warning">★★★★★</span> {{ number_format($rating, 1) }}
-                                            </div>
-                                        </div>
+                                @if($products->isEmpty())
+                                    <div class="no-products-message">
+                                        <i class="fas fa-search"></i>
+                                        <h3>Không tìm thấy sản phẩm</h3>
+                                        <p>Không có sản phẩm nào phù hợp với bộ lọc của bạn. Vui lòng thử lại với các tiêu chí khác.</p>
                                     </div>
-                                </li>
-                                <!-- end shop item -->
-                            @endforeach
+                                @else
+                                    @foreach ($products as $product)
+                                        <!-- start shop item -->
+                                        <li class="grid-item">
+                                            <div class="shop-box mb-10px">
+                                                <div class="shop-image mb-20px">
+                                                    <a href="{{ route('home.show', $product->id) }}">
+                                                        <img src="{{ asset('assets/images/shop/demo-fashion-store-product-01.jpg') }}" alt="{{ $product->name }}">
+                                                        <div class="shop-overlay bg-gradient-gray-light-dark-transparent"></div>
+                                                    </a>
+                                                </div>
+                                                <div class="shop-footer text-start">
+                                                    <a href="{{ route('home.show', $product->id) }}" class="alt-font text-dark-gray fs-19 fw-500 product-name-truncate">{{ $product->name }}</a>
+                                                    <div class="price lh-22 fs-16">
+                                                        @php
+                                                            $variant = $product->variants->first();
+                                                            $rating = $product->rating ?? 0;
+                                                            $reviewCount = $product->review_count ?? 0;
+                                                        @endphp
+                                                        @if ($variant && $variant->sale_price < $variant->listed_price)
+                                                            <div class="product-price">
+                                                                {{ number_format($variant->sale_price) }} ₫
+                                                                <span class="product-old-price">{{ number_format($variant->listed_price) }} ₫</span>
+                                                            </div>
+                                                        @elseif($variant)
+                                                            <span>{{ number_format($variant->listed_price) }}₫</span>
+                                                        @endif
+                                                    </div>
+                                                    <div class="rating">
+                                                        <span class="text-warning">★★★★★</span> {{ number_format($rating, 1) }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <!-- end shop item -->
+                                    @endforeach
+                                @endif
                             @endif
                         </ul>
                         
@@ -243,131 +249,6 @@
                                     </li>
                                 @endforeach
                             </ul>
-                        </div>
-                       
-                        
-                        <div class="mb-30px">
-                            <div class="d-flex align-items-center mb-20px">
-                                <span class="alt-font fw-500 fs-19 text-dark-gray">New arrivals</span>
-                                <div class="d-flex ms-auto">
-                                    <!-- start slider navigation -->
-                                    <div
-                                        class="slider-one-slide-prev-1 icon-very-small swiper-button-prev slider-navigation-style-08 me-5px">
-                                        <i class="fa-solid fa-arrow-left text-dark-gray"></i></div>
-                                    <div
-                                        class="slider-one-slide-next-1 icon-very-small swiper-button-next slider-navigation-style-08 ms-5px">
-                                        <i class="fa-solid fa-arrow-right text-dark-gray"></i></div>
-                                    <!-- end slider navigation -->
-                                </div>
-                            </div>
-                            <div class="swiper slider-one-slide"
-                                data-slider-options='{ "slidesPerView": 1, "loop": true, "autoplay": { "delay": 5000, "disableOnInteraction": false }, "navigation": { "nextEl": ".slider-one-slide-next-1", "prevEl": ".slider-one-slide-prev-1" }, "keyboard": { "enabled": true, "onlyInViewport": true }, "effect": "slide" }'>
-                                <div class="swiper-wrapper">
-                                    <!-- start text slider item -->
-                                    <div class="swiper-slide">
-                                        <div class="shop-filter new-arribals">
-                                            <div class="d-flex align-items-center mb-20px">
-                                                <figure class="mb-0">
-                                                    <a href="demo-fashion-store-single-product.html">
-                                                        <img class="border-radius-4px w-80px"
-                                                            src="https://placehold.co/600x765" alt="">
-                                                    </a>
-                                                </figure>
-                                                <div class="col ps-25px">
-                                                    <a href="demo-fashion-store-single-product.html"
-                                                        class="text-dark-gray alt-font fw-500 d-inline-block lh-normal">Textured
-                                                        sweater</a>
-                                                    <div class="fs-15 lh-normal"><del class="me-5px">$30.00</del>$23.00
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-20px">
-                                                <figure class="mb-0">
-                                                    <a href="demo-fashion-store-single-product.html">
-                                                        <img class="border-radius-4px w-80px"
-                                                            src="https://placehold.co/600x765" alt="">
-                                                    </a>
-                                                </figure>
-                                                <div class="col ps-25px">
-                                                    <a href="demo-fashion-store-single-product.html"
-                                                        class="text-dark-gray alt-font fw-500 d-inline-block lh-normal">Traveller
-                                                        shirt</a>
-                                                    <div class="fs-15 lh-normal"><del class="me-5px">$50.00</del>$43.00
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center">
-                                                <figure class="mb-0">
-                                                    <a href="demo-fashion-store-single-product.html">
-                                                        <img class="border-radius-4px w-80px"
-                                                            src="https://placehold.co/600x765" alt="">
-                                                    </a>
-                                                </figure>
-                                                <div class="col ps-25px">
-                                                    <a href="demo-fashion-store-single-product.html"
-                                                        class="text-dark-gray alt-font fw-500 d-inline-block lh-normal">Crewneck
-                                                        tshirt</a>
-                                                    <div class="fs-15 lh-normal"><del class="me-5px">$20.00</del>$15.00
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- end text slider item -->
-                                    <!-- start text slider item -->
-                                    <div class="swiper-slide">
-                                        <div class="shop-filter new-arribals">
-                                            <div class="d-flex align-items-center mb-20px">
-                                                <figure class="mb-0">
-                                                    <a href="demo-fashion-store-single-product.html">
-                                                        <img class="border-radius-4px w-80px"
-                                                            src="https://placehold.co/600x765" alt="">
-                                                    </a>
-                                                </figure>
-                                                <div class="col ps-25px">
-                                                    <a href="demo-fashion-store-single-product.html"
-                                                        class="text-dark-gray alt-font fw-500 d-inline-block lh-normal">Skinny
-                                                        trousers</a>
-                                                    <div class="fs-15 lh-normal"><del class="me-5px">$15.00</del>$10.00
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-20px">
-                                                <figure class="mb-0">
-                                                    <a href="demo-fashion-store-single-product.html">
-                                                        <img class="border-radius-4px w-80px"
-                                                            src="https://placehold.co/600x765" alt="">
-                                                    </a>
-                                                </figure>
-                                                <div class="col ps-25px">
-                                                    <a href="demo-fashion-store-single-product.html"
-                                                        class="text-dark-gray alt-font fw-500 d-inline-block lh-normal">Sleeve
-                                                        sweater</a>
-                                                    <div class="fs-15 lh-normal"><del class="me-5px">$35.00</del>$30.00
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center">
-                                                <figure class="mb-0">
-                                                    <a href="demo-fashion-store-single-product.html">
-                                                        <img class="border-radius-4px w-80px"
-                                                            src="https://placehold.co/600x765" alt="">
-                                                    </a>
-                                                </figure>
-                                                <div class="col ps-25px">
-                                                    <a href="demo-fashion-store-single-product.html"
-                                                        class="text-dark-gray alt-font fw-500 d-inline-block lh-normal">Pocket
-                                                        white</a>
-                                                    <div class="fs-15 lh-normal"><del class="me-5px">$20.00</del>$15.00
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- end text slider item -->
-                                </div>
-                                <!-- start slider navigation -->
-                            </div>
                         </div>
                     </form>
                 </div>
