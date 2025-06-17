@@ -21,9 +21,14 @@
                 </div>
             </div>
             <!-- end page title -->
-
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
             <div class="row">
-               
+
                 <!-- end col -->
 
                 <div class="col-xl-12 col-lg-8">
@@ -54,23 +59,21 @@
                                     <div class="col">
                                         <ul class="nav nav-tabs-custom card-header-tabs border-bottom-0" role="tablist">
                                             <li class="nav-item">
-                                                <a class="nav-link active fw-semibold" data-bs-toggle="tab"
-                                                    href="#productnav-all" role="tab">
-                                                    All <span
-                                                        class="badge bg-danger-subtle text-danger align-middle rounded-pill ms-1">12</span>
+                                                <a class="nav-link {{ request('status') === null || request('status') === 'active' ? 'active fw-semibold' : '' }}"
+                                                    href="{{ route('variants.index') }}">
+                                                    Đang hoạt động
                                                 </a>
                                             </li>
                                             <li class="nav-item">
-                                                <a class="nav-link fw-semibold" data-bs-toggle="tab"
-                                                    href="#productnav-published" role="tab">
-                                                    Published <span
-                                                        class="badge bg-danger-subtle text-danger align-middle rounded-pill ms-1">5</span>
+                                                <a class="nav-link {{ request('status') === 'deleted' ? 'active fw-semibold' : '' }}"
+                                                    href="{{ route('variants.index', ['status' => 'deleted']) }}">
+                                                    Đã xóa
                                                 </a>
                                             </li>
-                                            <li class="nav-item">
-                                                <a class="nav-link fw-semibold" data-bs-toggle="tab"
-                                                    href="#productnav-draft" role="tab">
-                                                    Draft
+                                              <li class="nav-item">
+                                                <a class="nav-link {{ request('status') === null ? '' : '' }} {{ request('status') === 'all' ? 'active fw-semibold' : '' }}"
+                                                    href="{{ route('variants.index', ['status' => 'all']) }}">
+                                                    Tất cả
                                                 </a>
                                             </li>
                                         </ul>
@@ -80,8 +83,7 @@
                                             <div class="my-n1 d-flex align-items-center text-muted">
                                                 Select <div id="select-content" class="text-body fw-semibold px-1"></div>
                                                 Result <button type="button" class="btn btn-link link-danger p-0 ms-3"
-                                                    data-bs-toggle="modal"
-                                                    data-bs-target="#removeItemModal">Remove</button>
+                                                    data-bs-toggle="modal" data-bs-target="#removeItemModal">Remove</button>
                                             </div>
                                         </div>
                                     </div>
@@ -117,7 +119,7 @@
                                                     <div class="avatar-sm bg-light rounded p-1 mb-3">
                                                         <img src="{{ $variant->variant_image_url ? asset($variant->variant_image_url) : asset('storage/no-image.png') }}"
                                                             alt="{{ $variant->name }}" class="img-fluid d-block rounded"
-                                                            width="50" height="50" >
+                                                            width="50" height="50">
                                                     </div>
                                                 </td>
                                                 <td>{{ number_format($variant->import_price, 0, ',', '.') }} đ</td>
@@ -128,46 +130,57 @@
                                                 <td>{{ $variant->size->size_name ?? '-' }}</td>
                                                 <td>{{ $variant->color->color_name ?? '-' }}</td>
                                                 <td>
-                                                    <div class="dropdown">
-                                                        <button class="btn btn-soft-secondary btn-sm" type="button"
-                                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <i class="ri-more-fill"></i>
-                                                        </button>
-                                                        <ul class="dropdown-menu dropdown-menu-end">
-                                                            <li>
-                                                                <a class="dropdown-item"
-                                                                    href="{{ route('variants.show', $variant->id) }}">
-                                                                    <i
-                                                                        class="ri-eye-fill align-bottom me-2 text-muted"></i>
-                                                                    Xem
-                                                                </a>
-                                                            </li>
-                                                            <li>
-                                                                <a class="dropdown-item"
-                                                                    href="{{ route('variants.edit', $variant->id) }}">
-                                                                    <i
-                                                                        class="ri-pencil-fill align-bottom me-2 text-muted"></i>
-                                                                    Sửa
-                                                                </a>
-                                                            </li>
-                                                            <li class="dropdown-divider"></li>
-                                                            <li>
-                                                                <form
-                                                                    action="{{ route('variants.destroy', $variant->id) }}"
-                                                                    method="POST"
-                                                                   class="delete-form">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <button type="submit"
-                                                                        class="dropdown-item text-danger">
+                                                    @if (request('status') == 'deleted')
+                                                        <form action="{{ route('variants.restore', $variant->id) }}"
+                                                            method="POST" class="restore-form">
+                                                            @csrf
+                                                            <button type="submit" class="dropdown-item text-success">
+                                                                <i
+                                                                    class="ri-arrow-go-back-line align-bottom me-2 text-muted"></i>Khôi
+                                                                phục
+                                                            </button>
+                                                        </form>
+                                                    @else
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-soft-secondary btn-sm" type="button"
+                                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                                <i class="ri-more-fill"></i>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                                <li>
+                                                                    <a class="dropdown-item"
+                                                                        href="{{ route('variants.show', $variant->id) }}">
                                                                         <i
-                                                                            class="ri-delete-bin-fill align-bottom me-2 text-muted"></i>
-                                                                        Xóa
-                                                                    </button>
-                                                                </form>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
+                                                                            class="ri-eye-fill align-bottom me-2 text-muted"></i>
+                                                                        Xem
+                                                                    </a>
+                                                                </li>
+                                                                <li>
+                                                                    <a class="dropdown-item"
+                                                                        href="{{ route('variants.edit', $variant->id) }}">
+                                                                        <i
+                                                                            class="ri-pencil-fill align-bottom me-2 text-muted"></i>
+                                                                        Sửa
+                                                                    </a>
+                                                                </li>
+                                                                <li class="dropdown-divider"></li>
+                                                                <li>
+                                                                    <form
+                                                                        action="{{ route('variants.destroy', $variant->id) }}"
+                                                                        method="POST" class="delete-form">
+                                                                        @csrf
+                                                                        @method('DELETE')
+                                                                        <button type="submit"
+                                                                            class="dropdown-item text-danger">
+                                                                            <i
+                                                                                class="ri-delete-bin-fill align-bottom me-2 text-muted"></i>
+                                                                            Xóa
+                                                                        </button>
+                                                                    </form>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -190,7 +203,7 @@
         <!-- container-fluid -->
     </div>
     <!-- End Page-content -->
-
+    {{ $variants->links('pagination::bootstrap-5') }}
     <footer class="footer">
         <div class="container-fluid">
             <div class="row">

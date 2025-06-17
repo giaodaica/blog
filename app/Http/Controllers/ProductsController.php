@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Validation\ValidationException;
 use App\Models\Categories;
 use App\Models\Products;
 use Illuminate\Http\Request;
@@ -10,10 +11,23 @@ use Illuminate\Support\Str;
 
 class ProductsController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $products = Products::with('category')->paginate(10);
-        return view('dashboard.pages.product.index', compact('products'));
+        $status = $request->get('status', 'active'); // active | trashed | all
+
+        if ($status == 'trashed') {
+            $products = Products::onlyTrashed()->with('category')->paginate(10);
+        } elseif ($status == 'all') {
+            $products = Products::withTrashed()->with('category')->paginate(10);
+        } else {
+            $products = Products::with('category')->paginate(10);
+        }
+
+        $totalActive = Products::count();
+        $totalTrashed = Products::onlyTrashed()->count();
+        $totalAll = $totalActive + $totalTrashed;
+
+        return view('dashboard.pages.product.index', compact('products', 'status', 'totalActive', 'totalTrashed', 'totalAll'));
     }
 
     public function create()
@@ -27,7 +41,6 @@ class ProductsController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
         $request->validate([
             'name' => 'required|string|max:255',
             'brand' => 'nullable|string|max:255',
@@ -67,10 +80,24 @@ class ProductsController extends Controller
             'variants.*.stock.required' => 'Số lượng kho không được để trống.',
             'variants.*.stock.integer' => 'Số lượng kho phải là số nguyên.',
             'variants.*.stock.min' => 'Số lượng kho không được nhỏ hơn 0.',
-            
+
             'variants.*.variant_image.required' => 'Vui lòng chọn ảnh cho biến thể.',
         ]);
 
+        // Validate trùng size trong cùng một màu
+        $combinations = [];
+        foreach ($request->variants as $variant) {
+            $key = $variant['color_id'] . '-' . $variant['size_id'];
+            if (in_array($key, $combinations)) {
+                // Nếu trùng thì trả lỗi validate chuẩn Laravel
+                throw ValidationException::withMessages([
+                    'variants' => ['Không được chọn trùng size cho cùng một màu.']
+                ]);
+            }
+            $combinations[] = $key;
+        }
+
+        // Nếu không trùng thì tiếp tục lưu sản phẩm như cũ
         try {
             DB::beginTransaction();
 
@@ -95,7 +122,6 @@ class ProductsController extends Controller
             foreach ($request->variants as $index => $variantData) {
                 $variantImagePath = null;
 
-                // Xử lý ảnh biến thể
                 if (isset($request->file('variants')[$index]['variant_image'])) {
                     $variantFile = $request->file('variants')[$index]['variant_image'];
                     $variantFileName = time() . '_' . $variantFile->getClientOriginalName();
@@ -103,14 +129,11 @@ class ProductsController extends Controller
                     $variantImagePath = 'uploads/product_variants/' . $variantFileName;
                 }
 
-                // Lấy tên màu và tên size
                 $color = \App\Models\Color::find($variantData['color_id']);
                 $size = \App\Models\Size::find($variantData['size_id']);
 
-                // Tạo tên biến thể: Tên sản phẩm + Màu + Size
                 $variantName = $product->name . ' - ' . ($color ? $color->color_name : '') . ' - ' . ($size ? $size->size_name : '');
 
-                // Tạo biến thể
                 $product->variants()->create([
                     'color_id' => $variantData['color_id'],
                     'size_id' => $variantData['size_id'],
@@ -131,7 +154,13 @@ class ProductsController extends Controller
             return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
+    public function restore($id)
+    {
+        $product = Products::withTrashed()->findOrFail($id);
+        $product->restore();
 
+        return redirect()->route('products.index')->with('success', 'Khôi phục sản phẩm thành công!');
+    }
 
     public function update(Request $request, $id)
     {

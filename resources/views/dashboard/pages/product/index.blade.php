@@ -3,7 +3,6 @@
 @section('main-content')
     <div class="page-content">
         <div class="container-fluid">
-
             <!-- start page title -->
             <div class="row">
                 <div class="col-12">
@@ -27,15 +26,11 @@
                 </div>
             @endif
             <!-- end page title -->
-
             <div class="row">
-
                 <!-- end col -->
-
                 <div class="col-xl-12 col-lg-8">
                     <div>
                         <div class="card">
-
                             <div class="card-header border-0">
                                 <div class="row g-4">
                                     <div class="col-sm-auto">
@@ -56,29 +51,26 @@
                                     </div>
                                 </div>
                             </div>
-
                             <div class="card-header">
                                 <div class="row align-items-center">
                                     <div class="col">
-                                        <ul class="nav nav-tabs-custom card-header-tabs border-bottom-0" role="tablist">
+                                        <ul class="nav nav-pills mb-3">
                                             <li class="nav-item">
-                                                <a class="nav-link active fw-semibold" data-bs-toggle="tab"
-                                                    href="#productnav-all" role="tab">
-                                                    All <span
-                                                        class="badge bg-danger-subtle text-danger align-middle rounded-pill ms-1">12</span>
+                                                <a class="nav-link {{ $status == 'active' ? 'active' : '' }}"
+                                                    href="{{ route('products.index', ['status' => 'active']) }}">
+                                                    Đang hoạt động ({{ $totalActive }})
                                                 </a>
                                             </li>
                                             <li class="nav-item">
-                                                <a class="nav-link fw-semibold" data-bs-toggle="tab"
-                                                    href="#productnav-published" role="tab">
-                                                    Published <span
-                                                        class="badge bg-danger-subtle text-danger align-middle rounded-pill ms-1">5</span>
+                                                <a class="nav-link {{ $status == 'trashed' ? 'active' : '' }}"
+                                                    href="{{ route('products.index', ['status' => 'trashed']) }}">
+                                                    Đã xóa ({{ $totalTrashed }})
                                                 </a>
                                             </li>
                                             <li class="nav-item">
-                                                <a class="nav-link fw-semibold" data-bs-toggle="tab"
-                                                    href="#productnav-draft" role="tab">
-                                                    Draft
+                                                <a class="nav-link {{ $status == 'all' ? 'active' : '' }}"
+                                                    href="{{ route('products.index', ['status' => 'all']) }}">
+                                                    Tất cả ({{ $totalAll }})
                                                 </a>
                                             </li>
                                         </ul>
@@ -95,10 +87,7 @@
                                 </div>
                             </div>
                             <!-- end card header -->
-
                             <div class="card-body">
-
-
                                 <table class="table align-middle table-nowrap mb-0">
                                     <thead class="table-light">
                                         <tr>
@@ -142,77 +131,81 @@
                                                 <td>{{ $product->category->name ?? 'Chưa có' }}</td>
 
                                                 <td>
-                                                    <div class="dropdown">
-                                                        <button class="btn btn-soft-secondary btn-sm" type="button"
-                                                            data-bs-toggle="dropdown" aria-expanded="false">
-                                                            <i class="ri-more-fill"></i>
-                                                        </button>
-                                                        <ul class="dropdown-menu dropdown-menu-end">
-                                                            <li>
-                                                                <a class="dropdown-item"
-                                                                    href="{{ route('products.show', $product->id) }}">
-                                                                    <i class="ri-eye-fill align-bottom me-2 text-muted"></i>
-                                                                    Xem
-                                                                </a>
-                                                            </li>
-                                                            <li>
-                                                                <a class="dropdown-item"
-                                                                    href="{{ route('products.edit', $product->id) }}">
-                                                                    <i
-                                                                        class="ri-pencil-fill align-bottom me-2 text-muted"></i>
-                                                                    Sửa
-                                                                </a>
-                                                            </li>
-
-                                                            <li>
-                                                                <form
-                                                                    action="{{ route('products.destroy', $product->id) }}"
-                                                                    method="POST" class="delete-form">
-                                                                    @csrf
-                                                                    @method('DELETE')
-                                                                    <button type="submit"
-                                                                        class="dropdown-item text-danger">
+                                                    @if ($product->deleted_at)
+                                                        <!-- Nếu sản phẩm đã bị xóa mềm -->
+                                                        <form action="{{ route('products.restore', $product->id) }}"
+                                                            method="POST" class="restore-form d-inline">
+                                                            @csrf
+                                                            <button type="button"
+                                                                class="btn btn-success btn-sm btn-restore">Khôi
+                                                                phục</button>
+                                                        </form>
+                                                    @else
+                                                        <div class="dropdown">
+                                                            <button class="btn btn-soft-secondary btn-sm" type="button"
+                                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                                <i class="ri-more-fill"></i>
+                                                            </button>
+                                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                                <li>
+                                                                    <a class="dropdown-item"
+                                                                        href="{{ route('products.show', $product->id) }}">
                                                                         <i
-                                                                            class="ri-delete-bin-fill align-bottom me-2 text-muted"></i>
-                                                                        Xóa
-                                                                    </button>
-                                                                </form>
-                                                            </li>
-                                                            <li>
-                                                                <a class="dropdown-item"
-                                                                    href="{{ route('variants.create', $product->id) }}">
-                                                                    <i
-                                                                        class="ri-add-fill align-bottom me-2 text-muted"></i>
-                                                                    Thêm biến thể
-                                                                </a>
-                                                            </li>
-                                                            <li>
-                                                                <a class="dropdown-item"
-                                                                    href="{{ route('variants.index', ['product_id' => $product->id]) }}">
-                                                                    <i
-                                                                        class="ri-file-list-3-line align-bottom me-2 text-muted"></i>
-                                                                    Xem biến thể
-                                                                </a>
-                                                            </li>
-                                                        </ul>
-                                                    </div>
+                                                                            class="ri-eye-fill align-bottom me-2 text-muted"></i>
+                                                                        Xem
+                                                                    </a>
+                                                                </li>
+                                                                <li>
+                                                                    <a class="dropdown-item"
+                                                                        href="{{ route('products.edit', $product->id) }}">
+                                                                        <i
+                                                                            class="ri-pencil-fill align-bottom me-2 text-muted"></i>
+                                                                        Sửa
+                                                                    </a>
+                                                                </li>
+
+                                                                <li>
+                                                                    <form
+                                                                        action="{{ route('products.destroy', $product->id) }}"
+                                                                        method="POST" class="delete-form">
+                                                                        @csrf
+                                                                        @method('DELETE')
+                                                                        <button type="submit"
+                                                                            class="dropdown-item text-danger">
+                                                                            <i
+                                                                                class="ri-delete-bin-fill align-bottom me-2 text-muted"></i>
+                                                                            Xóa
+                                                                        </button>
+                                                                    </form>
+                                                                </li>
+                                                                <li>
+                                                                    <a class="dropdown-item"
+                                                                        href="{{ route('variants.create', $product->id) }}">
+                                                                        <i
+                                                                            class="ri-add-fill align-bottom me-2 text-muted"></i>
+                                                                        Thêm biến thể
+                                                                    </a>
+                                                                </li>
+                                                                <li>
+                                                                    <a class="dropdown-item"
+                                                                        href="{{ route('variants.index', ['product_id' => $product->id]) }}">
+                                                                        <i
+                                                                            class="ri-file-list-3-line align-bottom me-2 text-muted"></i>
+                                                                        Xem biến thể
+                                                                    </a>
+                                                                </li>
+                                                            </ul>
+                                                        </div>
+                                                    @endif
                                                 </td>
                                             </tr>
                                         @endforeach
                                     </tbody>
                                 </table>
-
                                 {{-- Phân trang --}}
                                 <div class="mt-3">
                                     {{ $products->links() }}
                                 </div>
-
-
-
-
-
-
-
                             </div>
                             <!-- end card body -->
                         </div>
@@ -227,7 +220,9 @@
         <!-- container-fluid -->
     </div>
     <!-- End Page-content -->
-
+    <div class="d-flex justify-content-center mt-4">
+        {{ $products->appends(request()->query())->links() }}
+    </div>
     <footer class="footer">
         <div class="container-fluid">
             <div class="row">
@@ -287,5 +282,52 @@
                 });
             });
         });
+         document.addEventListener('DOMContentLoaded', function () {
+        // Xác nhận xóa
+        const deleteForms = document.querySelectorAll('.delete-form');
+        deleteForms.forEach(form => {
+            form.querySelector('.btn-delete').addEventListener('click', function (e) {
+                e.preventDefault();
+
+                Swal.fire({
+                    title: 'Bạn có chắc chắn muốn xóa?',
+                    text: "Hành động này không thể hoàn tác!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Xóa',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        // Xác nhận khôi phục
+        const restoreForms = document.querySelectorAll('.restore-form');
+        restoreForms.forEach(form => {
+            form.querySelector('.btn-restore').addEventListener('click', function (e) {
+                e.preventDefault();
+
+                Swal.fire({
+                    title: 'Bạn có chắc chắn muốn khôi phục?',
+                    text: "Sản phẩm sẽ được khôi phục!",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Khôi phục',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        });
+    });
     </script>
 @endsection

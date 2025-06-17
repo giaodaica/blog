@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Categories;
+
 use App\Models\Color;
 use App\Models\Product_variants;
 use Illuminate\Http\Request;
@@ -17,19 +17,28 @@ class ProductVariantsController extends Controller
     // Hiển thị danh sách biến thể
     public function index(Request $request)
     {
-        // Nếu có tham số product_id => Chỉ lấy biến thể của sản phẩm đó
-        if ($request->has('product_id')) {
-            $productId = $request->product_id;
+        $productId = $request->product_id;
+        $status = $request->query('status');
+
+        $query = Product_variants::with('product', 'color', 'size');
+
+        // Nếu có lọc theo product_id
+        if ($productId) {
             $product = Products::findOrFail($productId);
-
-            $variants = Product_variants::with('product', 'color', 'size')
-                ->where('product_id', $productId)
-                ->get();
+            $query->where('product_id', $productId);
         } else {
-            // Nếu không có => Hiển thị tất cả biến thể
             $product = null;
+        }
 
-            $variants = Product_variants::with('product', 'color', 'size')->get();
+        if ($status === 'all') {
+            // Hiển thị tất cả bao gồm đã xóa và chưa xóa
+            $variants = Product_variants::withTrashed()->paginate(10);
+        } elseif ($status === 'deleted') {
+            // Hiển thị đã xóa
+            $variants = Product_variants::onlyTrashed()->paginate(10);
+        } else {
+            // Mặc định là Đang hoạt động
+            $variants = Product_variants::whereNull('deleted_at')->paginate(10);
         }
 
         return view('dashboard.pages.variants.index', compact('variants', 'product'));
@@ -266,5 +275,12 @@ class ProductVariantsController extends Controller
             ->get();
 
         return view('variants.index', compact('product', 'variants'));
+    }
+    public function restore($id)
+    {
+        $variant = Product_variants::withTrashed()->findOrFail($id);
+        $variant->restore();
+
+        return redirect()->route('variants.index')->with('success', 'Khôi phục sản phẩm thành công!');
     }
 }

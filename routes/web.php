@@ -77,6 +77,7 @@ Route::prefix('dashboard')->group(function () {
     Route::post('voucher/disable/{id}', [VouchersController::class, 'disable']);
     Route::post('voucher/active/{id}', [VouchersController::class, 'active']);
     Route::resource('products', ProductsController::class);
+    Route::post('/products/{id}/restore', [ProductsController::class, 'restore'])->name('products.restore');
     Route::resource('categories', CategoriesController::class);
 
     // phần order
@@ -98,6 +99,7 @@ Route::prefix('dashboard')->group(function () {
     Route::put('variants/{id}/update', [ProductVariantsController::class, 'update'])->name('variants.update');
     Route::delete('variants/{id}', [ProductVariantsController::class, 'destroy'])->name('variants.destroy');
     Route::get('products/{product}/variants', [ProductVariantsController::class, 'showVariants'])->name('products.variants');
+    Route::post('variants/{id}/restore', [ProductVariantsController::class, 'restore'])->name('variants.restore');
 });
 
 
