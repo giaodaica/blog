@@ -49,20 +49,12 @@
                                 <div class="mb-3">
                                     <label class="form-label">Slug</label>
                                     <input type="text" class="form-control @error('brand') is-invalid @enderror"
-                                        name="brand" placeholder="Nhập thương hiệu" value="{{ old('brand') }}">
+                                        name="slug" placeholder="Nhập thương hiệu" value="{{ old('slug') }}">
                                     @error('brand')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
-                                <!-- Mô tả -->
-                                <div class="mb-3">
-                                    <label class="form-label">Mô tả</label>
-                                    <textarea class="form-control @error('description') is-invalid @enderror" name="description" rows="4">{{ old('description') }}</textarea>
-                                    @error('description')
-                                        <div class="invalid-feedback">{{ $message }}</div>
-                                    @enderror
-                                </div>
 
                                 <!-- Danh mục -->
                                 <div class="mb-3">

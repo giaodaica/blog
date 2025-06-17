@@ -42,9 +42,8 @@ class ProductsController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255',
-            'brand' => 'nullable|string|max:255',
-            'description' => 'nullable|string',
+            'name' => 'required|string|max:255|unique:products,name',
+            'slug' => 'required|unique:products,slug,',
             'category_id' => 'required|exists:categories,id',
             'image_url' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
 
@@ -58,6 +57,9 @@ class ProductsController extends Controller
             'variants.*.variant_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ], [
             'name.required' => 'Vui lòng nhập tên sản phẩm.',
+            'name.unique' => 'Tên sản phẩm đã tồn tại.',
+            'slug.required' => 'Slug không được để trống',
+            'slug.unique' => 'Slug đã tồn tại',
             'category_id.required' => 'Vui lòng chọn danh mục.',
             'image_url.required' => 'Vui lòng chọn ảnh sản phẩm.',
 
