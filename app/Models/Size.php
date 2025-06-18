@@ -7,6 +7,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Size extends Model
 {
-       use HasFactory;
-    //
+
+    protected $fillable = ['size_name'];
+
+    // Nếu có quan hệ với product_variants (gợi ý)
+    public function productVariants()
+    {
+        return $this->hasMany(Product_variants::class, 'size_id');
+    }
 }
+
