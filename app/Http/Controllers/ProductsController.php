@@ -41,10 +41,12 @@ class ProductsController extends Controller
 
     public function store(Request $request)
     {
+        // dd($request->all());
         $request->validate([
             'name' => 'required|string|max:255|unique:products,name',
-            'slug' => 'required|unique:products,slug,',
+            'slug' => 'nullable|unique:products,slug',
             'category_id' => 'required|exists:categories,id',
+            'description' => 'nullable|string',
             'image_url' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
 
             'variants' => 'required|array|min:1',
@@ -58,8 +60,7 @@ class ProductsController extends Controller
         ], [
             'name.required' => 'Vui lòng nhập tên sản phẩm.',
             'name.unique' => 'Tên sản phẩm đã tồn tại.',
-            'slug.required' => 'Slug không được để trống',
-            'slug.unique' => 'Slug đã tồn tại',
+            'slug.unique' => 'Slug đã tồn tại.',
             'category_id.required' => 'Vui lòng chọn danh mục.',
             'image_url.required' => 'Vui lòng chọn ảnh sản phẩm.',
 
@@ -86,24 +87,25 @@ class ProductsController extends Controller
             'variants.*.variant_image.required' => 'Vui lòng chọn ảnh cho biến thể.',
         ]);
 
-        // Validate trùng size trong cùng một màu
         $combinations = [];
-        foreach ($request->variants as $variant) {
+        $errors = [];
+
+        foreach ($request->variants as $index => $variant) {
             $key = $variant['color_id'] . '-' . $variant['size_id'];
             if (in_array($key, $combinations)) {
-                // Nếu trùng thì trả lỗi validate chuẩn Laravel
-                throw ValidationException::withMessages([
-                    'variants' => ['Không được chọn trùng size cho cùng một màu.']
-                ]);
+                $errors["variants.$index.size_id"] = ['Size này đã bị trùng cho cùng một màu.'];
+                $errors["variants.$index.color_id"] = ['Màu này đã bị trùng cho cùng một size.'];
             }
             $combinations[] = $key;
         }
 
-        // Nếu không trùng thì tiếp tục lưu sản phẩm như cũ
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
+
         try {
             DB::beginTransaction();
 
-            // Xử lý ảnh sản phẩm chính
             $imagePath = null;
             if ($request->hasFile('image_url')) {
                 $file = $request->file('image_url');
@@ -112,15 +114,15 @@ class ProductsController extends Controller
                 $imagePath = 'uploads/products/' . $filename;
             }
 
-            // Tạo sản phẩm
             $product = Products::create([
                 'name' => $request->name,
-                'slug' => Str::slug($request->name),
+                'description' => $request->description,
+                'slug' => $request->slug ? Str::slug($request->slug) : Str::slug($request->name),
+                
                 'image_url' => $imagePath,
                 'category_id' => $request->category_id,
             ]);
 
-            // Lưu các biến thể
             foreach ($request->variants as $index => $variantData) {
                 $variantImagePath = null;
 
@@ -171,8 +173,9 @@ class ProductsController extends Controller
         $request->validate([
             'name' => 'required|unique:products,name,' . $id,
             'slug' => 'required|unique:products,slug,' . $id,
+            'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
-            'image_url' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:2048',  // Ảnh có thể không có
+            'image_url' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:2048',
         ], [
             'name.required' => 'Tên sản phẩm không được để trống',
             'name.unique' => 'Tên sản phẩm đã tồn tại',
@@ -185,8 +188,10 @@ class ProductsController extends Controller
             'image_url.max' => 'Kích thước ảnh tối đa là 2MB',
         ]);
 
-        $data = $request->only(['name', 'slug', 'category_id']);
+        // Lấy dữ liệu để update
+        $data = $request->only(['name', 'slug', 'description', 'category_id']);
 
+        // Nếu có ảnh mới
         if ($request->hasFile('image_url')) {
             $file = $request->file('image_url');
             $filename = time() . '.' . $file->getClientOriginalExtension();

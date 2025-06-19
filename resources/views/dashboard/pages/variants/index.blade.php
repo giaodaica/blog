@@ -203,7 +203,7 @@
         <!-- container-fluid -->
     </div>
     <!-- End Page-content -->
-    {{ $variants->links('pagination::bootstrap-5') }}
+   {{ $variants->appends(request()->query())->links('pagination::bootstrap-5') }}
     <footer class="footer">
         <div class="container-fluid">
             <div class="row">

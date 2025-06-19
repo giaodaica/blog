@@ -17,31 +17,26 @@ class ProductVariantsController extends Controller
     // Hiển thị danh sách biến thể
     public function index(Request $request)
     {
-        $productId = $request->product_id;
         $status = $request->query('status');
+        $productId = $request->query('product_id'); // lấy product_id từ URL
 
-        $query = Product_variants::with('product', 'color', 'size');
+        $query = Product_variants::query()->with(['product', 'size', 'color']);
 
-        // Nếu có lọc theo product_id
+        // Nếu có product_id → lọc theo sản phẩm đó
         if ($productId) {
-            $product = Products::findOrFail($productId);
             $query->where('product_id', $productId);
-        } else {
-            $product = null;
         }
 
+        // Lọc theo trạng thái
         if ($status === 'all') {
-            // Hiển thị tất cả bao gồm đã xóa và chưa xóa
-            $variants = Product_variants::withTrashed()->paginate(10);
+            $variants = $query->withTrashed()->paginate(10);
         } elseif ($status === 'deleted') {
-            // Hiển thị đã xóa
-            $variants = Product_variants::onlyTrashed()->paginate(10);
+            $variants = $query->onlyTrashed()->paginate(10);
         } else {
-            // Mặc định là Đang hoạt động
-            $variants = Product_variants::whereNull('deleted_at')->paginate(10);
+            $variants = $query->whereNull('deleted_at')->paginate(10);
         }
 
-        return view('dashboard.pages.variants.index', compact('variants', 'product'));
+        return view('dashboard.pages.variants.index', compact('variants'));
     }
 
 

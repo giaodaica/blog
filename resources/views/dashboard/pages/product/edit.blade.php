@@ -34,7 +34,7 @@
                             {{-- Tên sản phẩm --}}
                             <div class="mb-3">
                                 <label class="form-label">Tên sản phẩm</label>
-                                <input type="text" name="name" class="form-control @error('name') is-invalid @enderror"
+                                <input type="text" name="name" id="product-name" class="form-control @error('name') is-invalid @enderror"
                                     value="{{ old('name', $product->name) }}" required>
                                 @error('name')
                                     <div class="invalid-feedback">{{ $message }}</div>
@@ -44,9 +44,18 @@
                             {{-- Slug --}}
                             <div class="mb-3">
                                 <label class="form-label">Slug</label>
-                                <input type="text" name="slug" class="form-control @error('slug') is-invalid @enderror"
-                                    value="{{ old('slug', $product->slug) }}" required>
+                                <input type="text" name="slug" id="product-slug" class="form-control @error('slug') is-invalid @enderror"
+                                    value="{{ old('slug', $product->slug) }}" readonly required>
                                 @error('slug')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            {{-- Mô tả sản phẩm --}}
+                            <div class="mb-3">
+                                <label class="form-label">Mô tả sản phẩm</label>
+                                <textarea name="description" class="form-control @error('description') is-invalid @enderror" rows="4" placeholder="Nhập mô tả sản phẩm">{{ old('description', $product->description) }}</textarea>
+                                @error('description')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
@@ -109,4 +118,20 @@
 
     </div>
 </div>
+@endsection
+
+@section('js-content')
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).on('input', '#product-name', function () {
+        let name = $(this).val();
+        let slug = name.toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9\s-]/g, '')
+            .replace(/[\s-]+/g, '-')
+            .replace(/^-+|-+$/g, '');
+
+        $('#product-slug').val(slug);
+    });
+</script>
 @endsection

@@ -21,7 +21,7 @@
                 @if ($errors->any())
                     <div class="alert alert-danger">
                         <ul class="mb-0">
-                            @foreach ($errors->all() as $error)
+                            @foreach (array_unique($errors->all()) as $error)
                                 <li>{{ $error }}</li>
                             @endforeach
                         </ul>
@@ -45,16 +45,26 @@
                                     @enderror
                                 </div>
 
-                                <!-- Thương hiệu -->
+                                <!-- Slug -->
                                 <div class="mb-3">
                                     <label class="form-label">Slug</label>
-                                    <input type="text" class="form-control @error('brand') is-invalid @enderror"
-                                        name="slug" placeholder="Nhập thương hiệu" value="{{ old('slug') }}">
-                                    @error('brand')
+                                    <input type="text" class="form-control @error('slug') is-invalid @enderror"
+                                        name="slug" placeholder="Slug sẽ được tự động tạo" value="{{ old('slug') }}"
+                                        readonly>
+                                    @error('slug')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
+                                <!-- Mô tả -->
+                                <div class="mb-3">
+                                    <label class="form-label">Mô tả sản phẩm</label>
+                                    <textarea class="form-control @error('description') is-invalid @enderror" name="description" rows="3"
+                                        placeholder="Nhập mô tả sản phẩm">{{ old('description') }}</textarea>
+                                    @error('description')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
                                 <!-- Danh mục -->
                                 <div class="mb-3">
@@ -101,104 +111,164 @@
                             <div class="card-body">
 
                                 <div id="variant-container">
-                                    <div class="row variant-item mb-3">
+                                    @php $variants = old('variants', []); @endphp
+                                    @foreach ($variants as $index => $variant)
+                                        <div class="row variant-item mb-3">
 
-                                        <!-- Size -->
-                                        <div class="col-lg-2">
-                                            <select class="form-select @error('variants.0.size_id') is-invalid @enderror"
-                                                name="variants[0][size_id]" required>
-                                                <option value="">Size</option>
-                                                @foreach ($sizes as $size)
-                                                    <option value="{{ $size->id }}"
-                                                        {{ old('variants.0.size_id') == $size->id ? 'selected' : '' }}>
-                                                        {{ $size->size_name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            @error('variants.0.size_id')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                        <!-- Color -->
-                                        <div class="col-lg-2">
-                                            <select class="form-select @error('variants.0.color_id') is-invalid @enderror"
-                                                name="variants[0][color_id]" required>
-                                                <option value="">Color</option>
-                                                @foreach ($colors as $color)
-                                                    <option value="{{ $color->id }}"
-                                                        {{ old('variants.0.color_id') == $color->id ? 'selected' : '' }}>
-                                                        {{ $color->color_name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            @error('variants.0.color_id')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                        <!-- Giá nhập -->
-                                        <div class="col-lg-2">
-                                            <input type="number"
-                                                class="form-control @error('variants.0.import_price') is-invalid @enderror"
-                                                name="variants[0][import_price]" value="{{ old('variants.0.import_price') }}"
-                                                placeholder="Giá nhập" min="0" required>
-                                            @error('variants.0.import_price')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                        <!-- Giá niêm yết -->
-                                        <div class="col-lg-2">
-                                            <input type="number"
-                                                class="form-control @error('variants.0.listed_price') is-invalid @enderror"
-                                                name="variants[0][listed_price]" value="{{ old('variants.0.listed_price') }}" placeholder="Giá niêm yết" min="0"
-                                                required>
-                                            @error('variants.0.listed_price')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                        <!-- Giá khuyến mãi -->
-                                        <div class="col-lg-2">
-                                            <input type="number"
-                                                class="form-control @error('variants.0.sale_price') is-invalid @enderror"
-                                                name="variants[0][sale_price]" value="{{ old('variants.0.sale_price') }}" placeholder="Giá khuyến mãi" min="0">
-                                            @error('variants.0.sale_price')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                        <!-- Số lượng -->
-                                        <div class="col-lg-2">
-                                            <input type="number"
-                                                class="form-control @error('variants.0.stock') is-invalid @enderror"
-                                                name="variants[0][stock]" value="{{ old('variants.0.stock') }}" placeholder="Số lượng" min="0" required>
-                                            @error('variants.0.stock')
-                                                <div class="invalid-feedback">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                        <!-- Ảnh biến thể -->
-                                        <div class="col-lg-2 mt-2">
-                                            <div class="input-group">
-                                                <input type="file"
-                                                    class="form-control @error('variants.0.variant_image') is-invalid @enderror"
-                                                    name="variants[0][variant_image]" accept="image/*" id="variant-image-0">
-                                              
+                                            <!-- Size -->
+                                            <div class="col-lg-2">
+                                                <select class="form-select @error('variants.' . $index . '.size_id') is-invalid @enderror"
+                                                    name="variants[{{ $index }}][size_id]" required>
+                                                    <option value="">Size</option>
+                                                    @foreach ($sizes as $size)
+                                                        <option value="{{ $size->id }}"
+                                                            {{ old('variants.' . $index . '.size_id', $variant['size_id']) == $size->id ? 'selected' : '' }}>
+                                                            {{ $size->size_name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('variants.' . $index . '.size_id')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
                                             </div>
-                                            <small id="variant-image-name-0" class="form-text text-muted"></small>
-                                            @error('variants.0.variant_image')
-                                                <div class="invalid-feedback d-block">{{ $message }}</div>
-                                            @enderror
+
+                                            <!-- Color -->
+                                            <div class="col-lg-2">
+                                                <select class="form-select @error('variants.' . $index . '.color_id') is-invalid @enderror"
+                                                    name="variants[{{ $index }}][color_id]" required>
+                                                    <option value="">Color</option>
+                                                    @foreach ($colors as $color)
+                                                        <option value="{{ $color->id }}"
+                                                            {{ old('variants.' . $index . '.color_id', $variant['color_id']) == $color->id ? 'selected' : '' }}>
+                                                            {{ $color->color_name }}
+                                                        </option>
+                                                    @endforeach
+                                                </select>
+                                                @error('variants.' . $index . '.color_id')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                            <!-- Giá nhập -->
+                                            <div class="col-lg-2">
+                                                <input type="number" class="form-control @error('variants.' . $index . '.import_price') is-invalid @enderror"
+                                                    name="variants[{{ $index }}][import_price]"
+                                                    value="{{ old('variants.' . $index . '.import_price', $variant['import_price']) }}"
+                                                    placeholder="Giá nhập" min="0" required>
+                                                @error('variants.' . $index . '.import_price')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                            <!-- Giá niêm yết -->
+                                            <div class="col-lg-2">
+                                                <input type="number" class="form-control @error('variants.' . $index . '.listed_price') is-invalid @enderror"
+                                                    name="variants[{{ $index }}][listed_price]"
+                                                    value="{{ old('variants.' . $index . '.listed_price', $variant['listed_price']) }}"
+                                                    placeholder="Giá niêm yết" min="0" required>
+                                                @error('variants.' . $index . '.listed_price')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                            <!-- Giá khuyến mãi -->
+                                            <div class="col-lg-2">
+                                                <input type="number" class="form-control @error('variants.' . $index . '.sale_price') is-invalid @enderror"
+                                                    name="variants[{{ $index }}][sale_price]"
+                                                    value="{{ old('variants.' . $index . '.sale_price', $variant['sale_price']) }}"
+                                                    placeholder="Giá khuyến mãi" min="0">
+                                                @error('variants.' . $index . '.sale_price')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                            <!-- Số lượng -->
+                                            <div class="col-lg-2">
+                                                <input type="number" class="form-control @error('variants.' . $index . '.stock') is-invalid @enderror"
+                                                    name="variants[{{ $index }}][stock]"
+                                                    value="{{ old('variants.' . $index . '.stock', $variant['stock']) }}"
+                                                    placeholder="Số lượng" min="0" required>
+                                                @error('variants.' . $index . '.stock')
+                                                    <div class="invalid-feedback">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+
+                                            <!-- Ảnh biến thể -->
+                                            <div class="col-lg-2 mt-2">
+                                                <div class="input-group">
+                                                    <input type="file"
+                                                        class="form-control @error('variants.' . $index . '.variant_image') is-invalid @enderror"
+                                                        name="variants[{{ $index }}][variant_image]" accept="image/*"
+                                                        id="variant-image-{{ $index }}">
+                                                </div>
+                                                <small id="variant-image-name-{{ $index }}" class="form-text text-muted"></small>
+                                                @error('variants.' . $index . '.variant_image')
+                                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+
                                         </div>
-                                    </div>
+                                    @endforeach
+
+                                    @if (count($variants) == 0)
+                                        <div class="row variant-item mb-3">
+                                            <!-- Size -->
+                                            <div class="col-lg-2">
+                                                <select class="form-select" name="variants[0][size_id]" required>
+                                                    <option value="">Size</option>
+                                                    @foreach ($sizes as $size)
+                                                        <option value="{{ $size->id }}">{{ $size->size_name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <!-- Color -->
+                                            <div class="col-lg-2">
+                                                <select class="form-select" name="variants[0][color_id]" required>
+                                                    <option value="">Color</option>
+                                                    @foreach ($colors as $color)
+                                                        <option value="{{ $color->id }}">{{ $color->color_name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+
+                                            <!-- Giá nhập -->
+                                            <div class="col-lg-2">
+                                                <input type="number" class="form-control" name="variants[0][import_price]" placeholder="Giá nhập" min="0" required>
+                                            </div>
+
+                                            <!-- Giá niêm yết -->
+                                            <div class="col-lg-2">
+                                                <input type="number" class="form-control" name="variants[0][listed_price]" placeholder="Giá niêm yết" min="0" required>
+                                            </div>
+
+                                            <!-- Giá khuyến mãi -->
+                                            <div class="col-lg-2">
+                                                <input type="number" class="form-control" name="variants[0][sale_price]" placeholder="Giá khuyến mãi" min="0">
+                                            </div>
+
+                                            <!-- Số lượng -->
+                                            <div class="col-lg-2">
+                                                <input type="number" class="form-control" name="variants[0][stock]" placeholder="Số lượng" min="0" required>
+                                            </div>
+
+                                            <!-- Ảnh biến thể -->
+                                            <div class="col-lg-2 mt-2">
+                                                <div class="input-group">
+                                                    <input type="file" class="form-control" name="variants[0][variant_image]" accept="image/*" id="variant-image-0">
+                                                </div>
+                                                <small id="variant-image-name-0" class="form-text text-muted"></small>
+                                            </div>
+                                        </div>
+                                    @endif
                                 </div>
 
-                                <p class="text-muted fst-italic">(*) Mỗi tổ hợp màu + size sẽ tạo ra một biến thể tự động với tên dạng: <strong>Tên sản phẩm + Màu + Size</strong></p>
+                                <p class="text-muted fst-italic">(*) Mỗi tổ hợp màu + size sẽ tạo ra một biến thể tự động
+                                    với tên dạng: <strong>Tên sản phẩm + Màu + Size</strong></p>
 
                                 <div class="text-center">
-                                    <button type="button" id="add-variant" class="btn btn-success btn-sm">+ Thêm biến thể</button>
+                                    <button type="button" id="add-variant" class="btn btn-success btn-sm">+ Thêm biến
+                                        thể</button>
                                 </div>
 
                             </div>
@@ -220,7 +290,18 @@
 @section('js-content')
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
-        let index = 1;
+        let index = {{ count(old('variants', [])) > 0 ? count(old('variants', [])) : 1 }};
+
+        $(document).on('input', 'input[name="name"]', function() {
+            let name = $(this).val();
+            let slug = name.toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/[\s-]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+
+            $('input[name="slug"]').val(slug);
+        });
 
         $('#add-variant').on('click', function() {
             let variantHtml = `
@@ -263,7 +344,6 @@
         <div class="col-lg-2 mt-2">
             <div class="input-group">
                 <input type="file" class="form-control" name="variants[${index}][variant_image]" accept="image/*" id="variant-image-${index}">
-              
             </div>
             <small id="variant-image-name-${index}" class="form-text text-muted"></small>
         </div>
@@ -274,13 +354,11 @@
             index++;
         });
 
-        // Hiển thị tên file ảnh chính
         $(document).on('change', '#product-image', function() {
             let fileName = $(this).val().split('\\').pop();
             $('#product-image-name').text(fileName);
         });
 
-        // Hiển thị tên file ảnh biến thể
         $(document).on('change', 'input[type="file"][name^="variants"]', function() {
             let inputId = $(this).attr('id');
             let fileName = $(this).val().split('\\').pop();
