@@ -100,6 +100,11 @@ Route::prefix('dashboard')->group(function () {
     Route::delete('variants/{id}', [ProductVariantsController::class, 'destroy'])->name('variants.destroy');
     Route::get('products/{product}/variants', [ProductVariantsController::class, 'showVariants'])->name('products.variants');
     Route::post('variants/{id}/restore', [ProductVariantsController::class, 'restore'])->name('variants.restore');
+ 
+    Route::post('/products/upload-temp-image', [ProductsController::class, 'uploadTempImage'])->name('products.uploadTempImage');
+
+   
+    Route::post('/products/upload-temp-variant-image', [ProductsController::class, 'uploadTempVariantImage'])->name('products.uploadTempVariantImage');
 });
 
 
