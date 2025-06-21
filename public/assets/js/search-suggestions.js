@@ -1,4 +1,4 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Constants and Configuration
     const CONFIG = {
         MAX_HISTORY_ITEMS: 5,
@@ -30,7 +30,8 @@ document.addEventListener('DOMContentLoaded', function() {
         currentKeyword: '',
         isLoading: false,
         debounceTimer: null,
-        lastRequestedTerm: null
+        lastRequestedTerm: null,
+        suggestionsVisible: true
     };
 
     // Get search parameters from URL
@@ -48,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Trending searches (should be fetched from API in production)
     const trendingSearches = [
-        "Áo thun nam", "Quần jean nữ", "Váy liền thân", "Giày thể thao", 
+        "Áo thun nam", "Quần jean nữ", "Váy liền thân", "Giày thể thao",
         "Túi xách", "Đồng hồ", "Kính mát", "Phụ kiện"
     ];
 
@@ -77,7 +78,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updateURL(params) {
             const currentPath = window.location.pathname;
             const searchParams = new URLSearchParams(window.location.search);
-        
+
             // Cập nhật các tham số tìm kiếm
             Object.entries(params).forEach(([key, value]) => {
                 if (value) {
@@ -86,11 +87,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     searchParams.delete(key);
                 }
             });
-        
+
             const newURL = `${currentPath}?${searchParams.toString()}`;
             window.history.pushState(null, null, newURL);
         },
-        
+
 
         showLoading() {
             loadingOverlay.style.display = 'flex';
@@ -156,17 +157,17 @@ document.addEventListener('DOMContentLoaded', function() {
         display() {
             const history = this.get();
             let historyHtml = '';
-            
+
             if (history.length > 0) {
                 historyHtml = history.map(keyword => `
-                    <div class="history-item p-2 border-bottom d-flex justify-content-between align-items-center" style="cursor: pointer;">
-                        <div class="d-flex align-items-center text-content">
-                            <i class="fa fa-history"></i>
-                            <span class="ms-2" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px;">${keyword}</span>
-                            
-                        </div>
-                        <button class="remove-history-item btn btn-sm btn-link p-0" data-keyword="${keyword}" style="line-height: 1;">&times;</button>
-                    </div>
+                  <div class="history-item p-2 border-bottom d-flex justify-content-between align-items-center" style="cursor: pointer;">
+    <div class="d-flex align-items-center flex-grow-1 text-content">
+        <i class="fa fa-history"></i>
+        <span class="ms-2 keyword-text" title="${keyword}">${keyword}</span>
+    </div>
+    <button class="remove-history-item btn btn-sm btn-link p-0 ms-2" data-keyword="${keyword}" style="line-height: 1;">&times;</button>
+</div>
+
                 `).join('');
             } else {
                 historyHtml = '<div class="p-2 fw-bold text-dark" style="font-size: 16px;">Chưa có lịch sử tìm kiếm</div>';
@@ -202,18 +203,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (keyword) params.append('q', keyword);
                 if (page) params.append('page', page);
                 if (sort) params.append('sort', sort);
-                
+
                 // Nếu additionalParams là chuỗi, phân tách và thêm vào params
                 if (additionalParams) {
                     const tempParams = new URLSearchParams(additionalParams);
                     for (const [key, value] of tempParams.entries()) {
-                            params.append(key, value);
+                        params.append(key, value);
                     }
                 }
-                
+
                 const url = `/search/filter?${params.toString()}&t=${Date.now()}`;
                 console.log('Search URL:', url);
-                
+
                 const response = await fetch(url, {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
@@ -241,19 +242,19 @@ document.addEventListener('DOMContentLoaded', function() {
         updateUI(html, keyword, page, sort) {
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
-            
+
             // Update search results count
             this.updateSearchCount(doc);
-            
+
             // Update products
             this.updateProducts(doc);
-            
+
             // Update pagination
             this.updatePagination(doc, keyword, page, sort);
-            
+
             // Update sorting
             this.updateSorting(doc, keyword, page, sort);
-            
+
             // Update URL
             utils.updateURL({
                 q: keyword,
@@ -324,7 +325,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Get available sizes and colors from current products
             const availableSizes = new Map();
             const availableColors = new Map();
-            
+
             const currentProducts = elements.productContainer.querySelectorAll('.grid-item');
             currentProducts.forEach(product => {
                 // Get available sizes
@@ -352,14 +353,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 const colorCheckboxes = colorFilter.querySelectorAll('input[type="checkbox"]');
                 colorCheckboxes.forEach(checkbox => {
                     if (!checkbox) return;
-                    
+
                     const colorLabel = checkbox.closest('li');
                     if (!colorLabel) return;
 
                     const colorId = checkbox.value;
                     const count = availableColors.get(colorId) || 0;
                     const countElement = colorLabel.querySelector('.item-qty');
-                    
+
                     if (count > 0) {
                         colorLabel.style.display = 'block';
                         checkbox.disabled = false;
@@ -383,14 +384,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 const sizeCheckboxes = sizeFilter.querySelectorAll('input[type="checkbox"]');
                 sizeCheckboxes.forEach(checkbox => {
                     if (!checkbox) return;
-                    
+
                     const sizeLabel = checkbox.closest('li');
                     if (!sizeLabel) return;
 
                     const sizeId = checkbox.value;
                     const count = availableSizes.get(sizeId) || 0;
                     const countElement = sizeLabel.querySelector('.item-qty');
-                    
+
                     if (count > 0) {
                         sizeLabel.style.display = 'block';
                         checkbox.disabled = false;
@@ -412,15 +413,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const newFilterInputs = document.querySelectorAll('input[type="checkbox"], input[type="radio"]');
             newFilterInputs.forEach(input => {
                 if (!input) return;
-                
-                input.addEventListener('change', function() {
+
+                input.addEventListener('change', function () {
                     // Get current URL parameters
                     const urlParams = new URLSearchParams(window.location.search);
                     const currentKeyword = urlParams.get('q') || state.currentKeyword;
 
                     // Build filter parameters
                     const filterParams = new URLSearchParams();
-                    
+
                     // Add search keyword
                     if (currentKeyword) {
                         filterParams.append('q', currentKeyword);
@@ -471,7 +472,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     window.history.pushState({}, '', newUrl);
 
                     // Perform search with filters
-                    search.perform(currentKeyword, 1, currentSort, filterParams.toString());
+                    search.perform(null, null, null, filterParams.toString());
                 });
             });
 
@@ -494,7 +495,7 @@ document.addEventListener('DOMContentLoaded', function() {
             };
 
             if (typeof imagesLoaded === 'function' && typeof $.fn.isotope === 'function') {
-                $(elements.productContainer).imagesLoaded(function() {
+                $(elements.productContainer).imagesLoaded(function () {
                     $(elements.productContainer).removeClass('grid-loading');
                     $(elements.productContainer).isotope(isotopeConfig);
                     // Force layout update after images are loaded
@@ -549,7 +550,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             // Remove the onchange attribute to prevent form submission
             sortSelect.removeAttribute('onchange');
-            sortSelect.value = sort;
+            sortSelect.value = (!sort || sort === 'default') ? '' : sort;
 
             // Prevent form submission
             const sortForm = sortSelect.closest('form');
@@ -569,7 +570,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.stopPropagation();
 
                 if (!state.currentKeyword) {
-                    sortSelect.value = 'default';
+                    sortSelect.value = 'Sắp xếp';
                     return;
                 }
 
@@ -591,6 +592,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
         async showSuggestions(term) {
             if (!elements.searchSuggestions) return;
+
+            // Prevent showing suggestions if suggestionsVisible is false
+            if (state.suggestionsVisible === false) {
+                elements.searchSuggestions.style.display = 'none';
+                return;
+            }
 
             const trimmedTerm = term ? term.trim() : '';
             elements.searchSuggestions.innerHTML = ''; // Clear previous content
@@ -629,7 +636,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         state.currentKeyword = keyword;
                         state.currentPage = 1;
                         elements.searchSuggestions.style.display = 'none'; // Hide dropdown
-                        this.perform(keyword);
+                        // Nếu không phải trang /search thì chuyển hướng
+                        if (!window.location.pathname.includes('/search')) {
+                            window.location.href = `/search?q=${encodeURIComponent(keyword)}`;
+                        } else {
+                            this.perform(keyword);
+                        }
                     });
                 });
                 elements.searchSuggestions.querySelectorAll('.remove-history-item').forEach(btn => {
@@ -659,6 +671,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
 
                 elements.searchSuggestions.style.display = 'block';
+
+                // When showing suggestions, set suggestionsVisible to true
+                state.suggestionsVisible = true;
 
                 return;
             }
@@ -768,6 +783,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 elements.searchSuggestions.style.display = 'block';
 
+                // When showing suggestions, set suggestionsVisible to true
+                state.suggestionsVisible = true;
+
             } catch (error) {
                 // Chỉ hiển thị lỗi nếu đây là lỗi cho yêu cầu gần nhất
                 if (state.lastRequestedTerm === trimmedTerm) {
@@ -832,6 +850,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (elements.searchSuggestions) {
                             elements.searchSuggestions.style.display = 'none';
                         }
+                        state.suggestionsVisible = false; // Hide suggestions after Enter
                         // Remove focus from input
                         elements.searchInput.blur();
                         search.perform(keyword);
@@ -890,14 +909,14 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.location.pathname.includes('/search')) {
         const filterInputs = document.querySelectorAll('.filter-sidebar input[type="checkbox"], .filter-sidebar input[type="radio"]');
         filterInputs.forEach(input => {
-            input.addEventListener('change', function() {
+            input.addEventListener('change', function () {
                 // Get current URL parameters
                 const urlParams = new URLSearchParams(window.location.search);
                 const currentKeyword = urlParams.get('q') || state.currentKeyword;
-    
+
                 // Build filter parameters
                 const filterParams = new URLSearchParams();
-                
+
                 // Add search keyword
                 if (currentKeyword) {
                     filterParams.append('q', currentKeyword);
@@ -948,14 +967,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.history.pushState({}, '', newUrl);
 
                 // Perform search with filters
-                search.perform(currentKeyword, 1, currentSort, filterParams.toString());
+                search.perform(null, null, null, filterParams.toString());
             });
-    });
-    
+        });
+
         // Add sort change handler for search results
         const sortSelect = document.querySelector('select[name="sort"]');
         if (sortSelect) {
-            sortSelect.addEventListener('change', function() {
+            sortSelect.addEventListener('change', function () {
                 // Get current URL parameters
                 const urlParams = new URLSearchParams(window.location.search);
                 const currentKeyword = urlParams.get('q') || state.currentKeyword;
@@ -963,7 +982,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Build filter parameters
                 const filterParams = new URLSearchParams();
-                
+
                 // Add search keyword
                 if (currentKeyword) {
                     filterParams.append('q', currentKeyword);
@@ -974,7 +993,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (selectedSizes.length > 0) {
                     selectedSizes.forEach(size => {
                         filterParams.append('sizes[]', size);
-    });
+                    });
                 }
 
                 // Add color filters
@@ -1013,8 +1032,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 window.history.pushState({}, '', newUrl);
 
                 // Perform search with filters
-                search.perform(currentKeyword, 1, currentSort, filterParams.toString());
-        });
+                search.perform(null, null, null, filterParams.toString());
+            });
         }
     }
 });

@@ -20,7 +20,7 @@ use App\Http\Controllers\Spatie\RoleController;
 use App\Http\Controllers\Spatie\UserRoleController;
 use App\Http\Controllers\VouchersController;
 use App\Http\Controllers\web\ProductController;
-
+use App\Http\Controllers\web\ProductDetailController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -35,7 +35,7 @@ Route::get('/search/suggestions', [SearchController::class, 'suggestions']);
 Route::get('/search/filter', [SearchController::class, 'search'])->name('search.filter');
 
 Route::get('info', [HomeController::class, 'info_customer'])->name('home.info')->middleware('auth', 'cache');
-Route::get('aonam/{id}', [HomeController::class, 'show'])->name('home.show');
+Route::get('aonam/{slug}', [ProductDetailController::class, 'index'])->name('home.show');
 Route::get('cart', [CartController::class, 'index'])->name('home.cart');
 Route::get('checkout', [OrderController::class, 'index'])->name('home.checkout');
 Route::get('done', [OrderController::class, 'done'])->name('home.done');

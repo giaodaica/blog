@@ -19157,3 +19157,10 @@ footer .footer-navbar .nav-item:last-child a {
   max-height: 3em;
   line-height: 1.5;
 }
+.keyword-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  max-width: 200px;
+}

@@ -109,6 +109,6 @@ class ProductController extends Controller
                 break;
         }
 
-        return $query->paginate(12);
+        return $query->paginate(1);
     }
 }

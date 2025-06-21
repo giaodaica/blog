@@ -8,7 +8,7 @@
                         <ul>
                             <li><a href="{{route('home')}}">Trang chủ</a></li>
                             <li><a href="{{route('home.shop')}}">Cửa Hàng</a></li>
-                            <li>Áo Nam - Nhớ dùng slug để url trông đẹp nhé </li>
+                            <li>{{ $product->name }}</li>
                         </ul>
                     </div>
                 </div>
@@ -25,64 +25,34 @@
                                 <div class="swiper product-image-slider" data-slider-options='{ "spaceBetween": 10, "loop": true, "autoplay": { "delay": 2000, "disableOnInteraction": false }, "watchOverflow": true, "navigation": { "nextEl": ".slider-product-next", "prevEl": ".slider-product-prev" }, "thumbs": { "swiper": { "el": ".product-image-thumb", "slidesPerView": "auto", "spaceBetween": 15, "direction": "vertical", "navigation": { "nextEl": ".swiper-thumb-next", "prevEl": ".swiper-thumb-prev" } } } }' data-thumb-slider-md-direction="horizontal">
                                     <div class="swiper-wrapper">
                                         <!-- start slider item -->
+                                        @foreach ($variants as $item)
+                                            
                                         <div class="swiper-slide gallery-box">
-                                            <a href="https://placehold.co/600x765" data-group="lightbox-gallery" title="Relaxed corduroy shirt">
-                                                <img class="w-100" src="https://placehold.co/600x765" alt="">
+                                            <a href="{{asset( $item->variant_image_url) }}" data-group="lightbox-gallery" title="Relaxed corduroy shirt">
+                                                <img class="w-100" src="{{asset( $item->variant_image_url) }}" alt="">
                                             </a>
                                         </div>
+                                        @endforeach
                                         <!-- end slider item -->
-                                        <div class="swiper-slide gallery-box">
-                                            <a href="https://placehold.co/600x765" data-group="lightbox-gallery" title="Relaxed corduroy shirt">
-                                                <img class="w-100" src="https://placehold.co/600x765" alt="">
-                                            </a>
-                                        </div>
-                                        <!-- end slider item -->
-                                        <div class="swiper-slide gallery-box">
-                                            <a href="https://placehold.co/600x765" data-group="lightbox-gallery" title="Relaxed corduroy shirt">
-                                                <img class="w-100" src="https://placehold.co/600x765" alt="">
-                                            </a>
-                                        </div>
-                                        <!-- end slider item -->
-                                        <div class="swiper-slide gallery-box">
-                                            <a href="https://placehold.co/600x765" data-group="lightbox-gallery" title="Relaxed corduroy shirt">
-                                                <img class="w-100" src="https://placehold.co/600x765" alt="">
-                                            </a>
-                                        </div>
-                                        <!-- end slider item -->
-                                        <!-- end slider item -->
-                                        <div class="swiper-slide gallery-box">
-                                            <a href="https://placehold.co/600x765" data-group="lightbox-gallery" title="Relaxed corduroy shirt">
-                                                <img class="w-100" src="https://placehold.co/600x765" alt="">
-                                            </a>
-                                        </div>
-                                        <!-- end slider item -->
-                                        <!-- end slider item -->
-                                        <div class="swiper-slide gallery-box">
-                                            <a href="https://placehold.co/600x765" data-group="lightbox-gallery" title="Relaxed corduroy shirt">
-                                                <img class="w-100" src="https://placehold.co/600x765" alt="">
-                                            </a>
-                                        </div>
-                                        <!-- end slider item -->
+                                      
                                     </div>
                                 </div>
                             </div>
                             <div class="col-12 col-lg-2 order-lg-1 position-relative single-product-thumb">
                                 <div class="swiper-container product-image-thumb slider-vertical">
                                     <div class="swiper-wrapper">
-                                        <div class="swiper-slide"><img class="w-100" src="https://placehold.co/600x765" alt=""></div>
-                                        <div class="swiper-slide"><img class="w-100" src="https://placehold.co/600x765" alt=""></div>
-                                        <div class="swiper-slide"><img class="w-100" src="https://placehold.co/600x765" alt=""></div>
-                                        <div class="swiper-slide"><img class="w-100" src="https://placehold.co/600x765" alt=""></div>
-                                        <div class="swiper-slide"><img class="w-100" src="https://placehold.co/600x765" alt=""></div>
-                                        <div class="swiper-slide"><img class="w-100" src="https://placehold.co/600x765" alt=""></div>
+                                        @foreach ($variants as $item)
+                                        <div class="swiper-slide"><img class="w-100" src="{{asset( $item->variant_image_url) }}" alt=""></div>
+                                        
+                                        @endforeach
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="col-12 col-lg-5 product-info">
-                        <span class="fw-500 text-dark-gray d-block">Zalando</span>
-                        <h4 class="alt-font text-dark-gray fw-500 mb-5px">Relaxed corduroy shirt</h5>
+                        
+                        <h5 class="alt-font text-dark-gray fw-500 mb-5px product-name-truncate">{{ $product->name }}</h5>
                             <div class="d-block d-sm-flex align-items-center mb-15px">
                                 <div class="me-10px xs-me-0">
                                     <a href="#tab" class="section-link ls-minus-1px icon-small">
@@ -94,48 +64,41 @@
                                     </a>
                                 </div>
                                 <a href="#tab" class="me-25px text-dark-gray fw-500 section-link xs-me-0">165 Reviews</a>
-                                <div><span class="text-dark-gray fw-500">SKU: </span>M492300</div>
+                                
                             </div>
                             <div class="product-price mb-10px">
-                                <span class="text-dark-gray fs-28 xs-fs-24 fw-700 ls-minus-1px"><del class="text-medium-gray me-10px fw-400">$85.00</del>$65.00</span>
+                                <span class="text-red fs-28 xs-fs-24 fw-700 ls-minus-1px">
+                                    @if($variants->first())
+                                    {{ number_format($variants->first()->sale_price) }}đ
+                                        <del class="text-medium-gray me-10px fw-400">{{ number_format($variants->first()->listed_price) }}đ</del>
+                                    @endif
+                                </span>
                             </div>
-                            <p>Lorem ipsum is simply dummy text of the printing and typesetting industry lorem ipsum standard.</p>
+                           
                             <div class="d-flex align-items-center mb-20px">
                                 <label class="text-dark-gray alt-font me-15px fw-500">Color</label>
                                 <ul class="shop-color mb-0">
-                                    <li>
-                                        <input class="d-none" type="radio" id="color-1" name="color" checked="">
-                                        <label for="color-1"><span style="background-color: #D4AF37"></span></label>
-                                    </li>
-                                    <li>
-                                        <input class="d-none" type="radio" id="color-2" name="color" checked="">
-                                        <label for="color-2"><span style="background-color: #5881bf"></span></label>
-                                    </li>
-                                    <li>
-                                        <input class="d-none" type="radio" id="color-3" name="color" checked="">
-                                        <label for="color-3"><span style="background-color: #87a968"></span></label>
-                                    </li>
+                                    @foreach($variants as $variant)
+                                        @if($variant->color)
+                                            <li>
+                                                <input class="d-none" type="radio" id="color-{{ $variant->color->id }}" name="color">
+                                                <label for="color-{{ $variant->color->id }}"><span style="background-color: {{ $variant->color->color_code ?? '#000' }}"></span></label>
+                                            </li>
+                                        @endif
+                                    @endforeach
                                 </ul>
                             </div>
                             <div class="d-flex align-items-center mb-35px">
                                 <label class="text-dark-gray me-15px fw-500">Size</label>
                                 <ul class="shop-size mb-0">
-                                    <li>
-                                        <input class="d-none" type="radio" id="size-1" name="size" checked="">
-                                        <label for="size-1"><span>S</span></label>
-                                    </li>
-                                    <li>
-                                        <input class="d-none" type="radio" id="size-2" name="size" checked="">
-                                        <label for="size-2"><span>M</span></label>
-                                    </li>
-                                    <li>
-                                        <input class="d-none" type="radio" id="size-3" name="size" checked="">
-                                        <label for="size-3"><span>L</span></label>
-                                    </li>
-                                    <li>
-                                        <input class="d-none" type="radio" id="size-4" name="size" checked="">
-                                        <label for="size-4"><span>XL</span></label>
-                                    </li>
+                                    @foreach($variants as $variant)
+                                        @if($variant->size)
+                                            <li>
+                                                <input class="d-none" type="radio" id="size-{{ $variant->size->id }}" name="size">
+                                                <label for="size-{{ $variant->size->id }}"><span>{{ $variant->size->size_name }}</span></label>
+                                            </li>
+                                        @endif
+                                    @endforeach
                                 </ul>
                             </div>
                             <div class="d-flex align-items-center flex-column flex-sm-row mb-20px position-relative">
@@ -150,9 +113,7 @@
                                         <span class="btn-double-text ls-0px" data-text="Thêm vào giỏ">Thêm vào giỏ</span>
                                     </span>
                                 </a>
-                                <a href="#" class="wishlist d-flex align-items-center justify-content-center border border-radius-5px border-color-extra-medium-gray order-2 order-sm-3">
-                                    <i class="feather icon-feather-heart icon-small text-dark-gray"></i>
-                                </a>
+                                
                             </div>
                             <div class="row mb-20px">
                                 <div class="col-auto icon-with-text-style-08">
@@ -165,26 +126,7 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="col-auto icon-with-text-style-08">
-                                    <div class="feature-box feature-box-left-icon-middle d-inline-flex align-middle">
-                                        <div class="feature-box-icon me-10px">
-                                            <i class="feather icon-feather-mail align-middle text-dark-gray"></i>
-                                        </div>
-                                        <div class="feature-box-content">
-                                            <a href="#" class="alt-font fw-500 text-dark-gray d-block">Ask a question</a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-auto icon-with-text-style-08">
-                                    <div class="feature-box feature-box-left-icon-middle d-inline-flex align-middle">
-                                        <div class="feature-box-icon me-10px">
-                                            <i class="feather icon-feather-share-2 align-middle text-dark-gray"></i>
-                                        </div>
-                                        <div class="feature-box-content">
-                                            <a href="#" class="alt-font fw-500 text-dark-gray d-block">Share</a>
-                                        </div>
-                                    </div>
-                                </div>
+                               
                             </div>
                             <div class="mb-20px h-1px w-100 bg-extra-medium-gray d-block"></div>
                             <div class="row mb-15px">
@@ -209,20 +151,10 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="bg-very-light-gray ps-30px pe-30px pt-25px pb-25px mb-20px xs-p-25px border-radius-4px">
-                                <span class="alt-font fs-17 fw-500 text-dark-gray mb-15px d-block lh-initial">Guarantee safe and secure checkout</span>
-                                <div>
-                                    <a href="#"><img src="{{asset('assets/images/visa.svg')}}" class="h-30px me-5px mb-5px" alt=""></a>
-                                    <a href="#"><img src="{{asset('assets/images/mastercard.svg')}}" class="h-30px me-5px mb-5px" alt=""></a>
-                                    <a href="#"><img src="{{asset('assets/images/american-express.svg')}}" class="h-30px me-5px mb-5px" alt=""></a>
-                                    <a href="#"><img src="{{asset('assets/images/discover.svg"')}}"class="h-30px me-5px mb-5px" alt=""></a>
-                                    <a href="#"><img src="{{asset('assets/images/diners-club.svg')}}" class="h-30px me-5px mb-5px" alt=""></a>
-                                    <a href="#"><img src="{{asset('assets/images/union-pay.svg')}}" class="h-30px" alt=""></a>
-                                </div>
-                            </div>
+                           
                             <div>
-                                <div class="w-100 d-block"><span class="text-dark-gray alt-font fw-500">Category:</span> <a href="#">Fashion,</a> <a href="#">Woman</a></div>
-                                <div><span class="text-dark-gray alt-font fw-500">Tags: </span><a href="#">Shirts,</a> <a href="#">Cotton,</a> <a href="#">Printed</a></div>
+                                <div class="w-100 d-block"><span class="text-dark-gray alt-font fw-500">Danh mục:</span> <a href="{{ route('home.shop', ['categories[]' => $product->category->id]) }}">{{ $product->category->name }}</a></div>
+                               
                             </div>
                     </div>
                 </div>
@@ -235,89 +167,17 @@
                 <div class="row">
                     <div class="col-12 tab-style-04">
                         <ul class="nav nav-tabs border-0 justify-content-center alt-font fs-19">
-                            <li class="nav-item"><a data-bs-toggle="tab" href="#tab_five1" class="nav-link active">Description<span class="tab-border bg-dark-gray"></span></a></li>
-                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab_five2">Additional information<span class="tab-border bg-dark-gray"></span></a></li>
-                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab_five3">Shipping and return<span class="tab-border bg-dark-gray"></span></a></li>
-                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab_five4" data-tab="review-tab">Reviews (3)<span class="tab-border bg-dark-gray"></span></a></li>
+                            <li class="nav-item"><a data-bs-toggle="tab" href="#tab_five1" class="nav-link active">Mô tả<span class="tab-border bg-dark-gray"></span></a></li>
+                           
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab_five3">Vận chuyển và trả lại<span class="tab-border bg-dark-gray"></span></a></li>
+                            <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab_five4" data-tab="review-tab">Đánh giá (3)<span class="tab-border bg-dark-gray"></span></a></li>
                         </ul>
                         <div class="mb-5 h-1px w-100 bg-extra-medium-gray sm-mt-10px xs-mb-8"></div>
                         <div class="tab-content">
                             <!-- start tab content -->
                             <div class="tab-pane fade in active show" id="tab_five1">
                                 <div class="row align-items-center justify-content-center">
-                                    <div class="col-lg-6 md-mb-40px">
-                                        <div class="d-flex align-items-center mb-5px">
-                                            <div class="col-auto pe-5px"><i class="bi bi-heart-fill text-red fs-16"></i></div>
-                                            <div class="col alt-font fw-500 text-dark-gray">We make you feel special</div>
-                                        </div>
-                                        <h4 class="alt-font text-dark-gray fw-500 mb-20px w-90 lg-w-100">Unique and quirky designs for the latest trends product.</h4>
-                                        <p class="w-90">Lorem ipsum is simply dummy text of the printing and typesetting industry lorem ipsum has been the standard dummy text.</p>
-                                        <div>
-                                            <div class="feature-box feature-box-left-icon-middle mb-10px">
-                                                <div class="feature-box-icon feature-box-icon-rounded w-30px h-30px rounded-circle bg-very-light-gray me-10px">
-                                                    <i class="fa-solid fa-check fs-12 text-dark-gray"></i>
-                                                </div>
-                                                <div class="feature-box-content">
-                                                    <span class="d-block text-dark-gray fw-500">Made from soft yet durable 100% organic cotton twill.</span>
-                                                </div>
-                                            </div>
-                                            <div class="feature-box feature-box-left-icon-middle mb-10px">
-                                                <div class="feature-box-icon feature-box-icon-rounded w-30px h-30px rounded-circle bg-very-light-gray me-10px">
-                                                    <i class="fa-solid fa-check fs-12 text-dark-gray"></i>
-                                                </div>
-                                                <div class="feature-box-content">
-                                                    <span class="d-block text-dark-gray fw-500">Front and back yoke seams allow a full range of shoulder.</span>
-                                                </div>
-                                            </div>
-                                            <div class="feature-box feature-box-left-icon-middle mb-10px">
-                                                <div class="feature-box-icon feature-box-icon-rounded w-30px h-30px rounded-circle bg-very-light-gray me-10px">
-                                                    <i class="fa-solid fa-check fs-12 text-dark-gray"></i>
-                                                </div>
-                                                <div class="feature-box-content">
-                                                    <span class="d-block text-dark-gray fw-500">Interior storm flap and zipper garage at chin for comfort.</span>
-                                                </div>
-                                            </div>
-                                            <div class="feature-box feature-box-left-icon-middle">
-                                                <div class="feature-box-icon feature-box-icon-rounded w-30px h-30px rounded-circle bg-very-light-gray me-10px">
-                                                    <i class="fa-solid fa-check fs-12 text-dark-gray"></i>
-                                                </div>
-                                                <div class="feature-box-content">
-                                                    <span class="d-block text-dark-gray fw-500">Color may slightly vary depending on your screen.</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="col-lg-6 col-md-8">
-                                        <img src="https://placehold.co/580x555" alt="" class="w-100" />
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- end tab content -->
-                            <!-- start tab content -->
-                            <div class="tab-pane fade in" id="tab_five2">
-                                <div class="row m-0">
-                                    <div class="col-12">
-                                        <div class="row">
-                                            <div class="col-lg-2 col-md-3 col-sm-4 pt-10px pb-10px xs-pb-0 text-dark-gray alt-font fw-500">Color:</div>
-                                            <div class="col-lg-10 col-md-9 col-sm-8 pt-10px pb-10px xs-pt-0">Black, yellow</div>
-                                        </div>
-                                        <div class="row bg-very-light-gray">
-                                            <div class="col-lg-2 col-md-3 col-sm-4 pt-10px pb-10px xs-pb-0 text-dark-gray alt-font fw-500">Style/Type:</div>
-                                            <div class="col-lg-10 col-md-9 col-sm-8 pt-10px pb-10px xs-pt-0">Sports, Formal</div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-lg-2 col-md-3 col-sm-4 pt-10px pb-10px xs-pb-0 text-dark-gray alt-font fw-500">Lining:</div>
-                                            <div class="col-lg-10 col-md-9 col-sm-8 pt-10px pb-10px xs-pt-0">100% polyester taffeta with a DWR finish</div>
-                                        </div>
-                                        <div class="row bg-very-light-gray">
-                                            <div class="col-lg-2 col-md-3 col-sm-4 pt-10px pb-10px xs-pb-0 text-dark-gray alt-font fw-500">Material:</div>
-                                            <div class="col-lg-10 col-md-9 col-sm-8 pt-10px pb-10px xs-pt-0">Lather, Cotton, Silk</div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="col-lg-2 col-md-3 col-sm-4 pt-10px pb-10px xs-pb-0 text-dark-gray alt-font fw-500">Free shipping:</div>
-                                            <div class="col-lg-10 col-md-9 col-sm-8 pt-10px pb-10px xs-pt-0">On all orders over $50</div>
-                                        </div>
-                                    </div>
+                                        <p class="w-90">{{ $product->description }}</p>
                                 </div>
                             </div>
                             <!-- end tab content -->
@@ -382,7 +242,7 @@
                                             <!-- end progress bar item -->
                                             <!-- start progress bar item -->
                                             <div class="progress sm-mb-0 border-radius-6px">
-                                                <div class="progress-bar bg-green m-0" role="progressbar" aria-valuenow="05" aria-valuemin="0" aria-valuemax="100" aria-label="rating"></div>
+                                                <div class="progress-bar bg-green m-0" `role="progressbar" aria-valuenow="05" aria-valuemin="0" aria-valuemax="100" aria-label="rating"></div>
                                             </div>
                                             <!-- end progress bar item -->
                                         </div>

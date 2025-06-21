@@ -74,13 +74,13 @@
                                         <li class="grid-item">
                                             <div class="shop-box mb-10px">
                                                 <div class="shop-image mb-20px">
-                                                    <a href="{{ route('home.show', $product->id) }}">
+                                                    <a href="{{ route('home.show', $product->slug) }}">
                                                         <img src="{{ asset('assets/images/shop/demo-fashion-store-product-01.jpg') }}" alt="{{ $product->name }}">
                                                         <div class="shop-overlay bg-gradient-gray-light-dark-transparent"></div>
                                                     </a>
                                                 </div>
                                                 <div class="shop-footer text-start">
-                                                    <a href="{{ route('home.show', $product->id) }}" class="alt-font text-dark-gray fs-19 fw-500 product-name-truncate">{{ $product->name }}</a>
+                                                    <a href="{{ route('home.show', $product->slug) }}" class="alt-font text-dark-gray fs-19 fw-500 product-name-truncate">{{ $product->name }}</a>
                                                     <div class="price lh-22 fs-16">
                                                         @php
                                                             $variant = $product->variants->first();
