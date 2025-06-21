@@ -39,13 +39,40 @@ class ProductsController extends Controller
         return view('dashboard.pages.product.create', compact('categories', 'colors', 'sizes'));
     }
 
+     public function uploadTempImage(Request $request)
+    {
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/temp'), $filename);
+
+            return response()->json(['url' => asset('uploads/temp/' . $filename)]);
+        }
+
+        return response()->json(['url' => '']);
+    }
+
+    public function uploadTempVariantImage(Request $request)
+    {
+        if ($request->hasFile('variant_image')) {
+            $file = $request->file('variant_image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('uploads/temp'), $filename);
+
+            return response()->json(['url' => asset('uploads/temp/' . $filename)]);
+        }
+
+        return response()->json(['url' => '']);
+    }
+
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255|unique:products,name',
-            'slug' => 'required|unique:products,slug,',
+            'slug' => 'nullable|unique:products,slug',
             'category_id' => 'required|exists:categories,id',
-            'image_url' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'description' => 'nullable|string',
+            'temp_image_url' => 'required|string',
 
             'variants' => 'required|array|min:1',
             'variants.*.size_id' => 'required|exists:sizes,id',
@@ -54,14 +81,13 @@ class ProductsController extends Controller
             'variants.*.listed_price' => 'required|numeric|min:0',
             'variants.*.sale_price' => 'nullable|numeric|min:0|lte:variants.*.listed_price',
             'variants.*.stock' => 'required|integer|min:0',
-            'variants.*.variant_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'variants.*.temp_variant_image_url' => 'required|string',
         ], [
             'name.required' => 'Vui lòng nhập tên sản phẩm.',
             'name.unique' => 'Tên sản phẩm đã tồn tại.',
-            'slug.required' => 'Slug không được để trống',
-            'slug.unique' => 'Slug đã tồn tại',
+            'slug.unique' => 'Slug đã tồn tại.',
             'category_id.required' => 'Vui lòng chọn danh mục.',
-            'image_url.required' => 'Vui lòng chọn ảnh sản phẩm.',
+            'temp_image_url.required' => 'Vui lòng chọn ảnh sản phẩm.',
 
             'variants.required' => 'Vui lòng thêm ít nhất một biến thể.',
             'variants.*.size_id.required' => 'Vui lòng chọn size.',
@@ -83,52 +109,56 @@ class ProductsController extends Controller
             'variants.*.stock.integer' => 'Số lượng kho phải là số nguyên.',
             'variants.*.stock.min' => 'Số lượng kho không được nhỏ hơn 0.',
 
-            'variants.*.variant_image.required' => 'Vui lòng chọn ảnh cho biến thể.',
+            'variants.*.temp_variant_image_url.required' => 'Vui lòng chọn ảnh cho biến thể.',
         ]);
 
-        // Validate trùng size trong cùng một màu
         $combinations = [];
-        foreach ($request->variants as $variant) {
+        $errors = [];
+
+        foreach ($request->variants as $index => $variant) {
             $key = $variant['color_id'] . '-' . $variant['size_id'];
             if (in_array($key, $combinations)) {
-                // Nếu trùng thì trả lỗi validate chuẩn Laravel
-                throw ValidationException::withMessages([
-                    'variants' => ['Không được chọn trùng size cho cùng một màu.']
-                ]);
+                $errors["variants.$index.size_id"] = ['Size này đã bị trùng cho cùng một màu.'];
+                $errors["variants.$index.color_id"] = ['Màu này đã bị trùng cho cùng một size.'];
             }
             $combinations[] = $key;
         }
 
-        // Nếu không trùng thì tiếp tục lưu sản phẩm như cũ
+        if (!empty($errors)) {
+            throw ValidationException::withMessages($errors);
+        }
+
         try {
             DB::beginTransaction();
 
-            // Xử lý ảnh sản phẩm chính
             $imagePath = null;
-            if ($request->hasFile('image_url')) {
-                $file = $request->file('image_url');
-                $filename = time() . '_' . $file->getClientOriginalName();
-                $file->move(public_path('uploads/products'), $filename);
-                $imagePath = 'uploads/products/' . $filename;
+            if ($request->temp_image_url) {
+                $tempPath = public_path(parse_url($request->temp_image_url, PHP_URL_PATH));
+                if (file_exists($tempPath)) {
+                    $filename = time() . '_' . basename($tempPath);
+                    rename($tempPath, public_path('uploads/products/' . $filename));
+                    $imagePath = 'uploads/products/' . $filename;
+                }
             }
-
-            // Tạo sản phẩm
+            $slug = Str::slug($request->slug ?: $request->name, '-');
             $product = Products::create([
                 'name' => $request->name,
-                'slug' => Str::slug($request->name),
+                'description' => $request->description,
+                'slug' => $slug,
                 'image_url' => $imagePath,
                 'category_id' => $request->category_id,
             ]);
 
-            // Lưu các biến thể
             foreach ($request->variants as $index => $variantData) {
                 $variantImagePath = null;
 
-                if (isset($request->file('variants')[$index]['variant_image'])) {
-                    $variantFile = $request->file('variants')[$index]['variant_image'];
-                    $variantFileName = time() . '_' . $variantFile->getClientOriginalName();
-                    $variantFile->move(public_path('uploads/product_variants'), $variantFileName);
-                    $variantImagePath = 'uploads/product_variants/' . $variantFileName;
+                if ($variantData['temp_variant_image_url']) {
+                    $tempVariantPath = public_path(parse_url($variantData['temp_variant_image_url'], PHP_URL_PATH));
+                    if (file_exists($tempVariantPath)) {
+                        $variantFileName = time() . '_' . basename($tempVariantPath);
+                        rename($tempVariantPath, public_path('uploads/product_variants/' . $variantFileName));
+                        $variantImagePath = 'uploads/product_variants/' . $variantFileName;
+                    }
                 }
 
                 $color = \App\Models\Color::find($variantData['color_id']);
@@ -156,6 +186,10 @@ class ProductsController extends Controller
             return redirect()->back()->with('error', 'Có lỗi xảy ra: ' . $e->getMessage());
         }
     }
+
+  
+
+
     public function restore($id)
     {
         $product = Products::withTrashed()->findOrFail($id);
@@ -171,8 +205,9 @@ class ProductsController extends Controller
         $request->validate([
             'name' => 'required|unique:products,name,' . $id,
             'slug' => 'required|unique:products,slug,' . $id,
+            'description' => 'nullable|string',
             'category_id' => 'required|exists:categories,id',
-            'image_url' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:2048',  // Ảnh có thể không có
+            'image_url' => 'nullable|image|mimes:jpg,png,jpeg,webp|max:2048',
         ], [
             'name.required' => 'Tên sản phẩm không được để trống',
             'name.unique' => 'Tên sản phẩm đã tồn tại',
@@ -185,8 +220,10 @@ class ProductsController extends Controller
             'image_url.max' => 'Kích thước ảnh tối đa là 2MB',
         ]);
 
-        $data = $request->only(['name', 'slug', 'category_id']);
+        // Lấy dữ liệu để update
+        $data = $request->only(['name', 'slug', 'description', 'category_id']);
 
+        // Nếu có ảnh mới
         if ($request->hasFile('image_url')) {
             $file = $request->file('image_url');
             $filename = time() . '.' . $file->getClientOriginalExtension();
