@@ -8,117 +8,240 @@
             <div class="row">
                 <div class="col-12">
                     <div class="page-title-box d-sm-flex align-items-center justify-content-between">
-                        <h4 class="mb-sm-0">Thêm sản phẩm</h4>
-
-                        <div class="page-title-right">
-                            <ol class="breadcrumb m-0">
-                                <li class="breadcrumb-item"><a href="javascript:void(0);">Ecommerce</a></li>
-                                <li class="breadcrumb-item active">Thêm sản phẩm</li>
-                            </ol>
-                        </div>
-
+                        <h4 class="mb-sm-0">Thêm mới sản phẩm</h4>
                     </div>
                 </div>
             </div>
 
             <!-- Form -->
             <form id="createproduct-form" autocomplete="off" class="needs-validation" novalidate method="POST"
-                action="{{ route('products.store') }}" enctype="multipart/form-data">
+                action="{{ route('products.store') }}">
                 @csrf
+
+                @if ($errors->any())
+                    <div class="alert alert-danger">
+                        <ul class="mb-0">
+                            @foreach (array_unique($errors->all()) as $error)
+                                <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
 
                 <div class="row">
 
-                    <!-- Left column: main info -->
-                    <div class="col-lg-8">
+                    <!-- Left column: Product Info -->
+                    <div class="col-lg-12">
                         <div class="card">
                             <div class="card-body">
 
-                                {{-- Tên sản phẩm --}}
+                                <!-- Tên sản phẩm -->
                                 <div class="mb-3">
-                                    <label class="form-label" for="product-name-input">Tên sản phẩm</label>
+                                    <label class="form-label">Tên sản phẩm</label>
                                     <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                        id="product-name-input" name="name" value="{{ old('name') }}"
-                                        placeholder="Nhập tên sản phẩm" required>
+                                        name="name" placeholder="Nhập tên sản phẩm" value="{{ old('name') }}" required>
                                     @error('name')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
-                                {{-- Slug --}}
+                                <!-- Slug -->
                                 <div class="mb-3">
-                                    <label for="product-slug-input" class="form-label">Slug</label>
+                                    <label class="form-label">Slug</label>
                                     <input type="text" class="form-control @error('slug') is-invalid @enderror"
-                                        id="product-slug-input" name="slug" value="{{ old('slug') }}"
-                                        placeholder="Nhập slug" required>
+                                        name="slug" placeholder="Slug sẽ được tự động tạo" value="{{ old('slug') }}"
+                                        readonly>
                                     @error('slug')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
 
-                                {{-- Ảnh đại diện --}}
+                                <!-- Mô tả -->
                                 <div class="mb-3">
-                                    <label for="product-image-input" class="form-label">Ảnh đại diện</label>
-                                    <input type="file" class="form-control @error('image_url') is-invalid @enderror"
-                                        id="product-image-input" name="image_url" accept="image/*" required>
-                                    @error('image_url')
+                                    <label class="form-label">Mô tả sản phẩm</label>
+                                    <textarea id="description-editor" class="form-control @error('description') is-invalid @enderror" name="description"
+                                        rows="3" placeholder="Nhập mô tả sản phẩm">{{ old('description') }}</textarea>
+                                    @error('description')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
-                                    <img id="product-img" src="#" alt="Preview Image" class="mt-2"
-                                        style="max-height: 150px; display:none;">
-                                </div>
-                                <div class="card mb-3">
-                                    <div class="card-header">
-                                        <h5 class="card-title mb-0">Danh mục sản phẩm</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        
-                                        <select class="form-select @error('category_id') is-invalid @enderror"
-                                            id="choices-category-input" name="category_id" data-choices
-                                            data-choices-search-false>
-                                            <option value="">-- Chọn danh mục --</option>
-                                            @foreach ($categories as $category)
-                                                <option value="{{ $category->id }}"
-                                                    {{ old('category_id') == $category->id ? 'selected' : '' }}>
-                                                    {{ $category->name }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        @error('category_id')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
                                 </div>
 
+                                <!-- Danh mục -->
+                                <div class="mb-3">
+                                    <label class="form-label">Danh mục sản phẩm</label>
+                                    <select class="form-select @error('category_id') is-invalid @enderror"
+                                        name="category_id" required>
+                                        <option value="">-- Chọn danh mục --</option>
+                                        @foreach ($categories as $category)
+                                            <option value="{{ $category->id }}"
+                                                {{ old('category_id') == $category->id ? 'selected' : '' }}>
+                                                {{ $category->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                    @error('category_id')
+                                        <div class="invalid-feedback">{{ $message }}</div>
+                                    @enderror
+                                </div>
+
+                                <!-- Ảnh đại diện -->
+                                <div class="mb-3">
+                                    <label class="form-label">Hình ảnh</label>
+                                    <div class="input-group">
+                                        <input type="file" class="form-control" id="product-image">
+                                        <label class="input-group-text" for="product-image">Thêm ảnh</label>
+                                    </div>
+                                    <input type="hidden" name="temp_image_url" id="temp_image_url"
+                                        value="{{ old('temp_image_url') }}">
+                                    <small id="product-image-name" class="form-text text-muted"></small>
+                                    <div id="product-image-preview" class="mt-2">
+                                        @if (old('temp_image_url'))
+                                            <img src="{{ old('temp_image_url') }}" alt="Preview" width="150">
+                                        @endif
+                                    </div>
+                                    @error('temp_image_url')
+                                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                                    @enderror
+                                </div>
 
                             </div>
                         </div>
                     </div>
 
-                    <div class="d-flex justify-content-start mb-5">
-                        <button type="submit" class="btn btn-primary">Lưu sản phẩm</button>
+                    <!-- Biến thể -->
+                    <div class="col-lg-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">Sản phẩm biến thể</h5>
+                            </div>
+                            <div class="card-body">
+
+                                <div id="variant-container">
+                                    @php $variants = old('variants', []); @endphp
+                                    @foreach ($variants as $index => $variant)
+                                        @include('dashboard.pages.product.partials.variant', [
+                                            'index' => $index,
+                                            'variant' => $variant,
+                                        ])
+                                    @endforeach
+
+                                    @if (count($variants) == 0)
+                                        @include('dashboard.pages.product.partials.variant', [
+                                            'index' => 0,
+                                        ])
+                                    @endif
+                                </div>
+
+                                <p class="text-muted fst-italic">(*) Mỗi tổ hợp màu + size sẽ tạo ra một biến thể tự động
+                                    với tên dạng: <strong>Tên sản phẩm + Màu + Size</strong></p>
+
+                                <div class="text-center">
+                                    <button type="button" id="add-variant" class="btn btn-success btn-sm">+ Thêm biến
+                                        thể</button>
+                                </div>
+
+                            </div>
+                        </div>
                     </div>
+
+                    <!-- Nút submit -->
+                    <div class="d-flex justify-content-start mb-5">
+                        <button type="submit" class="btn btn-primary">THÊM MỚI</button>
+                        <a href="{{ route('products.index') }}" class="btn btn-danger ms-2">QUAY LẠI</a>
+                    </div>
+
                 </div>
-
-
-
             </form>
         </div>
     </div>
+@endsection
 
+@section('js-content')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.ckeditor.com/ckeditor5/35.3.2/classic/ckeditor.js"></script>
     <script>
-        // Xử lý preview ảnh đại diện
-        const mainImageInput = document.getElementById('product-image-input');
-        const mainImagePreview = document.getElementById('product-img');
+        let index = {{ count(old('variants', [])) > 0 ? count(old('variants', [])) : 1 }};
 
-        mainImageInput.addEventListener('change', e => {
-            if (e.target.files && e.target.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    mainImagePreview.src = e.target.result;
-                    mainImagePreview.style.display = 'block';
-                };
-                reader.readAsDataURL(e.target.files[0]);
-            }
+        ClassicEditor
+            .create(document.querySelector('#description-editor'))
+            .catch(error => {
+                console.error(error);
+            });
+
+        // Hàm loại dấu tiếng Việt
+        function removeVietnameseTones(str) {
+            str = str.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            str = str.replace(/đ/g, 'd').replace(/Đ/g, 'D');
+            return str;
+        }
+
+        // Tự động tạo slug khi nhập tên sản phẩm
+        $(document).on('input', 'input[name="name"]', function() {
+            let name = $(this).val();
+            let slug = removeVietnameseTones(name).toLowerCase()
+                .trim()
+                .replace(/[^a-z0-9\s-]/g, '')
+                .replace(/[\s-]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+
+            $('input[name="slug"]').val(slug);
+        });
+
+        // Thêm biến thể
+        $('#add-variant').on('click', function() {
+            $.ajax({
+                url: '{{ route('products.create') }}',
+                method: 'GET',
+                success: function(res) {
+                    let newVariantHtml = `@include('dashboard.pages.product.partials.variant', ['index' => '__INDEX__'])`;
+                    newVariantHtml = newVariantHtml.replace(/__INDEX__/g, index);
+                    $('#variant-container').append(newVariantHtml);
+                    index++;
+                }
+            });
+        });
+
+        // Upload ảnh sản phẩm
+        $(document).on('change', '#product-image', function() {
+            let formData = new FormData();
+            formData.append('image', this.files[0]);
+            formData.append('_token', '{{ csrf_token() }}');
+
+            $.ajax({
+                url: '{{ route('products.uploadTempImage') }}',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    $('#temp_image_url').val(response.url);
+                    $('#product-image-preview').html(
+                        `<img src="${response.url}" alt="Preview" width="150">`);
+                }
+            });
+        });
+
+        // Upload ảnh biến thể
+        $(document).on('change', '.variant-image-input', function() {
+            let variantIndex = $(this).data('index');
+            let formData = new FormData();
+            formData.append('variant_image', this.files[0]);
+            formData.append('_token', '{{ csrf_token() }}');
+
+            let previewSelector = `#variant-image-preview-${variantIndex}`;
+
+            $.ajax({
+                url: '{{ route('products.uploadTempVariantImage') }}',
+                type: 'POST',
+                data: formData,
+                contentType: false,
+                processData: false,
+                success: function(response) {
+                    $(`input[name="variants[${variantIndex}][temp_variant_image_url]"]`).val(response
+                        .url);
+                    $(previewSelector).html(`<img src="${response.url}" alt="Preview" width="100">`);
+                }
+            });
         });
     </script>
 @endsection
