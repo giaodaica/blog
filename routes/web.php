@@ -21,6 +21,7 @@ use App\Http\Controllers\Spatie\UserRoleController;
 use App\Http\Controllers\VouchersController;
 use App\Http\Controllers\web\ProductController;
 use App\Http\Controllers\web\ProductDetailController;
+use App\Http\Controllers\web\ReviewController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -33,6 +34,8 @@ Route::get('shop', [ProductController::class, 'index'])->name('home.shop');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 Route::get('/search/suggestions', [SearchController::class, 'suggestions']);
 Route::get('/search/filter', [SearchController::class, 'search'])->name('search.filter');
+Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store')->middleware('auth');
+Route::get('/reviews/list/{product_id}', [ReviewController::class, 'list'])->name('reviews.list');
 
 Route::get('info', [HomeController::class, 'info_customer'])->name('home.info')->middleware('auth', 'cache');
 Route::get('aonam/{slug}', [ProductDetailController::class, 'index'])->name('home.show');
@@ -115,3 +118,6 @@ Route::prefix('dashboard')->name('dashboard.')->group(function () {
     Route::post('roles/order', [RoleController::class, 'order'])->name('roles.order');
     //  Route::post('permission/order', [RoleController::class, 'order'])->name('permission.order');
 });
+
+// Route cho admin trả lời bình luận
+Route::post('reviews/{id}/reply', [\App\Http\Controllers\web\ReviewController::class, 'update'])->name('reviews.reply');

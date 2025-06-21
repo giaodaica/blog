@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Products;
 use App\Models\Product_variants;
 use App\Models\ImageProductVariants;
+use App\Models\Review;
 
 class ProductDetailController extends Controller
 {
@@ -19,7 +20,13 @@ class ProductDetailController extends Controller
         $variants = Product_variants::with(['color', 'size'])
         ->where('product_id','=',$product->id)
         ->where('is_show', 1)->get();
-// dd($variants);
-        return view('pages.shop.show', compact('product', 'variants'));
+        // dd($variants);
+        $reviews = Review::where('product_id', $product->id)
+        ->where('is_show', 1)
+        ->with('user') // Eager load the user information
+        ->latest()
+        ->get();
+        
+        return view('pages.shop.show', compact('product', 'variants', 'reviews'));
     }
 }
