@@ -32,7 +32,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('shop', [ProductController::class, 'index'])->name('home.shop');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 Route::get('/search/suggestions', [SearchController::class, 'suggestions']);
-
+Route::get('/search/filter', [SearchController::class, 'search'])->name('search.filter');
 
 Route::get('info', [HomeController::class, 'info_customer'])->name('home.info')->middleware('auth', 'cache');
 Route::get('aonam/{id}', [HomeController::class, 'show'])->name('home.show');
