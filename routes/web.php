@@ -40,6 +40,11 @@ Route::get('/reviews/list/{product_id}', [ReviewController::class, 'list'])->nam
 Route::get('info', [HomeController::class, 'info_customer'])->name('home.info')->middleware('auth', 'cache');
 Route::get('aonam/{slug}', [ProductDetailController::class, 'index'])->name('home.show');
 Route::get('cart', [CartController::class, 'index'])->name('home.cart');
+Route::delete('/cart/delete-selected', [CartController::class, 'deleteSelected'])->name('cart.deleteSelected');
+Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity');
+Route::post('/cart/calculate-total', [CartController::class, 'calculateTotal'])->name('cart.calculateTotal');
+Route::post('/cart/apply-voucher', [CartController::class, 'applyVoucher'])->name('cart.applyVoucher');
+
 Route::get('checkout', [OrderController::class, 'index'])->name('home.checkout');
 Route::get('done', [OrderController::class, 'done'])->name('home.done');
 Route::get('dashboard', [HomeController::class, 'admin']);
