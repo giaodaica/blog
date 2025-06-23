@@ -37,7 +37,7 @@
                                     <div class="swiper-wrapper">
                                         <!-- start slider item -->
                                         @foreach ($variants as $item)
-                                            
+
                                         <div class="swiper-slide gallery-box">
                                             <a href="{{asset( $item->variant_image_url) }}" data-group="lightbox-gallery" title="Relaxed corduroy shirt">
                                                 <img class="w-100" src="{{asset( $item->variant_image_url) }}" alt="">
@@ -45,16 +45,16 @@
                                         </div>
                                         @endforeach
                                         <!-- end slider item -->
-                                      
+
                                     </div>
                                 </div>
                             </div>
                             <div class="col-12 col-lg-2 order-lg-1 position-relative single-product-thumb">
                                 <div class="swiper-container product-image-thumb slider-vertical">
                                     <div class="swiper-wrapper">
-                                        @foreach ($variants as $item)
-                                        <div class="swiper-slide"><img class="w-100" src="{{asset( $item->variant_image_url) }}" alt=""></div>
-                                        
+                                        @foreach ($images as $item)
+                                        <div class="swiper-slide"><img class="w-100" src="{{asset( $item) }}" alt=""></div>
+
                                         @endforeach
                                     </div>
                                 </div>
@@ -62,7 +62,7 @@
                         </div>
                     </div>
                     <div class="col-12 col-lg-5 product-info">
-                        
+
                         <h5 class="alt-font text-dark-gray fw-500 mb-5px product-name-truncate">{{ $product->name }}</h5>
                             <div class="d-block d-sm-flex align-items-center mb-15px">
                                 <div class="me-10px xs-me-0">
@@ -75,7 +75,7 @@
                                     </a>
                                 </div>
                                 <a href="#tab" class="me-25px text-dark-gray fw-500 section-link xs-me-0">165 Reviews</a>
-                                
+
                             </div>
                             <div class="product-price mb-10px">
                                 <span class="text-red fs-28 xs-fs-24 fw-700 ls-minus-1px">
@@ -85,30 +85,26 @@
                                     @endif
                                 </span>
                             </div>
-                           
+
                             <div class="d-flex align-items-center mb-20px">
                                 <label class="text-dark-gray alt-font me-15px fw-500">Color</label>
                                 <ul class="shop-color mb-0">
-                                    @foreach($variants as $variant)
-                                        @if($variant->color)
+                                    @foreach($colors as $color)
                                             <li>
-                                                <input class="d-none" type="radio" id="color-{{ $variant->color->id }}" name="color">
-                                                <label for="color-{{ $variant->color->id }}"><span style="background-color: {{ $variant->color->color_code ?? '#000' }}"></span></label>
+                                                <input class="d-none" type="radio" id="color-{{ $color->id }}" name="color">
+                                                <label class="" for="color-{{ $color->id }}"><span style="background-color: {{ $color->color_code ?? '#000' }}" ></span></label>
                                             </li>
-                                        @endif
                                     @endforeach
                                 </ul>
                             </div>
                             <div class="d-flex align-items-center mb-35px">
                                 <label class="text-dark-gray me-15px fw-500">Size</label>
                                 <ul class="shop-size mb-0">
-                                    @foreach($variants as $variant)
-                                        @if($variant->size)
+                                    @foreach($sizes as $size)
                                             <li>
-                                                <input class="d-none" type="radio" id="size-{{ $variant->size->id }}" name="size">
-                                                <label for="size-{{ $variant->size->id }}"><span>{{ $variant->size->size_name }}</span></label>
+                                                <input class="d-none" type="radio" id="size-{{ $size->id }}" name="size">
+                                                <label for="size-{{ $size->id }}"><span>{{ $size->size_name }}</span></label>
                                             </li>
-                                        @endif
                                     @endforeach
                                 </ul>
                             </div>
@@ -124,7 +120,7 @@
                                         <span class="btn-double-text ls-0px" data-text="Thêm vào giỏ">Thêm vào giỏ</span>
                                     </span>
                                 </a>
-                                
+
                             </div>
                             <div class="row mb-20px">
                                 <div class="col-auto icon-with-text-style-08">
@@ -137,7 +133,7 @@
                                         </div>
                                     </div>
                                 </div>
-                               
+
                             </div>
                             <div class="mb-20px h-1px w-100 bg-extra-medium-gray d-block"></div>
                             <div class="row mb-15px">
@@ -162,10 +158,10 @@
                                     </div>
                                 </div>
                             </div>
-                           
+
                             <div>
                                 <div class="w-100 d-block"><span class="text-dark-gray alt-font fw-500">Danh mục:</span> <a href="{{ route('home.shop', ['categories[]' => $product->category->id]) }}">{{ $product->category->name }}</a></div>
-                               
+
                             </div>
                     </div>
                 </div>
@@ -179,7 +175,7 @@
                     <div class="col-12 tab-style-04">
                         <ul class="nav nav-tabs border-0 justify-content-center alt-font fs-19">
                             <li class="nav-item"><a data-bs-toggle="tab" href="#tab_five1" class="nav-link active">Mô tả<span class="tab-border bg-dark-gray"></span></a></li>
-                           
+
                             <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab_five3">Vận chuyển và trả lại<span class="tab-border bg-dark-gray"></span></a></li>
                             <li class="nav-item"><a class="nav-link" data-bs-toggle="tab" href="#tab_five4" data-tab="review-tab">Đánh giá ({{ $totalReviews }})<span class="tab-border bg-dark-gray"></span></a></li>
                         </ul>
@@ -188,7 +184,7 @@
                             <!-- start tab content -->
                             <div class="tab-pane fade in active show" id="tab_five1">
                                 <div class="row align-items-center justify-content-center">
-                                        <p class="w-90">{{ $product->description }}</p>
+                                        <p class="w-90">{!! $product->description !!}</p>
                                 </div>
                             </div>
                             <!-- end tab content -->
@@ -287,7 +283,7 @@
                                             <p>Chưa có đánh giá nào cho sản phẩm này.</p>
                                         </div>
                                     @endif
-                                
+
                                     @if($reviews->count() > 0)
                                     <div class="col-12 last-paragraph-no-margin text-center">
                                         <a href="#" class="btn btn-link btn-hover-animation-switch btn-extra-large text-dark-gray">
@@ -333,7 +329,7 @@
                                                     <label class="form-label mb-15px">Đánh giá của bạn</label>
                                                     <textarea class="border-radius-4px form-control" cols="40" rows="4" name="content" placeholder="Tin nhắn của bạn"></textarea>
                                                 </div>
-                                               
+
                                                 <div class="">
                                                     <input type="hidden" name="redirect" value="">
                                                     <button class="btn btn-dark-gray btn-small btn-box-shadow btn-round-edge submit" type="submit">Gửi đánh giá</button>
@@ -521,7 +517,7 @@
                 color: #ffb60f; /* text-golden-yellow */
             }
         </style>
-       
+
 @endsection
 
 <script>

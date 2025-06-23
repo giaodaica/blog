@@ -18768,20 +18768,17 @@ canvas {
   position: relative;
   vertical-align: middle;
   cursor: pointer;
+  border: 1px solid #ccc;
+  box-sizing: border-box;
+  transition: all 0.2s;
 }
-.shop-color li input[type=radio]:checked + label span:after {
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  color: var(--white);
-  height: 28px;
-  width: 28px;
-  border: 2px solid var(--white);
-  border-radius: 100%;
-  text-align: center;
-  content: "";
-  font-weight: 900;
+
+/* ✅ Khi được chọn: viền trắng nổi bật, đặc biệt với nền tối */
+.shop-color li input[type=radio]:checked + label span {
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 2px #000; /* Viền đen ngoài, viền trắng trong */
 }
+
 /* Shop size */
 .shop-size {
   list-style: none;

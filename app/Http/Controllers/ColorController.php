@@ -23,17 +23,22 @@ class ColorController extends Controller
     // Lưu màu mới
     public function store(Request $request)
     {
+        // dd($_POST)
         $request->validate([
             'color_name' => ['required', 'unique:colors,color_name', 'max:50', 'regex:/^[\pL\s]+$/u'],
+            'color_code' => ['required', 'regex:/^#([A-Fa-f0-9]{6})$/'],
         ], [
             'color_name.required' => 'Tên màu không được để trống.',
             'color_name.unique' => 'Tên màu đã tồn tại, vui lòng chọn tên khác.',
             'color_name.max' => 'Tên màu không được dài quá 50 ký tự.',
             'color_name.regex' => 'Tên màu chỉ được chứa chữ và khoảng trắng.',
+            'color_code.required' => 'Vui lòng chọn màu',
+            'color_code.regex' => 'Mã màu không hợp lệ',
         ]);
 
         Color::create([
             'color_name' => $request->color_name,
+            'color_code' => $request->color_code
         ]);
 
         return redirect()->route('colors.index')->with('success', 'Thêm màu thành công!');
@@ -62,6 +67,7 @@ class ColorController extends Controller
 
         $color->update([
             'color_name' => $request->color_name,
+            'color_code' => $request->color_code
         ]);
 
         return redirect()->route('colors.index')->with('success', 'Cập nhật màu thành công!');

@@ -37,7 +37,11 @@
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-
+                                <div>
+                                    <label for="colorPicker" class="form-label">Chọn mã màu</label>
+                                    <input type="color" name="color_code" class="form-control form-control-color w-25"
+                                        id="colorPicker" value="{{$color->color_code}}">
+                                </div>
 
 
                                 <a href="{{ route('colors.index') }}" class="btn btn-secondary mt-3 w-100">Quay lại</a>
