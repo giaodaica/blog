@@ -19,7 +19,12 @@
                 </div>
             </div>
             <!-- Kết thúc tiêu đề -->
-
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card" id="categoryList">
@@ -28,8 +33,7 @@
                                 <div class="col-sm"></div>
                                 <div class="col-sm-auto">
                                     <div class="d-flex gap-1 flex-wrap">
-                                        <a href="{{ route('colors.create') }}" class="btn btn-success"
-                                            id="addCategory-btn">
+                                        <a href="{{ route('colors.create') }}" class="btn btn-success" id="addCategory-btn">
                                             <i class="ri-add-line align-bottom me-1"></i> Thêm màu
                                         </a>
                                         <button type="button" class="btn btn-info">
@@ -56,6 +60,7 @@
                                             <th class="sort" data-sort="color_name">Tên màu</th>
                                             <th class="sort" data-sort="created_at">Ngày tạo</th>
                                             <th class="sort" data-sort="action">Hành động</th>
+                                            <th class="sort" data-sort="color_code">Mã màu</th>
                                         </tr>
                                     </thead>
 
@@ -88,9 +93,7 @@
                                                         <li class="list-inline-item" data-bs-toggle="tooltip"
                                                             data-bs-trigger="hover" data-bs-placement="top" title="Xóa">
                                                             <form action="{{ route('colors.destroy', $color->id) }}"
-                                                                method="POST"
-                                                                onsubmit="return confirm('Bạn có chắc muốn xóa màu này?');"
-                                                                style="display:inline;">
+                                                                method="POST" class="delete-form" style="display:inline;">
                                                                 @csrf
                                                                 @method('DELETE')
                                                                 <button type="submit"
@@ -101,6 +104,13 @@
                                                             </form>
                                                         </li>
                                                     </ul>
+                                                </td>
+                                                <td>
+                                                    <div
+                                                        style="width: 30px; height: 30px; background-color: {{ $color->color_code }}; border-radius: 4px; border: 1px solid #ccc;">
+                                                    </div>
+                                                    <span>{{ $color->color_code }}</span>
+
                                                 </td>
                                             </tr>
                                         @endforeach
@@ -150,4 +160,33 @@
             </div>
         </div>
     </footer>
+@endsection
+@section('js-content')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteForms = document.querySelectorAll('.delete-form');
+
+            deleteForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault(); // Chặn submit mặc định
+
+                    Swal.fire({
+                        title: 'Bạn có chắc chắn?',
+                        text: "Hành động này sẽ không thể hoàn tác!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Xóa',
+                        cancelButtonText: 'Hủy'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit(); // Chấp nhận xóa
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 @endsection

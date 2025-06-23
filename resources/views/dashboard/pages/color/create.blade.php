@@ -34,14 +34,21 @@
                                 <div class="mb-3">
                                     <label for="color_name" class="form-label">Tên màu</label>
                                     <input type="text" name="color_name"
-                                        class="form-control @error('color_name') is-invalid @enderror" value="{{ old('color_name') }}"
-                                        id="color_name" placeholder="Nhập tên màu">
+                                        class="form-control @error('color_name') is-invalid @enderror"
+                                        value="{{ old('color_name') }}" id="color_name" placeholder="Nhập tên màu">
                                     @error('color_name')
                                         <div class="invalid-feedback">{{ $message }}</div>
                                     @enderror
                                 </div>
-
-                               
+                                <!-- Color Picker -->
+                                <div>
+                                    <label for="colorPicker" class="form-label">Chọn mã màu</label>
+                                    <input type="color" name="color_code" class="form-control form-control-color w-25"
+                                        id="colorPicker" value="{{ old('color_code') }}">
+                                </div>
+                                @error('color_code')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
 
                                 <button type="submit" class="btn btn-primary mt-3 w-100">Tạo màu</button>
                                 <a href="{{ route('colors.index') }}" class="btn btn-secondary mt-2 w-100">Quay lại</a>
@@ -53,5 +60,4 @@
             </form>
         </div>
     </div>
-
 @endsection

@@ -20,7 +20,8 @@ use App\Http\Controllers\Spatie\RoleController;
 use App\Http\Controllers\Spatie\UserRoleController;
 use App\Http\Controllers\VouchersController;
 use App\Http\Controllers\web\ProductController;
-
+use App\Http\Controllers\web\ProductDetailController;
+use App\Http\Controllers\web\ReviewController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -32,10 +33,12 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('shop', [ProductController::class, 'index'])->name('home.shop');
 Route::get('/search', [SearchController::class, 'index'])->name('search');
 Route::get('/search/suggestions', [SearchController::class, 'suggestions']);
-
+Route::get('/search/filter', [SearchController::class, 'search'])->name('search.filter');
+Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store')->middleware('auth');
+Route::get('/reviews/list/{product_id}', [ReviewController::class, 'list'])->name('reviews.list');
 
 Route::get('info', [HomeController::class, 'info_customer'])->name('home.info')->middleware('auth', 'cache');
-Route::get('aonam/{id}', [HomeController::class, 'show'])->name('home.show');
+Route::get('aonam/{slug}', [ProductDetailController::class, 'index'])->name('home.show');
 Route::get('cart', [CartController::class, 'index'])->name('home.cart');
 Route::delete('/cart/delete-selected', [CartController::class, 'deleteSelected'])->name('cart.deleteSelected');
 Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity');
@@ -82,37 +85,44 @@ Route::prefix('dashboard')->group(function () {
     Route::post('voucher/disable/{id}', [VouchersController::class, 'disable']);
     Route::post('voucher/active/{id}', [VouchersController::class, 'active']);
     Route::resource('products', ProductsController::class);
+    Route::post('/products/{id}/restore', [ProductsController::class, 'restore'])->name('products.restore');
     Route::resource('categories', CategoriesController::class);
- 
-        // phần order
-    Route::get('order',[OrderController::class,'db_order'])->name('dashboard.order');
-    Route::post('order/change/{id}',[OrderController::class,'db_order_change']);
-    Route::get('order/{id}',[OrderController::class,'db_order_show']);
 
- 
-       // Route resource cho color và size
+    // phần order
+    Route::get('order', [OrderController::class, 'db_order'])->name('dashboard.order');
+    Route::post('order/change/{id}', [OrderController::class, 'db_order_change']);
+    Route::get('order/{id}', [OrderController::class, 'db_order_show']);
+
+
+    // Route resource cho color và size
     Route::resource('colors', ColorController::class);
     Route::resource('sizes', SizeController::class);
 
 
-     Route::get('variants', [ProductVariantsController::class, 'index'])->name('variants.index');
-    Route::get('variants/create/{productId}', [ProductVariantsController::class, 'create'])->name('variants.create');
-    Route::post('variants/store/{productId}', [ProductVariantsController::class, 'store'])->name('variants.store');
+    Route::get('variants', [ProductVariantsController::class, 'index'])->name('variants.index');
+    Route::get('variants/create', [ProductVariantsController::class, 'create'])->name('variants.create');
+    Route::post('variants/store', [ProductVariantsController::class, 'store'])->name('variants.store');
     Route::get('variants/{id}', [ProductVariantsController::class, 'show'])->name('variants.show');
     Route::get('variants/{id}/edit', [ProductVariantsController::class, 'edit'])->name('variants.edit');
     Route::put('variants/{id}/update', [ProductVariantsController::class, 'update'])->name('variants.update');
     Route::delete('variants/{id}', [ProductVariantsController::class, 'destroy'])->name('variants.destroy');
+    Route::get('products/{product}/variants', [ProductVariantsController::class, 'showVariants'])->name('products.variants');
+    Route::post('variants/{id}/restore', [ProductVariantsController::class, 'restore'])->name('variants.restore');
+ 
+    Route::post('/products/upload-temp-image', [ProductsController::class, 'uploadTempImage'])->name('products.uploadTempImage');
 
-
-    
+   
+    Route::post('/products/upload-temp-variant-image', [ProductsController::class, 'uploadTempVariantImage'])->name('products.uploadTempVariantImage');
 });
 
 
 Route::prefix('dashboard')->name('dashboard.')->group(function () {
-// Phân quyền
+    // Phân quyền
     Route::resource('roles', RoleController::class);
     Route::resource('permissions', PermissionController::class);
     Route::post('roles/order', [RoleController::class, 'order'])->name('roles.order');
     //  Route::post('permission/order', [RoleController::class, 'order'])->name('permission.order');
 });
 
+// Route cho admin trả lời bình luận
+Route::post('reviews/{id}/reply', [\App\Http\Controllers\web\ReviewController::class, 'update'])->name('reviews.reply');

@@ -87,7 +87,9 @@
     </div>
 
     {{-- Script xem trước ảnh trước khi upload --}}
-@section('scripts')
+
+@endsection
+@section('js-content')
     <script>
         document.getElementById('image').addEventListener('change', function(e) {
             const [file] = e.target.files;
@@ -97,5 +99,4 @@
             }
         });
     </script>
-@endsection
 @endsection

@@ -16,23 +16,34 @@
                     <li class="grid-item">
                         <div class="shop-box mb-10px">
                             <div class="shop-image mb-20px">
-                                <a href="{{ route('home.show', $product->id) }}">
+                                <a href="{{ route('home.show', $product->slug) }}">
                                     <img src="{{ asset('assets/images/shop/demo-fashion-store-product-01.jpg') }}" alt="{{ $product->name }}">
                                     <div class="shop-overlay bg-gradient-gray-light-dark-transparent"></div>
                                 </a>
                             </div>
-                            <div class="shop-footer text-center">
-                                <a href="{{ route('home.show', $product->id) }}" class="alt-font text-dark-gray fs-19 fw-500">{{ $product->name }}</a>
+                            <div class="shop-footer text-start">
+                                <a href="{{ route('home.show', $product->slug) }}" class="alt-font text-dark-gray fs-19 fw-500 product-name-truncate">{{ $product->name }}</a>
                                 <div class="price lh-22 fs-16">
                                     @php
                                         $variant = $product->variants->first();
+                                        $rating = $product->rating ?? 0; // Giả sử có trường rating
+                                        $reviewCount = $product->review_count ?? 0; // Giả sử có trường review_count
                                     @endphp
-                                    @if($variant && $variant->sale_price < $variant->listed_price)
-                                        <del>{{ number_format($variant->listed_price,2) }}đ</del>
-                                        {{ number_format($variant->sale_price,2) }}đ
+                                    @if ($variant && $variant->sale_price < $variant->listed_price)
+                                        {{-- <del class="text-muted">{{ number_format($variant->listed_price, 3) }}đ</del>
+                                        <span class="text-danger">{{ number_format($variant->sale_price, 3) }}đ</span> --}}
+                                        <div class="product-price">
+                                            {{ number_format($variant->sale_price) }} ₫
+                                            <span class="product-old-price">{{ number_format($variant->listed_price) }} ₫</span>
+                                        </div>
                                     @elseif($variant)
-                                        {{ number_format($variant->listed_price,2) }}đ
+                                        <span>{{ number_format($variant->listed_price) }}₫</span>
                                     @endif
+                                </div>
+                                <div class="rating">
+                                    <span class="text-warning">★★★★★</span> {{ number_format($rating, 1) }}
+                                    {{-- <div> ( đánh giá)</div> --}}
+                                    {{-- <div class="rating-text"> ({{ $reviewCount }} đánh giá)</div> --}}
                                 </div>
                             </div>
                         </div>
@@ -44,3 +55,22 @@
         </div>
     </div>
 </section>
+<style>
+    .product-price {
+    color: #ff6b35;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.product-old-price {
+    color: #999;
+    text-decoration: line-through;
+    font-size: 13px;
+    margin-right: 10px;
+}
+.rating-text {
+    color: #666;
+    font-size: 14px;
+}
+</style>

@@ -19,7 +19,12 @@
                 </div>
             </div>
             <!-- Kết thúc tiêu đề -->
-
+     @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            @endif
             <div class="row">
                 <div class="col-lg-12">
                     <div class="card" id="categoryList">
@@ -87,7 +92,7 @@
                                                             data-bs-trigger="hover" data-bs-placement="top" title="Xóa">
                                                             <form action="{{ route('sizes.destroy', $size->id) }}"
                                                                 method="POST"
-                                                                onsubmit="return confirm('Bạn có chắc muốn xóa size này?');"
+                                                              class="delete-form"
                                                                 style="display:inline;">
                                                                 @csrf
                                                                 @method('DELETE')
@@ -151,4 +156,33 @@
             </div>
         </div>
     </footer>
+@endsection
+@section('js-content')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const deleteForms = document.querySelectorAll('.delete-form');
+
+            deleteForms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault(); // Chặn submit mặc định
+
+                    Swal.fire({
+                        title: 'Bạn có chắc chắn?',
+                        text: "Hành động này sẽ không thể hoàn tác!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Xóa',
+                        cancelButtonText: 'Hủy'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit(); // Chấp nhận xóa
+                        }
+                    });
+                });
+            });
+        });
+    </script>
 @endsection

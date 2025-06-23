@@ -22,73 +22,117 @@
         <div class="container-fluid">
             <div class="row flex-row-reverse">
                 <div class="col-xxl-10 col-lg-9 ps-5 md-ps-15px md-mb-60px">
-                    <ul class="shop-modern shop-wrapper grid-loading grid grid-5col lg-grid-4col md-grid-3col sm-grid-2col xs-grid-1col gutter-extra-large text-center">
-                        <li class="grid-sizer"></li>
-                        @foreach ($products as $product)
-                            <!-- start shop item -->
-                            <li class="grid-item">
-                                <div class="shop-box mb-10px">
-                                    <div class="shop-image mb-20px">
-                                        <a href="{{ route('home.show', $product->id) }}">
-                                            <img src="{{ asset('assets/images/shop/demo-fashion-store-product-01.jpg') }}" alt="{{ $product->name }}">
-                                            <div class="shop-overlay bg-gradient-gray-light-dark-transparent"></div>
-                                        </a>
-                                    </div>
-                                    <div class="shop-footer text-start">
-                                        <a href="{{ route('home.show', $product->id) }}" class="alt-font text-dark-gray fs-19 fw-500">{{ $product->name }}</a>
-                                        <div class="price lh-22 fs-16">
-                                            @php
-                                                $variant = $product->variants->first();
-                                                $rating = $product->rating ?? 0; // Giả sử có trường rating
-                                                $reviewCount = $product->review_count ?? 0; // Giả sử có trường review_count
-                                            @endphp
-                                            @if ($variant && $variant->sale_price < $variant->listed_price)
-                                                {{-- <del class="text-muted">{{ number_format($variant->listed_price, 3) }}đ</del>
-                                                <span class="text-danger">{{ number_format($variant->sale_price, 3) }}đ</span> --}}
-                                                <div class="product-price">
-                                                    {{ number_format($variant->sale_price, 3) }} ₫
-                                                    <span class="product-old-price">{{ number_format($variant->listed_price, 3) }} ₫</span>
-                                                </div>
-                                            @elseif($variant)
-                                                <span>{{ number_format($variant->listed_price, 0) }}₫</span>
-                                            @endif
-                                        </div>
-                                        <div class="rating">
-                                            <span class="text-warning">★★★★★</span> {{ number_format($rating, 1) }}
-                                            {{-- <div> ( đánh giá)</div> --}}
-                                            {{-- <div class="rating-text"> ({{ $reviewCount }} đánh giá)</div> --}}
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                            <!-- end shop item -->
-                        @endforeach
-                    </ul>
+                    <div class="row align-items-center">
+                        <div class="col-md-6">
+                            <div id="search-summary" class="text-muted fs-15 mb-0"></div>
+                        </div>
                     
-                    <div class="w-100 d-flex mt-4 justify-content-center md-mt-30px">
-                        <ul class="pagination pagination-style-01 fs-13 fw-500 mb-0">
-                            <!-- Nút Previous -->
-                            <li class="page-item {{ $products->onFirstPage() ? 'disabled' : '' }}">
-                                <a class="page-link" href="{{ $products->previousPageUrl() }}" {{ $products->onFirstPage() ? 'aria-disabled="true"' : '' }}>
-                                    <i class="feather icon-feather-arrow-left fs-18 d-xs-none"></i>
-                                </a>
-                            </li>
+                        <div class="col-md-6 text-md-end">
+                            <form action="{{ route('home.shop') }}" method="GET" class="d-flex justify-content-md-end align-items-center gap-2">
+                                {{-- Preserve all existing filters --}}
+                                @foreach(request()->except('sort') as $key => $value)
+                                    @if(is_array($value))
+                                        @foreach($value as $v)
+                                            <input type="hidden" name="{{ $key }}[]" value="{{ $v }}">
+                                        @endforeach
+                                    @else
+                                        <input type="hidden" name="{{ $key }}" value="{{ $value }}">
+                                    @endif
+                                @endforeach
                     
-                            <!-- Các trang -->
-                            @for ($i = 1; $i <= $products->lastPage(); $i++)
-                                <li class="page-item {{ $products->currentPage() == $i ? 'active' : '' }}">
-                                    <a class="page-link" href="{{ $products->url($i) }}">{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</a>
-                                </li>
-                            @endfor
-                    
-                            <!-- Nút Next -->
-                            <li class="page-item {{ $products->hasMorePages() ? '' : 'disabled' }}">
-                                <a class="page-link" href="{{ $products->nextPageUrl() }}" {{ $products->hasMorePages() ? '' : 'aria-disabled="true"' }}>
-                                    <i class="feather icon-feather-arrow-right fs-18 d-xs-none"></i>
-                                </a>
-                            </li>
-                        </ul>
+                                
+                                <select name="sort" id="sort" class="form-select form-select-sm w-auto border-0 bg-light">
+                                    <option value="">Sắp xếp</option>
+                                    <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Mới nhất</option>
+                                    <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Giá tăng dần</option>
+                                    <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Giá giảm dần</option>
+                                </select>
+                            </form>
+                        </div>
                     </div>
+                    
+                    @if($products->isEmpty())
+                        <div class="text-center py-5">
+                            <h6 class="alt-font fw-500 text-dark-gray mb-3">Rất tiếc, chúng tôi không tìm thấy sản phẩm nào phù hợp.</h6>
+                           
+                        </div>
+                    @else
+                   
+                    
+                        <ul class="shop-modern shop-wrapper grid-loading grid grid-5col lg-grid-4col md-grid-3col sm-grid-2col xs-grid-1col gutter-extra-large text-center">
+                            <li class="grid-sizer"></li>
+                            @if (!request('q'))
+                                @if($products->isEmpty())
+                                    <div class="no-products-message">
+                                        <i class="fas fa-search"></i>
+                                        <h3>Không tìm thấy sản phẩm</h3>
+                                        <p>Không có sản phẩm nào phù hợp với bộ lọc của bạn. Vui lòng thử lại với các tiêu chí khác.</p>
+                                    </div>
+                                @else
+                                    @foreach ($products as $product)
+                                        <!-- start shop item -->
+                                        <li class="grid-item">
+                                            <div class="shop-box mb-10px">
+                                                <div class="shop-image mb-20px">
+                                                    <a href="{{ route('home.show', $product->slug) }}">
+                                                        <img src="{{ asset('assets/images/shop/demo-fashion-store-product-01.jpg') }}" alt="{{ $product->name }}">
+                                                        <div class="shop-overlay bg-gradient-gray-light-dark-transparent"></div>
+                                                    </a>
+                                                </div>
+                                                <div class="shop-footer text-start">
+                                                    <a href="{{ route('home.show', $product->slug) }}" class="alt-font text-dark-gray fs-19 fw-500 product-name-truncate">{{ $product->name }}</a>
+                                                    <div class="price lh-22 fs-16">
+                                                        @php
+                                                            $variant = $product->variants->first();
+                                                            $rating = $product->rating ?? 0;
+                                                            $reviewCount = $product->review_count ?? 0;
+                                                        @endphp
+                                                        @if ($variant && $variant->sale_price < $variant->listed_price)
+                                                            <div class="product-price">
+                                                                {{ number_format($variant->sale_price) }} ₫
+                                                                <span class="product-old-price">{{ number_format($variant->listed_price) }} ₫</span>
+                                                            </div>
+                                                        @elseif($variant)
+                                                            <span>{{ number_format($variant->listed_price) }}₫</span>
+                                                        @endif
+                                                    </div>
+                                                    <div class="rating">
+                                                        <span class="text-warning">★★★★★</span> {{ number_format($rating, 1) }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <!-- end shop item -->
+                                    @endforeach
+                                @endif
+                            @endif
+                        </ul>
+                        
+                        <div class="w-100 d-flex mt-4 justify-content-center md-mt-30px">
+                            <ul class="pagination pagination-style-01 fs-13 fw-500 mb-0">
+                                <!-- Nút Previous -->
+                                <li class="page-item {{ $products->onFirstPage() ? 'disabled' : '' }}">
+                                    <a class="page-link" href="{{ $products->previousPageUrl() }}" {{ $products->onFirstPage() ? 'aria-disabled="true"' : '' }}>
+                                        <i class="feather icon-feather-arrow-left fs-18 d-xs-none"></i>
+                                    </a>
+                                </li>
+                        
+                                <!-- Các trang -->
+                                @for ($i = 1; $i <= $products->lastPage(); $i++)
+                                    <li class="page-item {{ $products->currentPage() == $i ? 'active' : '' }}">
+                                        <a class="page-link" href="{{ $products->url($i) }}">{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</a>
+                                    </li>
+                                @endfor
+                        
+                                <!-- Nút Next -->
+                                <li class="page-item {{ $products->hasMorePages() ? '' : 'disabled' }}">
+                                    <a class="page-link" href="{{ $products->nextPageUrl() }}" {{ $products->hasMorePages() ? '' : 'aria-disabled="true"' }}>
+                                        <i class="feather icon-feather-arrow-right fs-18 d-xs-none"></i>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    @endif
                 </div>
                 <div class="col-xxl-2 col-lg-3 shop-sidebar"
                     data-anime='{ "el": "childs", "translateY": [-15, 0], "opacity": [0,1], "duration": 300, "delay": 0, "staggervalue": 300, "easing": "easeOutQuad" }'>
@@ -139,11 +183,11 @@
                                 @php
                                     $priceRanges = [
                                         '' => 'Tất cả',
-                                        '0-100' => 'Dưới 100k',
-                                        '100-300' => '100K - 300k',
-                                        '300-500' => '300k - 500k',
-                                        '500-1000' => '500k - 1 triệu',
-                                        '1000-999999' => 'Trên 1 triệu',
+                                        '0-100000' => 'Dưới 100k',
+                                        '100000-300000' => '100K - 300k',
+                                        '300000-500000' => '300k - 500k',
+                                        '500000-1000000' => '500k - 1 triệu',
+                                        '1000000-999999999' => 'Trên 1 triệu',
                                     ];
                                     $selectedPriceRange = request('price_range', ''); // Default to empty string
                                 @endphp
@@ -206,131 +250,6 @@
                                 @endforeach
                             </ul>
                         </div>
-                       
-                        
-                        <div class="mb-30px">
-                            <div class="d-flex align-items-center mb-20px">
-                                <span class="alt-font fw-500 fs-19 text-dark-gray">New arrivals</span>
-                                <div class="d-flex ms-auto">
-                                    <!-- start slider navigation -->
-                                    <div
-                                        class="slider-one-slide-prev-1 icon-very-small swiper-button-prev slider-navigation-style-08 me-5px">
-                                        <i class="fa-solid fa-arrow-left text-dark-gray"></i></div>
-                                    <div
-                                        class="slider-one-slide-next-1 icon-very-small swiper-button-next slider-navigation-style-08 ms-5px">
-                                        <i class="fa-solid fa-arrow-right text-dark-gray"></i></div>
-                                    <!-- end slider navigation -->
-                                </div>
-                            </div>
-                            <div class="swiper slider-one-slide"
-                                data-slider-options='{ "slidesPerView": 1, "loop": true, "autoplay": { "delay": 5000, "disableOnInteraction": false }, "navigation": { "nextEl": ".slider-one-slide-next-1", "prevEl": ".slider-one-slide-prev-1" }, "keyboard": { "enabled": true, "onlyInViewport": true }, "effect": "slide" }'>
-                                <div class="swiper-wrapper">
-                                    <!-- start text slider item -->
-                                    <div class="swiper-slide">
-                                        <div class="shop-filter new-arribals">
-                                            <div class="d-flex align-items-center mb-20px">
-                                                <figure class="mb-0">
-                                                    <a href="demo-fashion-store-single-product.html">
-                                                        <img class="border-radius-4px w-80px"
-                                                            src="https://placehold.co/600x765" alt="">
-                                                    </a>
-                                                </figure>
-                                                <div class="col ps-25px">
-                                                    <a href="demo-fashion-store-single-product.html"
-                                                        class="text-dark-gray alt-font fw-500 d-inline-block lh-normal">Textured
-                                                        sweater</a>
-                                                    <div class="fs-15 lh-normal"><del class="me-5px">$30.00</del>$23.00
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-20px">
-                                                <figure class="mb-0">
-                                                    <a href="demo-fashion-store-single-product.html">
-                                                        <img class="border-radius-4px w-80px"
-                                                            src="https://placehold.co/600x765" alt="">
-                                                    </a>
-                                                </figure>
-                                                <div class="col ps-25px">
-                                                    <a href="demo-fashion-store-single-product.html"
-                                                        class="text-dark-gray alt-font fw-500 d-inline-block lh-normal">Traveller
-                                                        shirt</a>
-                                                    <div class="fs-15 lh-normal"><del class="me-5px">$50.00</del>$43.00
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center">
-                                                <figure class="mb-0">
-                                                    <a href="demo-fashion-store-single-product.html">
-                                                        <img class="border-radius-4px w-80px"
-                                                            src="https://placehold.co/600x765" alt="">
-                                                    </a>
-                                                </figure>
-                                                <div class="col ps-25px">
-                                                    <a href="demo-fashion-store-single-product.html"
-                                                        class="text-dark-gray alt-font fw-500 d-inline-block lh-normal">Crewneck
-                                                        tshirt</a>
-                                                    <div class="fs-15 lh-normal"><del class="me-5px">$20.00</del>$15.00
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- end text slider item -->
-                                    <!-- start text slider item -->
-                                    <div class="swiper-slide">
-                                        <div class="shop-filter new-arribals">
-                                            <div class="d-flex align-items-center mb-20px">
-                                                <figure class="mb-0">
-                                                    <a href="demo-fashion-store-single-product.html">
-                                                        <img class="border-radius-4px w-80px"
-                                                            src="https://placehold.co/600x765" alt="">
-                                                    </a>
-                                                </figure>
-                                                <div class="col ps-25px">
-                                                    <a href="demo-fashion-store-single-product.html"
-                                                        class="text-dark-gray alt-font fw-500 d-inline-block lh-normal">Skinny
-                                                        trousers</a>
-                                                    <div class="fs-15 lh-normal"><del class="me-5px">$15.00</del>$10.00
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center mb-20px">
-                                                <figure class="mb-0">
-                                                    <a href="demo-fashion-store-single-product.html">
-                                                        <img class="border-radius-4px w-80px"
-                                                            src="https://placehold.co/600x765" alt="">
-                                                    </a>
-                                                </figure>
-                                                <div class="col ps-25px">
-                                                    <a href="demo-fashion-store-single-product.html"
-                                                        class="text-dark-gray alt-font fw-500 d-inline-block lh-normal">Sleeve
-                                                        sweater</a>
-                                                    <div class="fs-15 lh-normal"><del class="me-5px">$35.00</del>$30.00
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div class="d-flex align-items-center">
-                                                <figure class="mb-0">
-                                                    <a href="demo-fashion-store-single-product.html">
-                                                        <img class="border-radius-4px w-80px"
-                                                            src="https://placehold.co/600x765" alt="">
-                                                    </a>
-                                                </figure>
-                                                <div class="col ps-25px">
-                                                    <a href="demo-fashion-store-single-product.html"
-                                                        class="text-dark-gray alt-font fw-500 d-inline-block lh-normal">Pocket
-                                                        white</a>
-                                                    <div class="fs-15 lh-normal"><del class="me-5px">$20.00</del>$15.00
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- end text slider item -->
-                                </div>
-                                <!-- start slider navigation -->
-                            </div>
-                        </div>
                     </form>
                 </div>
             </div>
@@ -345,5 +264,5 @@
 
 @push('scripts')
     <script src="{{ asset('assets/js/shop/shop.js') }}"></script>
-    
+    <script src="{{ asset('assets/js/shop/sort.js') }}"></script>
 @endpush
