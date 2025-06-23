@@ -161,7 +161,7 @@ class SearchController extends Controller
         // Get products with search query
         $products = Products::with(['category', 'variants.color', 'variants.size'])
             ->where(function($q) use ($query) {
-                $q->where('name', 'like', "%{$query}%");
+                $q->where('products.name', 'like', "%{$query}%");
                   
             })
             ->whereHas('category', function ($q) {
@@ -209,7 +209,7 @@ class SearchController extends Controller
                     ->where('product_variants.stock', '>', 0)
                     ->whereNull('product_variants.deleted_at')
                     ->whereNull('products.deleted_at')
-                    ->select('products.*', 'product_variants.sale_price')
+                    ->select('products.*', 'products.id as product_id', 'product_variants.sale_price')
                     ->distinct();
         }
 

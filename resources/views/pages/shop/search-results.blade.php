@@ -123,9 +123,9 @@
             @endif
         </div>
         <div class="col-md-6 text-md-end">
-            <form action="{{ route('search.filter') }}" method="GET" class="mb-4">
-                <input type="hidden" name="q" value="{{ request('q') }}">
-                @foreach(request()->except(['q', 'sort']) as $key => $value)
+            <form action="{{ route('search.filter') }}" method="GET" class="d-flex justify-content-md-end align-items-center gap-2">
+                {{-- Preserve all existing filters --}}
+                @foreach(request()->except('sort') as $key => $value)
                     @if(is_array($value))
                         @foreach($value as $v)
                             <input type="hidden" name="{{ $key }}[]" value="{{ $v }}">
@@ -134,11 +134,13 @@
                         <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                     @endif
                 @endforeach
-                <select name="sort" class="form-select" onchange="this.form.submit()">
-                    <option value="default" {{ request('sort') == 'default' ? 'selected' : '' }}>Mặc định</option>
+    
+                
+                <select name="sort" id="sort" class="form-select form-select-sm w-auto border-0 bg-light">
+                    <option value="">Sắp xếp</option>
+                    <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Mới nhất</option>
                     <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Giá tăng dần</option>
                     <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Giá giảm dần</option>
-                    <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Mới nhất</option>
                 </select>
             </form>
         </div>
@@ -157,13 +159,13 @@
                 <li class="grid-item" data-category="{{ $product->category_id }}">
                     <div class="shop-box mb-10px">
                         <div class="shop-image mb-20px">
-                            <a href="{{ route('home.show', $product->id) }}">
+                            <a href="{{ route('home.show', $product->slug) }}">
                                 <img src="{{ asset('assets/images/shop/demo-fashion-store-product-01.jpg') }}" alt="{{ $product->name }}">
                                 <div class="shop-overlay bg-gradient-gray-light-dark-transparent"></div>
                             </a>
                         </div>
                         <div class="shop-footer text-start">
-                            <a href="{{ route('home.show', $product->id) }}" class="alt-font text-dark-gray fs-19 fw-500 product-name-truncate">{{ $product->name }}</a>
+                            <a href="{{ route('home.show', $product->slug) }}" class="alt-font text-dark-gray fs-19 fw-500 product-name-truncate">{{ $product->name }}</a>
                             <div class="price lh-22 fs-16">
                                 @php
                                     $variant = $product->variants->first();

@@ -19,7 +19,7 @@
                 </div>
             </div>
             <!-- Kết thúc tiêu đề -->
-     @if (session('success'))
+            @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -33,8 +33,7 @@
                                 <div class="col-sm"></div>
                                 <div class="col-sm-auto">
                                     <div class="d-flex gap-1 flex-wrap">
-                                        <a href="{{ route('colors.create') }}" class="btn btn-success"
-                                            id="addCategory-btn">
+                                        <a href="{{ route('colors.create') }}" class="btn btn-success" id="addCategory-btn">
                                             <i class="ri-add-line align-bottom me-1"></i> Thêm màu
                                         </a>
                                         <button type="button" class="btn btn-info">
@@ -61,6 +60,7 @@
                                             <th class="sort" data-sort="color_name">Tên màu</th>
                                             <th class="sort" data-sort="created_at">Ngày tạo</th>
                                             <th class="sort" data-sort="action">Hành động</th>
+                                            <th class="sort" data-sort="color_code">Mã màu</th>
                                         </tr>
                                     </thead>
 
@@ -93,9 +93,7 @@
                                                         <li class="list-inline-item" data-bs-toggle="tooltip"
                                                             data-bs-trigger="hover" data-bs-placement="top" title="Xóa">
                                                             <form action="{{ route('colors.destroy', $color->id) }}"
-                                                                method="POST"
-                                                               class="delete-form"
-                                                                style="display:inline;">
+                                                                method="POST" class="delete-form" style="display:inline;">
                                                                 @csrf
                                                                 @method('DELETE')
                                                                 <button type="submit"
@@ -106,6 +104,13 @@
                                                             </form>
                                                         </li>
                                                     </ul>
+                                                </td>
+                                                <td>
+                                                    <div
+                                                        style="width: 30px; height: 30px; background-color: {{ $color->color_code }}; border-radius: 4px; border: 1px solid #ccc;">
+                                                    </div>
+                                                    <span>{{ $color->color_code }}</span>
+
                                                 </td>
                                             </tr>
                                         @endforeach
