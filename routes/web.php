@@ -37,6 +37,8 @@ Route::get('/search/filter', [SearchController::class, 'search'])->name('search.
 Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store')->middleware('auth');
 Route::get('/reviews/list/{product_id}', [ReviewController::class, 'list'])->name('reviews.list');
 
+Route::post('add-to-cart/{id}',[CartController::class,'add_to_cart']);
+
 Route::get('info', [HomeController::class, 'info_customer'])->name('home.info')->middleware('auth', 'cache');
 Route::get('aonam/{slug}', [ProductDetailController::class, 'index'])->name('home.show');
 Route::get('cart', [CartController::class, 'index'])->name('home.cart');
@@ -103,10 +105,10 @@ Route::prefix('dashboard')->group(function () {
     Route::delete('variants/{id}', [ProductVariantsController::class, 'destroy'])->name('variants.destroy');
     Route::get('products/{product}/variants', [ProductVariantsController::class, 'showVariants'])->name('products.variants');
     Route::post('variants/{id}/restore', [ProductVariantsController::class, 'restore'])->name('variants.restore');
- 
+
     Route::post('/products/upload-temp-image', [ProductsController::class, 'uploadTempImage'])->name('products.uploadTempImage');
 
-   
+
     Route::post('/products/upload-temp-variant-image', [ProductsController::class, 'uploadTempVariantImage'])->name('products.uploadTempVariantImage');
 });
 
