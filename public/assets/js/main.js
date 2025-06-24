@@ -216,58 +216,56 @@
     });
 
     // Close on outside area
-    $(document).on('click', 'body', function (e) {
-        // Close all menu
-        if (!($(e.target).closest('.navbar-nav').length || $(e.target).closest('.navbar-full-screen-menu-inner').length)) {
-            setTimeout(function () {
-                $('.navbar-collapse.collapse').collapse('hide');
-            }, 100);
+    document.addEventListener('click', function (e) {
+    const isInsideNavbar = e.target.closest('.navbar-nav') || e.target.closest('.navbar-full-screen-menu-inner');
+
+    // Ẩn menu chính
+    if (!isInsideNavbar) {
+        setTimeout(() => {
+            const collapses = document.querySelectorAll('.navbar-collapse.collapse.show');
+            collapses.forEach(el => el.classList.remove('show'));
+        }, 100);
+    }
+
+    // Ẩn push menu
+    if (!(e.target.classList.contains('push-button') || e.target.closest('.push-button') || e.target.closest('.push-menu') || e.target.closest('.hamburger-menu'))) {
+        document.body.classList.remove('show-menu');
+    }
+
+    // Ẩn ô tìm kiếm
+    if (!(e.target.classList.contains('search-form') || e.target.closest('.search-form-icon') || e.target.closest('.search-form-box'))) {
+        document.body.classList.remove('show-search-popup');
+    }
+
+    // Ẩn dropdown menu, ngôn ngữ và giỏ hàng
+    if (!e.target.closest('.navbar-nav')) {
+        const headerLang = document.querySelector('.header-language');
+        if (headerLang) {
+            headerLang.classList.remove('show');
+            headerLang.querySelector('.dropdown-menu')?.classList.remove('show');
         }
-        // Close push menu
-        if (!($(e.target).hasClass('push-button') || $(e.target).closest('.push-button').length || $(e.target).closest('.push-menu').length || $(e.target).closest('.hamburger-menu').length)) {
-            $('html, body').removeClass('show-menu');
+
+        const headerCart = document.querySelector('.header-cart');
+        if (headerCart) {
+            headerCart.classList.remove('show');
+            headerCart.querySelector('.dropdown-menu')?.classList.remove('show');
         }
-        // Close search
-        if (!($(e.target).hasClass('search-form') || $(e.target).closest('.search-form-icon').length || $(e.target).closest('.search-form-box').length)) {
-            $('body').removeClass('show-search-popup');
+
+        document.querySelectorAll('.navbar-nav .dropdown').forEach(drop => {
+            drop.classList.remove('show');
+            drop.querySelector('.dropdown-menu')?.classList.remove('show');
+        });
+    }
+
+    // Ẩn menu trái
+    if (!e.target.closest('.left-modern-header')) {
+        const leftMenu = document.querySelector('.left-modern-header.show');
+        if (leftMenu) {
+            leftMenu.classList.remove('show');
         }
-        // Close dropdown menu, language and cart
-        if (!$(e.target).closest('.navbar-nav').length) {
-            if (!$(e.target).closest('.header-language').length) {
-                // Close language menu
-                $('.header-language').trigger('mouseleave');
-                $('.header-language').removeClass('show');
-                $('.header-language').children('.dropdown-menu').removeClass('show');
-            }
-            if (!$(e.target).closest('.header-cart').length) {
-                // Close cart
-                $('.header-cart').trigger('mouseleave');
-                $('.header-cart').removeClass('show');
-                $('.header-cart').children('.dropdown-menu').removeClass('show');
-            }
-            // Close all dropdown
-            $('.navbar-nav .dropdown').each(function () {
-                var _this = $(this);
-                _this.trigger('mouseleave');
-                _this.removeClass('show');
-                _this.children('.dropdown-menu').removeClass('show');
-            });
-        } else if ($(e.target).parents('body').find('.header-language.open').length) {
-            // Close language menu
-            $('.header-language').trigger('mouseleave');
-            $('.header-language').removeClass('show');
-            $('.header-language').children('.dropdown-menu').removeClass('show');
-        } else if ($(e.target).parents('body').find('.header-cart.open').length) {
-            // Close cart
-            $('.header-cart').trigger('mouseleave');
-            $('.header-cart').removeClass('show');
-            $('.header-cart').children('.dropdown-menu').removeClass('show');
-        }
-        // Close left-modern-header menu
-        if (!$(e.target).closest('.left-modern-header').length) {
-            $(".left-modern-header").collapse('hide');
-        }
-    });
+    }
+});
+
 
     // Close on escape key
     $(document).on('keydown', function (e) {
@@ -3359,21 +3357,7 @@ if ($.fn.countdown !== undefined && $.fn.countdown !== null) {
      Quantity input
      ====================================== */
 
-  $('.qty-plus').click(function () {
-    var th = $(this).closest('.quantity').find('.qty-text');
-    th.val(+th.val() + 1);
-    updateCartTotals(); // Cập nhật tổng giá sau khi tăng
-});
-
-$('.qty-minus').click(function () {
-    var th = $(this).closest('.quantity').find('.qty-text');
-    if (th.val() > 1)
-        th.val(+th.val() - 1);
-    updateCartTotals(); // Cập nhật tổng giá sau khi giảm
-});
-$('.qty-text').on('input', function () {
-    updateCartTotals();
-});
+ 
 
 
     /* ===================================
