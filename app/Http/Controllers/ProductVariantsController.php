@@ -6,7 +6,7 @@ namespace App\Http\Controllers;
 use App\Models\Color;
 use App\Models\Product_variants;
 use Illuminate\Http\Request;
-
+use Intervention\Image\Facades\Image;
 use App\Models\Products;
 
 use App\Models\Size;
@@ -97,7 +97,8 @@ class ProductVariantsController extends Controller
 
         foreach ($request->variants as $index => $variantData) {
             // Kiểm tra trùng trong database
-            $exists = Product_variants::where('product_id', $request->product_id)
+            $exists = Product_variants::withTrashed()
+                ->where('product_id', $request->product_id)
                 ->where('size_id', $variantData['size_id'])
                 ->where('color_id', $variantData['color_id'])
                 ->exists();

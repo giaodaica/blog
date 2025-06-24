@@ -36,9 +36,7 @@
                                         <a href="{{ route('sizes.create') }}" class="btn btn-success" id="addCategory-btn">
                                             <i class="ri-add-line align-bottom me-1"></i> Thêm kích thước
                                         </a>
-                                        <button type="button" class="btn btn-info">
-                                            <i class="ri-file-download-line align-bottom me-1"></i> Nhập dữ liệu
-                                        </button>
+                                    
                                         {{-- Nút xóa nhiều chưa có logic --}}
                                     </div>
                                 </div>

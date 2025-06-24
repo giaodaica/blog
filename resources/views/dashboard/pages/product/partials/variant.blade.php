@@ -18,17 +18,26 @@
     </div>
 
     <!-- Color -->
-    <div class="col-lg-2">
-        <select class="form-select @error('variants.' . $index . '.color_id') is-invalid @enderror"
-            name="variants[{{ $index }}][color_id]" required>
+    <div class="col-lg-2 d-flex align-items-center">
+        <select class="form-select color-select @error('variants.' . $index . '.color_id') is-invalid @enderror"
+            name="variants[{{ $index }}][color_id]" required
+            data-color-preview="color-preview-{{ $index }}">
             <option value="">Color</option>
             @foreach ($colors as $color)
-                <option value="{{ $color->id }}"
+                <option value="{{ $color->id }}" data-color-code="{{ $color->color_code }}"
                     {{ old('variants.' . $index . '.color_id', $variant['color_id'] ?? '') == $color->id ? 'selected' : '' }}>
                     {{ $color->color_name }}
                 </option>
             @endforeach
         </select>
+        <div id="color-preview-{{ $index }}" class="ms-2 border"
+            style="width: 30px; height: 30px; background-color: 
+            @php
+$selectedColorId = old('variants.' . $index . '.color_id', $variant['color_id'] ?? '');
+                $selectedColor = $colors->firstWhere('id', $selectedColorId);
+                echo $selectedColor ? $selectedColor->color_code : '#fff'; @endphp;
+        ">
+        </div>
         @error('variants.' . $index . '.color_id')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
@@ -71,8 +80,8 @@
     <div class="col-lg-2">
         <input type="number" class="form-control @error('variants.' . $index . '.stock') is-invalid @enderror"
             name="variants[{{ $index }}][stock]"
-            value="{{ old('variants.' . $index . '.stock', $variant['stock'] ?? '') }}"
-            placeholder="Số lượng" min="0" required>
+            value="{{ old('variants.' . $index . '.stock', $variant['stock'] ?? '') }}" placeholder="Số lượng"
+            min="0" required>
         @error('variants.' . $index . '.stock')
             <div class="invalid-feedback">{{ $message }}</div>
         @enderror
@@ -83,8 +92,8 @@
         <div class="input-group">
             <input type="file"
                 class="form-control variant-image-input @error('variants.' . $index . '.variant_image') is-invalid @enderror"
-                name="variants[{{ $index }}][variant_image]" accept="image/*" id="variant-image-{{ $index }}"
-                data-index="{{ $index }}">
+                name="variants[{{ $index }}][variant_image]" accept="image/*"
+                id="variant-image-{{ $index }}" data-index="{{ $index }}">
         </div>
 
         <!-- Preview -->
@@ -102,5 +111,8 @@
             <div class="invalid-feedback d-block">{{ $message }}</div>
         @enderror
     </div>
-
+    <hr>
+    <div class="text-start">
+        <button type="button" class="btn btn-danger btn-sm remove-variant">Xóa</button>
+    </div>
 </div>
