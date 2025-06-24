@@ -103,3 +103,25 @@ updateCartTotals(); // Cập nhật tổng giá sau khi giảm
 $('.qty-text').on('input', function () {
 updateCartTotals();
 });
+document.addEventListener('DOMContentLoaded', function() {
+    function updateStockInfo() {
+        var color = document.querySelector('input[name="color"]:checked');
+        var size = document.querySelector('input[name="size"]:checked');
+        var stockInfo = document.getElementById('stock-info');
+        if (color && size) {
+            var key = color.value + '-' + size.value;
+            var stock = window.variantStock[key] !== undefined ? window.variantStock[key] : 0;
+            stockInfo.textContent = 'Tồn kho: ' + stock;
+            stockInfo.className = stock > 0 ? 'text-success' : 'text-danger';
+        } else {
+            stockInfo.textContent = '';
+        }
+    }
+
+    document.querySelectorAll('input[name="color"], input[name="size"]').forEach(function(input) {
+        input.addEventListener('change', updateStockInfo);
+    });
+
+    // Gọi lần đầu nếu có sẵn lựa chọn
+    updateStockInfo();
+});

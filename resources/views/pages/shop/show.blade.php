@@ -8,6 +8,11 @@
         $count = $ratingCounts->get($i, 0);
         $ratingPercentages[$i] = $totalReviews > 0 ? ($count / $totalReviews) * 100 : 0;
     }
+
+    $stockMap = [];
+    foreach ($variants as $variant) {
+        $stockMap[$variant->color_id . '-' . $variant->size_id] = $variant->stock;
+    }
 @endphp
 @extends('layouts.layout')
 @section('content')
@@ -31,7 +36,8 @@
     <section class="pt-60px pb-0 md-pt-30px">
         <div class="container">
             @if (session('success'))
-            <div class="alert alert-success">{{ session('success') }}</div>
+         
+            <div class="d-none toast-error" data-message="{{ session('success') }}"></div>
             @endif
             <div class="row">
                 <div class="col-lg-7 pe-50px md-pe-15px md-mb-40px">
@@ -154,6 +160,9 @@
                             <div class="text-danger">{{ session('error') }}</div>
                         @endif
                     </form>
+                    <div class="mb-2">
+                        <span id="stock-info" class="text-success"></span>
+                    </div>
                     <div class="row mb-20px">
                         <div class="col-auto icon-with-text-style-08">
                             <div class="feature-box feature-box-left-icon-middle d-inline-flex align-middle">
@@ -650,6 +659,12 @@
 
 @endsection 
 
+
 @push('scripts')
 <script src="{{ asset('assets/js/shop/show.js') }}"></script>
+<script>
+    window.variantStock = @json($stockMap);
+</script>
 @endpush
+
+
