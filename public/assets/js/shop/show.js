@@ -58,11 +58,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Toast notification for errors
-    const toastErrors = document.querySelectorAll('.toast-error');
-    toastErrors.forEach(function(el) {
+    // Toast notification for all messages
+    document.querySelectorAll('.toast-message').forEach(function(el) {
         const msg = el.getAttribute('data-message');
-        if (msg) showToast(msg, 'danger');
+        const type = el.getAttribute('data-type') || 'info';
+        if (msg) showToast(msg, type);
     });
 
     function showToast(message, type = 'info') {

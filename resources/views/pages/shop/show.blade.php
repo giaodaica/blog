@@ -36,9 +36,17 @@
     <section class="pt-60px pb-0 md-pt-30px">
         <div class="container">
             @if (session('success'))
-         
-            <div class="d-none toast-error" data-message="{{ session('success') }}"></div>
+                <div class="d-none toast-message" data-message="{{ session('success') }}" data-type="success"></div>
             @endif
+            @if (session('error'))
+                <div class="d-none toast-message" data-message="{{ session('error') }}" data-type="danger"></div>
+            @endif
+            @error('color')
+                <div class="d-none toast-message" data-message="{{ $message }}" data-type="danger"></div>
+            @enderror
+            @error('size')
+                <div class="d-none toast-message" data-message="{{ $message }}" data-type="danger"></div>
+            @enderror
             <div class="row">
                 <div class="col-lg-7 pe-50px md-pe-15px md-mb-40px">
                     <div class="row overflow-hidden position-relative">
@@ -116,9 +124,6 @@
                                                 style="background-color: {{ $color->color_code ?? '#000' }}"></span></label>
                                     </li>
                                 @endforeach
-                                @error('color')
-                                    <div class="d-none toast-error" data-message="{{ $message }}"></div>
-                                @enderror
                             </ul>
                         </div>
                         <div class="d-flex align-items-center mb-35px">
@@ -131,9 +136,6 @@
                                         <label for="size-{{ $size->id }}"><span>{{ $size->size_name }}</span></label>
                                     </li>
                                 @endforeach
-                                @error('size')
-                                   <div class="d-none toast-error" data-message="{{ $message }}"></div>
-                                @enderror
                             </ul>
                         </div>
                         <div class="d-flex align-items-center flex-column flex-sm-row mb-20px position-relative">
@@ -156,9 +158,6 @@
                         @error('quantity')
                             <div class="text-danger">{{ $message }}</div>
                         @enderror
-                        @if (session('error'))
-                            <div class="text-danger">{{ session('error') }}</div>
-                        @endif
                     </form>
                     <div class="mb-2">
                         <span id="stock-info" class="text-success"></span>
