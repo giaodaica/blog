@@ -175,7 +175,6 @@ class ProductsController extends Controller
                     'listed_price' => $variantData['listed_price'],
                     'sale_price' => $variantData['sale_price'],
                     'stock' => $variantData['stock'],
-                    'is_show' => isset($variantData['is_show']) ? 1 : 0,
                 ]);
             }
 
@@ -187,7 +186,7 @@ class ProductsController extends Controller
         }
     }
 
-  
+
 
 
     public function restore($id)
