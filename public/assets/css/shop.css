@@ -16,6 +16,31 @@
     height: 3rem;
 }
 
+.no-products-message {
+    text-align: center;
+    padding: 40px 20px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.no-products-message i {
+    font-size: 48px;
+    color: #dc3545;
+    margin-bottom: 15px;
+}
+
+.no-products-message h3 {
+    color: #343a40;
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.no-products-message p {
+    color: #6c757d;
+    margin-bottom: 0;
+}
+
 .checkbox-container {
     display: flex;
     align-items: center;
@@ -112,7 +137,7 @@
 }
 .product-price {
     color: #ff6b35;
-    font-size: 18px;
+    font-size: 17px;
     font-weight: 700;
     margin-bottom: 5px;
 }
@@ -120,10 +145,11 @@
 .product-old-price {
     color: #999;
     text-decoration: line-through;
-    font-size: 14px;
+    font-size: 13px;
     margin-right: 10px;
 }
 .rating-text {
     color: #666;
     font-size: 14px;
 }
+

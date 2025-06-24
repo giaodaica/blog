@@ -7,40 +7,51 @@ use App\Models\Products;
 use App\Models\Categories;
 use App\Models\Color;
 use App\Models\Size;
+use App\Traits\ProductFilterTrait;
 use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+    use ProductFilterTrait;
+
     public function index()
     {
         $products = $this->getFilteredProducts();
-        $categories = Categories::withCount('products')->get();
-        $colors = Color::whereHas('productVariants', function ($query) {
-            $query->where('stock', '>', 0)->where('is_show', 1)->whereNull('deleted_at');
-        })->withCount(['productVariants' => function ($query) {
-            $query->where('stock', '>', 0)->where('is_show', 1)->whereNull('deleted_at');   
-        }])->get();
-        $sizes = Size::withCount('productVariants')->get();
+        
+        // Get selected filters
+        $selectedCategories = request('categories', []);
+        $selectedColors = request('colors', []);
+        $selectedSizes = request('sizes', []);
+
+        // Get filtered data using trait
+        $filteredData = $this->getFilteredData(null, $selectedCategories, $selectedColors, $selectedSizes);
 
         if (request()->ajax()) {
-            return view('pages.shop.shop', compact('products', 'categories', 'colors', 'sizes'))->render();
+            return view('pages.shop.shop', array_merge(
+                ['products' => $products],
+                $filteredData
+            ))->render();
         }
 
-        return view('pages.shop.shop', compact('products', 'categories', 'colors', 'sizes'));
+        return view('pages.shop.shop', array_merge(
+            ['products' => $products],
+            $filteredData
+        ));
     }
 
     private function getFilteredProducts()
     {
         $query = Products::with(['category', 'variants.color', 'variants.size'])
         ->whereHas('category', function ($query) {
-            $query->where('status', '1');
+            $query->where('status', '1')
+                  ->whereNull('categories.deleted_at');
         })
         ->whereHas('variants', function ($query) {
             $query->where('is_show', 1)
-                  ->where('stock', '>', 0) // ✅ chỉ lấy biến thể còn hàng
-                  ->whereNull('deleted_at');
+                  ->where('stock', '>', 0)
+                  ->whereNull('product_variants.deleted_at');
         })
-        ->whereNull('deleted_at');
+        ->whereNull('products.deleted_at');
     
 
         // Filter by categories
@@ -72,7 +83,32 @@ class ProductController extends Controller
             });
         }
 
+        // Handle sorting using JOINs
+        $sort = request('sort');
+        if (in_array($sort, ['price_asc', 'price_desc'])) {
+            $query->join('product_variants', 'products.id', '=', 'product_variants.product_id')
+                  ->where('product_variants.is_show', 1)
+                  ->where('product_variants.stock', '>', 0)
+                  ->whereNull('product_variants.deleted_at')
+                  ->whereNull('products.deleted_at')
+                  ->select('products.*', 'product_variants.sale_price')
+                  ->distinct();
+        }
+    
+        // Xử lý sắp xếp
+        switch ($sort) {
+            case 'price_asc':
+                $query->orderBy('product_variants.sale_price', 'asc');
+                break;
+            case 'price_desc':
+                $query->orderBy('product_variants.sale_price', 'desc');
+                break;
+            case 'newest':
+            default:
+                $query->orderBy('products.created_at', 'desc');
+                break;
+        }
 
-        return $query->orderBy('created_at', 'desc')->paginate(5);
+        return $query->paginate(1);
     }
 }
