@@ -14,4 +14,10 @@ class Vouchers extends Model
     public function cate_vouchers(){
         return $this->belongsTo(CategoriesVouchers::class,'category_id','id');
     }
+    public function users()
+{
+    return $this->belongsToMany(User::class, 'vouchers_users')
+                ->withPivot('status', 'is_used', 'issued_date')
+                ->withTimestamps();
+}
 }
