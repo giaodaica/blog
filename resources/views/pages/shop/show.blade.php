@@ -81,7 +81,9 @@
                                 <span class="text-red fs-28 xs-fs-24 fw-700 ls-minus-1px">
                                     @if($variants->first())
                                     {{ number_format($variants->first()->sale_price) }}đ
-                                        <del class="text-medium-gray me-10px fw-400">{{ number_format($variants->first()->listed_price) }}đ</del>
+                                        @if($variants->first()->listed_price != $variants->first()->sale_price)
+                                            <del class="text-medium-gray me-10px fw-400">{{ number_format($variants->first()->listed_price) }}đ</del>
+                                        @endif
                                     @endif
                                 </span>
                             </div>

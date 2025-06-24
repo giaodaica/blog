@@ -178,7 +178,7 @@
                                         <span class="product-old-price">{{ number_format($variant->listed_price) }} ₫</span>
                                     </div>
                                 @elseif($variant)
-                                    <span>{{ number_format($variant->listed_price) }}₫</span>
+                                    <span class="product-price">{{ number_format($variant->listed_price) }}₫</span>
                                 @endif
                             </div>
                             <div class="rating">
