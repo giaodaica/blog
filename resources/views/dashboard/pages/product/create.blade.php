@@ -104,6 +104,7 @@
                                     @enderror
                                 </div>
 
+
                             </div>
                         </div>
                     </div>
@@ -242,6 +243,17 @@
                     $(previewSelector).html(`<img src="${response.url}" alt="Preview" width="100">`);
                 }
             });
+        });
+        // Xóa biến thể
+        $(document).on('click', '.remove-variant', function() {
+            $(this).closest('.variant-item').remove();
+        });
+
+        $(document).on('change', '.color-select', function() {
+            let selectedOption = $(this).find('option:selected');
+            let colorCode = selectedOption.data('color-code') || '#fff';
+            let previewBoxId = $(this).data('color-preview');
+            $('#' + previewBoxId).css('background-color', colorCode);
         });
     </script>
 @endsection

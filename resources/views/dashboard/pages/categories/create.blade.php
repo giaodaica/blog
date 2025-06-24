@@ -51,8 +51,10 @@
                                         <option value="" disabled {{ old('status') === null ? 'selected' : '' }}>
                                             -- Chọn trạng thái --
                                         </option>
-                                        <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Không hoạt động</option>
-                                        <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Hoạt động</option>
+                                        <option value="0" {{ old('status') == '0' ? 'selected' : '' }}>Không hoạt động
+                                        </option>
+                                        <option value="1" {{ old('status') == '1' ? 'selected' : '' }}>Hoạt động
+                                        </option>
                                     </select>
 
                                     @error('status')
@@ -76,10 +78,14 @@
                                 @error('image')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
-                          
+
+                                {{-- Ảnh xem trước --}}
+                                <img id="preview-image" src="#" alt="Ảnh xem trước" class="img-fluid mt-3"
+                                    style="display: none; max-height: 180px;">
                             </div>
                         </div>
                     </div>
+
 
                 </div>
             </form>
@@ -87,7 +93,6 @@
     </div>
 
     {{-- Script xem trước ảnh trước khi upload --}}
-
 @endsection
 @section('js-content')
     <script>
@@ -96,6 +101,7 @@
             if (file) {
                 const preview = document.getElementById('preview-image');
                 preview.src = URL.createObjectURL(file);
+                preview.style.display = 'block'; // Hiện ảnh
             }
         });
     </script>
