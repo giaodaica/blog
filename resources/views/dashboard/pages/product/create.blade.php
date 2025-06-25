@@ -18,15 +18,6 @@
                 action="{{ route('products.store') }}">
                 @csrf
 
-                @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul class="mb-0">
-                            @foreach (array_unique($errors->all()) as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
 
                 <div class="row">
 
@@ -158,6 +149,44 @@
 @endsection
 
 @section('js-content')
+    <style>
+          .invalid-feedback {
+            min-height: 18px;
+            font-size: 13px;
+        }
+        .variant-item {
+            border-bottom: 1px dashed #ccc;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .variant-separator {
+            border-top: 1px dashed #bbb;
+            margin-top: 25px;
+            margin-bottom: 25px;
+        }
+
+        .variant-error-message {
+            font-size: 0.875em;
+            color: #dc3545;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .alert-danger {
+            background-color: #fff4f4;
+            border: 1px solid #f8d7da;
+            color: #842029;
+            font-size: 0.9rem;
+            border-radius: 6px;
+        }
+
+        .alert-danger ul {
+            padding-left: 1rem;
+            margin: 0;
+        }
+        
+    </style>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.ckeditor.com/ckeditor5/35.3.2/classic/ckeditor.js"></script>
     <script>

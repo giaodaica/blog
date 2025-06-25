@@ -117,7 +117,10 @@
                                                         <div class="flex-grow-1">
                                                             <h5 class="fs-14 mb-1">
                                                                 <a href="{{ route('products.show', $product->id) }}"
-                                                                    class="text-body">{{ $product->name }}</a>
+                                                                    class="text-body text-truncate d-inline-block"
+                                                                    style="max-width: 200px;" title="{{ $product->name }}">
+                                                                    {{ $product->name }}
+                                                                </a>
                                                             </h5>
                                                             <p class="text-muted mb-0">Danh mục: <span
                                                                     class="fw-medium">{{ $product->category->name ?? 'Chưa có' }}</span>
@@ -126,7 +129,10 @@
                                                     </div>
                                                 </td>
 
-                                                <td>{{ $product->slug }}</td>
+                                                <td class="text-truncate" style="max-width: 150px;"
+                                                    title="{{ $product->slug }}">
+                                                    {{ $product->slug }}
+                                                </td>
 
                                                 <td>{{ $product->category->name ?? 'Chưa có' }}</td>
 
@@ -282,52 +288,52 @@
                 });
             });
         });
-         document.addEventListener('DOMContentLoaded', function () {
-        // Xác nhận xóa
-        const deleteForms = document.querySelectorAll('.delete-form');
-        deleteForms.forEach(form => {
-            form.querySelector('.btn-delete').addEventListener('click', function (e) {
-                e.preventDefault();
+        document.addEventListener('DOMContentLoaded', function() {
+            // Xác nhận xóa
+            const deleteForms = document.querySelectorAll('.delete-form');
+            deleteForms.forEach(form => {
+                form.querySelector('.btn-delete').addEventListener('click', function(e) {
+                    e.preventDefault();
 
-                Swal.fire({
-                    title: 'Bạn có chắc chắn muốn xóa?',
-                    text: "Hành động này không thể hoàn tác!",
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Xóa',
-                    cancelButtonText: 'Hủy'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
+                    Swal.fire({
+                        title: 'Bạn có chắc chắn muốn xóa?',
+                        text: "Hành động này không thể hoàn tác!",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Xóa',
+                        cancelButtonText: 'Hủy'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+
+            // Xác nhận khôi phục
+            const restoreForms = document.querySelectorAll('.restore-form');
+            restoreForms.forEach(form => {
+                form.querySelector('.btn-restore').addEventListener('click', function(e) {
+                    e.preventDefault();
+
+                    Swal.fire({
+                        title: 'Bạn có chắc chắn muốn khôi phục?',
+                        text: "Sản phẩm sẽ được khôi phục!",
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Khôi phục',
+                        cancelButtonText: 'Hủy'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
                 });
             });
         });
-
-        // Xác nhận khôi phục
-        const restoreForms = document.querySelectorAll('.restore-form');
-        restoreForms.forEach(form => {
-            form.querySelector('.btn-restore').addEventListener('click', function (e) {
-                e.preventDefault();
-
-                Swal.fire({
-                    title: 'Bạn có chắc chắn muốn khôi phục?',
-                    text: "Sản phẩm sẽ được khôi phục!",
-                    icon: 'question',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Khôi phục',
-                    cancelButtonText: 'Hủy'
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        form.submit();
-                    }
-                });
-            });
-        });
-    });
     </script>
 @endsection

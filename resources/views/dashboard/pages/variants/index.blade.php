@@ -9,38 +9,34 @@
                 <div class="col-12">
                     <div class="page-title-box d-sm-flex align-items-center justify-content-between">
                         <h4 class="mb-sm-0">Sản phẩm</h4>
-
                         <div class="page-title-right">
                             <ol class="breadcrumb m-0">
                                 <li class="breadcrumb-item"><a href="javascript: void(0);">Thương mại điện tử</a></li>
                                 <li class="breadcrumb-item active">Sản phẩm</li>
                             </ol>
                         </div>
-
                     </div>
                 </div>
             </div>
-            <!-- end page title -->
+
+            <!-- thông báo -->
             @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
+
             <div class="row">
-
-                <!-- end col -->
-
                 <div class="col-xl-12 col-lg-8">
                     <div>
                         <div class="card">
+
+                            <!-- card-header -->
                             <div class="card-header border-0">
                                 <div class="row g-4">
                                     <div class="col-sm-auto">
-                                        <div>
-                                            <a href="{{ route('variants.create') }}" class="btn btn-info"
-                                                id="addproduct-btn"> Thêm biến thể</a>
-                                        </div>
+                                        <a href="{{ route('variants.create') }}" class="btn btn-info"> Thêm biến thể</a>
                                     </div>
                                     <div class="col-sm">
                                         <div class="d-flex justify-content-sm-end">
@@ -54,59 +50,43 @@
                                 </div>
                             </div>
 
+                            <!-- Tabs -->
                             <div class="card-header">
                                 <div class="row align-items-center">
                                     <div class="col">
                                         <ul class="nav nav-tabs-custom card-header-tabs border-bottom-0" role="tablist">
                                             <li class="nav-item">
                                                 <a class="nav-link {{ request('status') === null || request('status') === 'active' ? 'active fw-semibold' : '' }}"
-                                                    href="{{ route('variants.index') }}">
-                                                    Đang hoạt động
-                                                </a>
+                                                    href="{{ route('variants.index') }}">Đang hoạt động</a>
                                             </li>
                                             <li class="nav-item">
                                                 <a class="nav-link {{ request('status') === 'deleted' ? 'active fw-semibold' : '' }}"
-                                                    href="{{ route('variants.index', ['status' => 'deleted']) }}">
-                                                    Đã xóa
-                                                </a>
+                                                    href="{{ route('variants.index', ['status' => 'deleted']) }}">Đã xóa</a>
                                             </li>
-                                              <li class="nav-item">
-                                                <a class="nav-link {{ request('status') === null ? '' : '' }} {{ request('status') === 'all' ? 'active fw-semibold' : '' }}"
-                                                    href="{{ route('variants.index', ['status' => 'all']) }}">
-                                                    Tất cả
-                                                </a>
+                                            <li class="nav-item">
+                                                <a class="nav-link {{ request('status') === 'all' ? 'active fw-semibold' : '' }}"
+                                                    href="{{ route('variants.index', ['status' => 'all']) }}">Tất cả</a>
                                             </li>
                                         </ul>
                                     </div>
-                                    <div class="col-auto">
-                                        <div id="selection-element">
-                                            <div class="my-n1 d-flex align-items-center text-muted">
-                                                Select <div id="select-content" class="text-body fw-semibold px-1"></div>
-                                                Result <button type="button" class="btn btn-link link-danger p-0 ms-3"
-                                                    data-bs-toggle="modal" data-bs-target="#removeItemModal">Remove</button>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
-                            <!-- end card header -->
 
-                            <div class="card-body">
-
-                                <!-- Bảng biến thể sản phẩm -->
-                                <table class="table align-middle table-nowrap mb-0">
+                            <!-- Bảng -->
+                            <div class="card-body table-responsive">
+                                <table class="table align-middle mb-0">
                                     <thead class="table-light">
                                         <tr>
-                                            <th>#</th>
-                                            <th>Tên biến thể</th>
+                                            <th style="min-width: 30px;">#</th>
+                                            <th style="max-width: 150px;">Tên biến thể</th>
                                             <th>Ảnh</th>
-                                            <th>Giá nhập</th>
-                                            <th>Giá niêm yết</th>
-                                            <th>Giá bán</th>
-                                            <th>Kho</th>
-                                            <th>Tên sản phẩm</th>
-                                            <th>Size</th>
-                                            <th>Màu sắc</th>
+                                            <th style="max-width: 120px;">Giá nhập</th>
+                                            <th style="max-width: 120px;">Giá niêm yết</th>
+                                            <th style="max-width: 120px;">Giá bán</th>
+                                            <th style="max-width: 80px;">Kho</th>
+                                            <th style="max-width: 150px;">Tên sản phẩm</th>
+                                            <th style="max-width: 100px;">Size</th>
+                                            <th style="max-width: 100px;">Màu sắc</th>
                                             <th>Hành động</th>
                                         </tr>
                                     </thead>
@@ -114,7 +94,12 @@
                                         @foreach ($variants as $index => $variant)
                                             <tr>
                                                 <td>{{ $index + 1 }}</td>
-                                                <td class="fw-semibold">{{ $variant->name }}</td>
+
+                                                <td class="fw-semibold text-break"
+                                                    style="max-width: 150px; word-break: break-all; overflow-wrap: break-word;">
+                                                    {{ $variant->name }}
+                                                </td>
+
                                                 <td>
                                                     <div class="avatar-sm bg-light rounded p-1 mb-3">
                                                         <img src="{{ $variant->variant_image_url ? asset($variant->variant_image_url) : asset('storage/no-image.png') }}"
@@ -122,13 +107,35 @@
                                                             width="50" height="50">
                                                     </div>
                                                 </td>
-                                                <td>{{ number_format($variant->import_price, 0, ',', '.') }} đ</td>
-                                                <td>{{ number_format($variant->listed_price, 0, ',', '.') }} đ</td>
-                                                <td>{{ number_format($variant->sale_price, 0, ',', '.') }} đ</td>
-                                                <td>{{ $variant->stock }}</td>
-                                                <td>{{ $variant->product->name ?? 'Chưa có' }}</td>
-                                                <td>{{ $variant->size->size_name ?? '-' }}</td>
-                                                <td>{{ $variant->color->color_name ?? '-' }}</td>
+
+                                                <td class="text-break" style="max-width: 120px; word-break: break-all;">
+                                                    {{ number_format($variant->import_price, 0, ',', '.') }} đ
+                                                </td>
+
+                                                <td class="text-break" style="max-width: 120px; word-break: break-all;">
+                                                    {{ number_format($variant->listed_price, 0, ',', '.') }} đ
+                                                </td>
+
+                                                <td class="text-break" style="max-width: 120px; word-break: break-all;">
+                                                    {{ number_format($variant->sale_price, 0, ',', '.') }} đ
+                                                </td>
+
+                                                <td class="text-break" style="max-width: 80px; word-break: break-all;">
+                                                    {{ $variant->stock }}
+                                                </td>
+
+                                                <td class="text-break" style="max-width: 150px; word-break: break-all;">
+                                                    {{ $variant->product->name ?? 'Chưa có' }}
+                                                </td>
+
+                                                <td class="text-break" style="max-width: 100px; word-break: break-all;">
+                                                    {{ $variant->size->size_name ?? '-' }}
+                                                </td>
+
+                                                <td class="text-break" style="max-width: 100px; word-break: break-all;">
+                                                    {{ $variant->color->color_name ?? '-' }}
+                                                </td>
+
                                                 <td>
                                                     @if (request('status') == 'deleted')
                                                         <form action="{{ route('variants.restore', $variant->id) }}"
@@ -143,7 +150,7 @@
                                                     @else
                                                         <div class="dropdown">
                                                             <button class="btn btn-soft-secondary btn-sm" type="button"
-                                                                data-bs-toggle="dropdown" aria-expanded="false">
+                                                                data-bs-toggle="dropdown">
                                                                 <i class="ri-more-fill"></i>
                                                             </button>
                                                             <ul class="dropdown-menu dropdown-menu-end">
@@ -186,51 +193,48 @@
                                         @endforeach
                                     </tbody>
                                 </table>
-
-
                             </div>
 
-                            <!-- end card body -->
-                        </div>
-                        <!-- end card -->
-                    </div>
-                </div>
-                <!-- end col -->
-            </div>
-            <!-- end row -->
 
-        </div>
-        <!-- container-fluid -->
-    </div>
-    <!-- End Page-content -->
-   {{ $variants->appends(request()->query())->links('pagination::bootstrap-5') }}
-    <footer class="footer">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-sm-6">
-                    <script>
-                        document.write(new Date().getFullYear())
-                    </script> © Velzon.
-                </div>
-                <div class="col-sm-6">
-                    <div class="text-sm-end d-none d-sm-block">
-                        Design & Develop by Themesbrand
+                            <!-- Phân trang -->
+                            <div class="card-footer text-end">
+                                {{ $variants->appends(request()->query())->links('pagination::bootstrap-5') }}
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </footer>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-sm-6">
+                        <script>
+                            document.write(new Date().getFullYear())
+                        </script> © Velzon.
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="text-sm-end d-none d-sm-block">
+                            Design & Develop by Themesbrand
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
 @endsection
+
 @section('js-content')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const deleteForms = document.querySelectorAll('.delete-form');
-
             deleteForms.forEach(form => {
                 form.addEventListener('submit', function(e) {
-                    e.preventDefault(); // Chặn submit mặc định
-
+                    e.preventDefault();
                     Swal.fire({
                         title: 'Bạn có chắc chắn?',
                         text: "Hành động này sẽ không thể hoàn tác!",
@@ -242,7 +246,7 @@
                         cancelButtonText: 'Hủy'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            form.submit(); // Chấp nhận xóa
+                            form.submit();
                         }
                     });
                 });

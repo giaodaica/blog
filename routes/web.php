@@ -82,6 +82,7 @@ Route::prefix('dashboard')->group(function () {
     Route::post('voucher/disable/{id}', [VouchersController::class, 'disable']);
     Route::post('voucher/active/{id}', [VouchersController::class, 'active']);
     Route::resource('products', ProductsController::class);
+    
     Route::post('/products/{id}/restore', [ProductsController::class, 'restore'])->name('products.restore');
     Route::resource('categories', CategoriesController::class);
 

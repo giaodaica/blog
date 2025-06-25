@@ -258,4 +258,5 @@ class ProductsController extends Controller
         $product = Products::with(relations: 'category')->findOrFail($id);
         return view('dashboard.pages.product.show', compact('product'));
     }
+    
 }
