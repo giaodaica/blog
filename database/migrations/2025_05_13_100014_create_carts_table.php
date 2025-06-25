@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('product_variants_id')->unique();
-            $table->unsignedBigInteger('flash_sale_items_id')->unique()->nullable();
+            $table->unsignedBigInteger('product_variants_id');
+            $table->unsignedBigInteger('flash_sale_items_id')->nullable();
             $table->integer('quantity');
             $table->decimal('price_at_time', 10, 2);
             $table->enum('promotion_type', ['0', 'flash_sale', 'bundle'])->default('0');

@@ -6,12 +6,12 @@
             <div class="row align-items-center justify-content-center"
                 data-anime='{ "el": "childs", "translateY": [-15, 0], "opacity": [0,1], "duration": 300, "delay": 0, "staggervalue": 200, "easing": "easeOutQuad" }'>
                 <div class="col-12 col-xl-8 col-lg-10 text-center position-relative page-title-extra-large">
-                    <h1 class="alt-font fw-600 text-dark-gray mb-10px">Shopping cart</h1>
+                    <h1 class="alt-font fw-600 text-dark-gray mb-10px">Giỏ Hàng</h1>
                 </div>
                 <div class="col-12 breadcrumb breadcrumb-style-01 d-flex justify-content-center">
                     <ul>
-                        <li><a href="demo-fashion-store.html">Home</a></li>
-                        <li>Shopping cart</li>
+                        <li><a href="demo-fashion-store.html">Trang chủ</a></li>
+                        <li>Giỏ Hàng</li>
                     </ul>
                 </div>
             </div>
@@ -42,7 +42,8 @@
                                      @foreach($cartItems as $item)
                                         <tr>
                                             <td class="product-remove">
-                                                <input type="checkbox" class="cart-item-checkbox">
+                                               <input type="checkbox" class="cart-item-checkbox" value="{{ $item->id }}">
+
                                             </td>
                                            <td class="product-thumbnail">
                                                 <a href="demo-jewellery-store-single-product.html">
@@ -61,9 +62,9 @@
                                                 {{ number_format($item->price_at_time, 0, ',', '.') }} đ
                                             </td>
                                             <td class="product-quantity" data-title="Quantity">
-                                                <div class="quantity">
+                                                <div class="quantity" data-id="{{ $item->id }}">
                                                     <button type="button" class="qty-minus">-</button>
-                                                    <input class="qty-text" type="text" id="1" value="{{ $item->quantity }}" aria-label="qty-text">
+                                                    <input class="qty-text" type="text" value="{{ $item->quantity }}" readonly>
                                                     <button type="button" class="qty-plus">+</button>
                                                 </div>
                                             </td>
@@ -78,7 +79,7 @@
                         </div>
                     </div>
                     <div class="row mt-20px">
-                        <div class="col-xl-6 col-xxl-7 col-md-6">
+                        {{-- <div class="col-xl-6 col-xxl-7 col-md-6">
                             <div class="coupon-code-panel mobile d-flex align-items-center d-block d-sm-none px-2 py-2"
                                 style="background:#fff; border-radius:4px;">
                                 <div class="flex-grow-1 text-start">Chọn tất cả</div>
@@ -87,76 +88,86 @@
                                         style="width: 18px;">
                                 </div>
                             </div>
+                        </div> --}}
+                <div class="col-xl-6 col-xxl-7 col-md-6">
+                    <div class="row g-2 align-items-center">
+                        <div class="col-8">
+                            <select id="voucher-select" class="form-select">
+                                <option value="">-- Chọn mã giảm giá --</option>
+                                @foreach($availableVouchers as $voucher)
+                                    <option value="{{ $voucher->code }}">
+                                        {{ $voucher->code }} - Giảm {{ number_format($voucher->max_discount, 0, ',', '.') }} đ
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
-                        <div class="col-xl-6 col-xxl-7 col-md-6">
-                            <div class="coupon-code-panel">
-                                <input type="text" class="bg-white border-radius-4px" placeholder="Coupon code">
-                                <a href="#" class="btn apply-coupon-btn fs-13 fw-600 text-uppercase">Apply</a>
-                            </div>
+                        <div class="col-4">
+                            <a href="#" class="btn btn-dark w-100" onclick="applyVoucher()">Áp dụng</a>
                         </div>
+                    </div>
 
+</div>
 
 
                         <div class="col-xl-6 col-xxl-5 col-md-6 text-center text-md-end sm-mt-15px">
-                            <a href="#"
-                                class="btn btn-small border-1 btn-round-edge btn-transparent-light-gray text-transform-none me-15px lg-me-5px">Empty
-                                cart</a>
-                            {{-- <a href="#"
-                                class="btn btn-small border-1 btn-round-edge btn-transparent-light-gray text-transform-none">Update
-                                cart</a> --}}
+                          <a href="#" id="delete-selected-btn"
+                                class="btn btn-small border-1 btn-round-edge btn-transparent-light-gray text-transform-none me-15px lg-me-5px">
+                                Xóa sản phẩm đã chọn
+                        </a>
                         </div>
                     </div>
                 </div>
                 <div class="col-lg-4">
                     <div class="bg-very-light-gray border-radius-6px p-50px xl-p-30px lg-p-25px">
-                        <span class="fs-26 alt-font fw-600 text-dark-gray mb-5px d-block">Cart totals</span>
+                        <span class="fs-26 alt-font fw-600 text-dark-gray mb-5px d-block">	Tổng đơn hàng</span>
                         <table class="w-100 total-price-table">
                             <tbody>
                                 <tr>
-                                    <th class="w-45 fw-600 text-dark-gray alt-font">Subtotal</th>
-                                    <td class="text-dark-gray fw-600">$405.00</td>
-                                </tr>
-                                <tr class="shipping">
-                                    <th class="fw-600 text-dark-gray alt-font">Shipping</th>
-                                    <td data-title="Shipping">
-                                        <ul class="p-0 m-0">
-                                            <li class="d-flex align-items-center">
-                                                <input id="free_shipping" type="radio" name="shipping-option"
-                                                    class="d-block w-auto mb-0 me-10px p-0" checked="checked">
-                                                <label class="md-line-height-18px" for="free_shipping">Free
-                                                    shipping</label>
-                                            </li>
-                                            <li class="d-flex align-items-center">
-                                                <input id="flat" type="radio" name="shipping-option"
-                                                    class="d-block w-auto mb-0 me-10px p-0">
-                                                <label class="md-line-height-18px" for="flat">Flat: $12.00</label>
-                                            </li>
-                                            <li class="d-flex align-items-center">
-                                                <input id="local_pickup" type="radio" name="shipping-option"
-                                                    class="d-block w-auto mb-0 me-10px p-0">
-                                                <label class="md-line-height-18px" for="local_pickup">Local pickup</label>
-                                            </li>
-                                        </ul>
+                                    <th class="w-45 fw-600 text-dark-gray alt-font">Tạm tính</th>
+                                    <td class="text-dark-gray fw-600" id="subtotal">
+                                        {{ number_format($subtotal, 0, ',', '.') }} đ
                                     </td>
                                 </tr>
-                               
+                              
+<tr class="max_discount">
+    <th class="fw-600 text-dark-gray alt-font">
+        {{ session('voucher_code') ? 'Voucher' : 'Mã giảm giá' }}
+    </th>
+    <td data-title="Voucher">
+        @if(session('voucher_code'))
+            <span class="text-danger fw-600">
+                -{{ number_format(session('voucher_discount', 0), 0, ',', '.') }} đ
+            </span><br>
+            <small class="text-dark-gray">({{ session('voucher_code') }})</small>
+        @else
+            <span class="text-muted">Chưa áp dụng</span>
+        @endif
+    </td>
+</tr>
+
+
+
+
+
                                 <tr class="total-amount">
-                                    <th class="fw-600 text-dark-gray alt-font pb-0">Tổng tiền</th>
+                                    <th class="fw-600 text-dark-gray alt-font pb-0">Tổng tiền </th>
                                     <td class="pb-0" data-title="Total">
-                                        <h6 class="d-block fw-700 mb-0 text-dark-gray alt-font">$405.00</h6>
-                                        {{-- <span class="fs-14">(Includes $19.29 tax)</span> --}}
+                                        <h6 id="total" class="d-block fw-700 mb-0 text-dark-gray alt-font">
+                                            {{ number_format($total, 0, ',', '.') }} đ
+                                        </h6>
                                     </td>
                                 </tr>
                             </tbody>
                         </table>
-                        <a href="checkout"
-                            class="btn btn-dark-gray btn-large btn-switch-text btn-round-edge btn-box-shadow w-100 mt-25px">
+                        <a href="CHECK OUT DON HANG"
+                        class="btn btn-dark-gray btn-large btn-switch-text btn-round-edge btn-box-shadow w-100 mt-25px">
                             <span>
                                 <span class="btn-double-text" data-text="Đặt Hàng">Đặt Hàng</span>
                             </span>
                         </a>
                     </div>
                 </div>
+
             </div>
         </div>
     </section>
@@ -204,6 +215,124 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 // ...existing code...
 </script>
+<script>
+document.getElementById('delete-selected-btn').addEventListener('click', function (e) {
+    e.preventDefault();
+
+    const selected = document.querySelectorAll('.cart-item-checkbox:checked');
+    const ids = Array.from(selected).map(cb => cb.value);
+
+    if (ids.length === 0) {
+        alert("Vui lòng chọn sản phẩm để xoá.");
+        return;
+    }
+
+    fetch("{{ route('cart.deleteSelected') }}", {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ ids })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('Đã xoá sản phẩm thành công.');
+            location.reload();
+        } else {
+            alert('Xoá thất bại.');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Có lỗi xảy ra.');
+    });
+});
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.qty-plus, .qty-minus').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            let parent = btn.closest('.quantity');
+            let id = parent.dataset.id;
+            let input = parent.querySelector('.qty-text');
+            let action = btn.classList.contains('qty-plus') ? 'increase' : 'decrease';
+
+            fetch("{{ route('cart.updateQuantity') }}", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ id: id, action: action })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    input.value = res.quantity;
+                    parent.closest('tr').querySelector('.product-subtotal').innerText = res.item_total;
+                    document.getElementById('subtotal').innerText = res.subtotal;
+                    document.getElementById('total').innerText = res.total;
+                }
+            })
+            .catch(() => alert("Có lỗi xảy ra khi cập nhật số lượng."));
+        });
+    });
+});
+</script>
+
+<script>
+function updateShipping(fee) {
+    let subtotalText = document.getElementById('subtotal')?.innerText.replace(/\D/g, '') || 0;
+    let discountText = document.getElementById('voucher-discount')?.innerText.replace(/\D/g, '') || 0;
+
+    let subtotal = parseInt(subtotalText);
+    let discount = parseInt(discountText);
+
+    let total = subtotal - discount + fee;
+    document.getElementById('total-price').innerText = total.toLocaleString('vi-VN') + ' đ';
+}
+</script>
+
+<script>
+function applyVoucher() {
+    let code = $('#voucher-select').val();
+
+    if (!code) {
+        alert("Vui lòng chọn mã giảm giá.");
+        return;
+    }
+
+    $.ajax({
+        url: "{{ route('cart.applyVoucher') }}",
+        method: "POST",
+        data: {
+            _token: '{{ csrf_token() }}',
+            code: code
+        },
+        success: function (res) {
+            if (res.success) {
+                $('#subtotal').text(res.subtotal);
+                $('#total').text(res.total);
+
+                // Cập nhật phần hiển thị tiền giảm
+                $('#voucher-discount').text('-' + res.discount);
+
+                alert("Áp dụng mã giảm giá thành công!");
+            } else {
+                alert(res.message);
+            }
+        },
+        error: function () {
+            alert("Có lỗi xảy ra khi áp dụng mã.");
+        }
+    });
+}
+</script>
+
 
 @endsection
 @section('cdn-custom')

@@ -52,4 +52,10 @@ class User extends Authenticatable implements MustVerifyEmail
             'password' => 'hashed',
         ];
     }
+    public function vouchers()
+{
+    return $this->belongsToMany(Vouchers::class, 'vouchers_users')
+                ->withPivot('status', 'is_used', 'issued_date')
+                ->withTimestamps();
+}
 }
