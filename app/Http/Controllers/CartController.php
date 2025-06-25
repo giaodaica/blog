@@ -8,7 +8,7 @@ use App\Models\Vouchers;
 use App\Models\VouchersUsers;
 
 use App\Models\Product_variants;
-
+use App\Models\Products;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -188,7 +188,12 @@ public function applyVoucher(Request $request)
             'quantity.required' => 'Bạn phải chọn số lượng',
             'quantity.integer' => 'Số lượng không hợp lệ',
             'quantity.min' => 'Số lượng sản phẩm tối thiểu phải là 1',
+
         ]);
+        $product = Products::find($id);
+        if(!$product){
+            return redirect()->back()->with('error', 'Sản phẩm không tồn tại');
+        }
         $variants = Product_variants::where('product_id',$id)->
         where('color_id',$request->color)->
         where('size_id',$request->size)->first();
@@ -197,7 +202,7 @@ public function applyVoucher(Request $request)
             return redirect()->back()->with('error','Sản phẩm này đã hết hàng hoặc không có xin vui lòng thao tác lại');
         }
         if($variants->stock < $request->quantity){
-            return redirect()->back()->with('error','Số lượng sản phẩm tồn kho không đủ vui lòng kiểm tra lại');
+            return redirect()->back()->with('error',"Số lượng sản phẩm tồn kho chỉ còn $variants->stock");
         }
         $user_id = auth::user()->id;
         $items_cart = Cart::where('user_id',$user_id)->where('product_variants_id',$variants->id)->first();
