@@ -14,20 +14,47 @@ class ProductsController extends Controller
     public function index(Request $request)
     {
         $status = $request->get('status', 'active'); // active | trashed | all
+        $search = $request->get('keyword');
+        $categoryId = $request->get('category_id');
 
-        if ($status == 'trashed') {
-            $products = Products::onlyTrashed()->with('category')->paginate(10);
-        } elseif ($status == 'all') {
-            $products = Products::withTrashed()->with('category')->paginate(10);
-        } else {
-            $products = Products::with('category')->paginate(10);
+        $query = Products::query()->with('category');
+
+        if ($status === 'trashed') {
+            $query = Products::onlyTrashed()->with('category');
+        } elseif ($status === 'all') {
+            $query = Products::withTrashed()->with('category');
         }
+
+        // Lọc theo tên hoặc slug
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%$search%")
+                    ->orWhere('slug', 'like', "%$search%");
+            });
+        }
+
+        // Lọc theo danh mục
+        if ($categoryId) {
+            $query->where('category_id', $categoryId);
+        }
+
+        $products = $query->paginate(10)->appends(request()->query());
 
         $totalActive = Products::count();
         $totalTrashed = Products::onlyTrashed()->count();
         $totalAll = $totalActive + $totalTrashed;
 
-        return view('dashboard.pages.product.index', compact('products', 'status', 'totalActive', 'totalTrashed', 'totalAll'));
+        // Lấy danh sách danh mục để render form lọc
+        $categories = Categories::all();
+
+        return view('dashboard.pages.product.index', compact(
+            'products',
+            'status',
+            'totalActive',
+            'totalTrashed',
+            'totalAll',
+            'categories'
+        ));
     }
 
     public function create()
@@ -39,7 +66,7 @@ class ProductsController extends Controller
         return view('dashboard.pages.product.create', compact('categories', 'colors', 'sizes'));
     }
 
-     public function uploadTempImage(Request $request)
+    public function uploadTempImage(Request $request)
     {
         if ($request->hasFile('image')) {
             $file = $request->file('image');
@@ -258,5 +285,4 @@ class ProductsController extends Controller
         $product = Products::with(relations: 'category')->findOrFail($id);
         return view('dashboard.pages.product.show', compact('product'));
     }
-    
 }

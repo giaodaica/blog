@@ -15,29 +15,52 @@ use App\Models\Size;
 class ProductVariantsController extends Controller
 {
     // Hiển thị danh sách biến thể
-    public function index(Request $request)
-    {
-        $status = $request->query('status');
-        $productId = $request->query('product_id'); // lấy product_id từ URL
+ public function index(Request $request)
+{
+    $status = $request->query('status');
+    $productId = $request->query('product_id');
+    $keyword = $request->query('keyword');
+    $colorId = $request->query('color_id');
+    $sizeId = $request->query('size_id');
 
-        $query = Product_variants::query()->with(['product', 'size', 'color']);
+    $query = Product_variants::query()
+        ->with(['product', 'size', 'color']);
 
-        // Nếu có product_id → lọc theo sản phẩm đó
-        if ($productId) {
-            $query->where('product_id', $productId);
-        }
-
-        // Lọc theo trạng thái
-        if ($status === 'all') {
-            $variants = $query->withTrashed()->paginate(10);
-        } elseif ($status === 'deleted') {
-            $variants = $query->onlyTrashed()->paginate(10);
-        } else {
-            $variants = $query->whereNull('deleted_at')->paginate(10);
-        }
-
-        return view('dashboard.pages.variants.index', compact('variants'));
+    // Lọc theo product_id nếu có
+    if ($productId) {
+        $query->where('product_id', $productId);
     }
+
+    // Lọc theo keyword (tên biến thể)
+    if ($keyword) {
+        $query->where('name', 'LIKE', '%' . $keyword . '%');
+    }
+
+    // Lọc theo màu
+    if ($colorId) {
+        $query->where('color_id', $colorId);
+    }
+
+    // Lọc theo size
+    if ($sizeId) {
+        $query->where('size_id', $sizeId);
+    }
+
+    // Trạng thái
+    if ($status === 'all') {
+        $variants = $query->withTrashed()->paginate(10);
+    } elseif ($status === 'deleted') {
+        $variants = $query->onlyTrashed()->paginate(10);
+    } else {
+        $variants = $query->whereNull('deleted_at')->paginate(10);
+    }
+
+    // Để có dropdown chọn màu/size
+    $colors = Color::all();
+    $sizes = Size::all();
+
+    return view('dashboard.pages.variants.index', compact('variants', 'colors', 'sizes', 'status'));
+}
 
 
     public function create()

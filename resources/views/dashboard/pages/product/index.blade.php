@@ -27,7 +27,6 @@
             @endif
             <!-- end page title -->
             <div class="row">
-                <!-- end col -->
                 <div class="col-xl-12 col-lg-8">
                     <div>
                         <div class="card">
@@ -35,19 +34,31 @@
                                 <div class="row g-4">
                                     <div class="col-sm-auto">
                                         <div>
-                                            <a href="{{ route('products.create') }}" class="btn btn-success"
-                                                id="addproduct-btn"><i class="ri-add-line align-bottom me-1"></i> Thêm sản
-                                                phẩm </a>
+                                            <a href="{{ route('products.create') }}" class="btn btn-success" id="addproduct-btn">
+                                                <i class="ri-add-line align-bottom me-1"></i> Thêm sản phẩm
+                                            </a>
                                         </div>
                                     </div>
                                     <div class="col-sm">
-                                        <div class="d-flex justify-content-sm-end">
-                                            <div class="search-box ms-2">
-                                                <input type="text" class="form-control" id="searchProductList"
-                                                    placeholder="Search Products...">
-                                                <i class="ri-search-line search-icon"></i>
+                                        <form method="GET" action="{{ route('products.index') }}" class="row g-2">
+                                            <input type="hidden" name="status" value="{{ $status }}">
+                                            <div class="col">
+                                                <input type="text" name="keyword" class="form-control" placeholder="Tìm tên hoặc slug..." value="{{ request('keyword') }}">
                                             </div>
-                                        </div>
+                                            <div class="col">
+                                                <select name="category_id" class="form-select">
+                                                    <option value="">-- Tất cả danh mục --</option>
+                                                    @foreach ($categories as $cat)
+                                                        <option value="{{ $cat->id }}" {{ request('category_id') == $cat->id ? 'selected' : '' }}>{{ $cat->name }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </div>
+                                            <div class="col-auto">
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="ri-search-line"></i> Tìm
+                                                </button>
+                                            </div>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -86,6 +97,17 @@
                                     </div>
                                 </div>
                             </div>
+                             @if ($products->isEmpty())
+                                <div class="card-body">
+                                    <div class="noresult text-center">
+                                        <lord-icon src="https://cdn.lordicon.com/msoeawqm.json" trigger="loop"
+                                            colors="primary:#405189,secondary:#0ab39c"
+                                            style="width:75px;height:75px"></lord-icon>
+                                        <h5 class="mt-2">Rất tiếc! Không tìm thấy kết quả</h5>
+                                        <p class="text-muted">Chúng tôi đã tìm nhưng không thấy sản phẩm nào phù hợp.</p>
+                                    </div>
+                                </div>
+                            @else
                             <!-- end card header -->
                             <div class="card-body">
                                 <table class="table align-middle table-nowrap mb-0">
@@ -214,6 +236,7 @@
                                 </div>
                             </div>
                             <!-- end card body -->
+                              @endif
                         </div>
                         <!-- end card -->
                     </div>
