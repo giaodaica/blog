@@ -36,9 +36,7 @@
                                         <a href="{{ route('colors.create') }}" class="btn btn-success" id="addCategory-btn">
                                             <i class="ri-add-line align-bottom me-1"></i> Thêm màu
                                         </a>
-                                        <button type="button" class="btn btn-info">
-                                            <i class="ri-file-download-line align-bottom me-1"></i> Nhập dữ liệu
-                                        </button>
+                                  
                                         {{-- Nút xóa nhiều chưa có logic --}}
                                     </div>
                                 </div>

@@ -8,6 +8,11 @@
         $count = $ratingCounts->get($i, 0);
         $ratingPercentages[$i] = $totalReviews > 0 ? ($count / $totalReviews) * 100 : 0;
     }
+
+    $stockMap = [];
+    foreach ($variants as $variant) {
+        $stockMap[$variant->color_id . '-' . $variant->size_id] = $variant->stock;
+    }
 @endphp
 @extends('layouts.layout')
 @section('content')
@@ -27,8 +32,21 @@
     </section>
     <!-- end section -->
     <!-- start section -->
+    
     <section class="pt-60px pb-0 md-pt-30px">
         <div class="container">
+            @if (session('success'))
+                <div class="d-none toast-message" data-message="{{ session('success') }}" data-type="success"></div>
+            @endif
+            @if (session('error'))
+                <div class="d-none toast-message" data-message="{{ session('error') }}" data-type="danger"></div>
+            @endif
+            @error('color')
+                <div class="d-none toast-message" data-message="{{ $message }}" data-type="danger"></div>
+            @enderror
+            @error('size')
+                <div class="d-none toast-message" data-message="{{ $message }}" data-type="danger"></div>
+            @enderror
             <div class="row">
                 <div class="col-lg-7 pe-50px md-pe-15px md-mb-40px">
                     <div class="row overflow-hidden position-relative">
@@ -82,13 +100,16 @@
                     </div>
                     <div class="product-price mb-10px">
                         <span class="text-red fs-28 xs-fs-24 fw-700 ls-minus-1px">
-                            @if ($variants->first())
-                                {{ number_format($variants->first()->sale_price) }}đ
-                                <del
-                                    class="text-medium-gray me-10px fw-400">{{ number_format($variants->first()->listed_price) }}đ</del>
+                            @if($variants->first())
+                            {{ number_format($variants->first()->sale_price) }}đ
+                                @if($variants->first()->listed_price != $variants->first()->sale_price)
+                                    <del class="text-medium-gray me-10px fw-400">{{ number_format($variants->first()->listed_price) }}đ</del>
+                                @endif
                             @endif
                         </span>
                     </div>
+
+                    
 
                     <form action="{{ url('add-to-cart', $product->id) }}" method="post">
                         @csrf
@@ -103,9 +124,6 @@
                                                 style="background-color: {{ $color->color_code ?? '#000' }}"></span></label>
                                     </li>
                                 @endforeach
-                                @error('color')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
                             </ul>
                         </div>
                         <div class="d-flex align-items-center mb-35px">
@@ -118,9 +136,6 @@
                                         <label for="size-{{ $size->id }}"><span>{{ $size->size_name }}</span></label>
                                     </li>
                                 @endforeach
-                                @error('size')
-                                    <div class="text-danger">{{ $message }}</div>
-                                @enderror
                             </ul>
                         </div>
                         <div class="d-flex align-items-center flex-column flex-sm-row mb-20px position-relative">
@@ -143,10 +158,10 @@
                         @error('quantity')
                             <div class="text-danger">{{ $message }}</div>
                         @enderror
-                        @if (session('error'))
-                            <div class="text-danger">{{ session('error') }}</div>
-                        @endif
                     </form>
+                    <div class="mb-2">
+                        <span id="stock-info" class="text-success"></span>
+                    </div>
                     <div class="row mb-20px">
                         <div class="col-auto icon-with-text-style-08">
                             <div class="feature-box feature-box-left-icon-middle d-inline-flex align-middle">
@@ -639,86 +654,16 @@
         }
     </style>
 
-@endsection
+    <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
 
+@endsection 
+
+
+@push('scripts')
+<script src="{{ asset('assets/js/shop/show.js') }}"></script>
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Nếu có hash trên URL, active tab tương ứng
-        if (window.location.hash) {
-            let hash = window.location.hash;
-            let tabLink = document.querySelector('a[href="' + hash + '"]');
-            if (tabLink) {
-                let tab = new bootstrap.Tab(tabLink);
-                tab.show();
-            }
-        }
-
-        // Khi click vào tab, cập nhật hash trên URL
-        document.querySelectorAll('.nav-tabs .nav-link').forEach(function(tabLink) {
-            tabLink.addEventListener('shown.bs.tab', function(e) {
-                history.replaceState(null, null, e.target.getAttribute('href'));
-            });
-        });
-
-        // Ẩn các review-item từ số 4 trở đi
-        let reviews = document.querySelectorAll('.review-item');
-        let showMoreBtn = document.querySelector('.btn-text');
-        let showMoreBtnA = showMoreBtn ? showMoreBtn.closest('a') : null;
-        let expanded = false;
-
-        function collapseReviews() {
-            reviews.forEach((item, idx) => {
-                item.style.display = (idx > 2) ? 'none' : '';
-            });
-            if (showMoreBtn) showMoreBtn.textContent = 'Hiển thị thêm đánh giá';
-            expanded = false;
-        }
-
-        function expandReviews() {
-            reviews.forEach(item => item.style.display = '');
-            if (showMoreBtn) showMoreBtn.textContent = 'Thu gọn đánh giá';
-            expanded = true;
-        }
-
-        if (reviews.length > 3) {
-            collapseReviews();
-            if (showMoreBtnA) showMoreBtnA.style.display = '';
-        } else if (showMoreBtnA) {
-            showMoreBtnA.style.display = 'none';
-        }
-
-        if (showMoreBtnA) {
-            showMoreBtnA.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (!expanded) {
-                    expandReviews();
-                } else {
-                    collapseReviews();
-                    // Scroll về vị trí review-list-container nếu cần
-                    document.getElementById('review-list-container').scrollIntoView({
-                        behavior: 'smooth'
-                    });
-                }
-            });
-        }
-    });
+    window.variantStock = @json($stockMap);
 </script>
-@section('js-page-custom')
-<script>
-    $('.qty-plus').click(function () {
-    var th = $(this).closest('.quantity').find('.qty-text');
-    th.val(+th.val() + 1);
-    updateCartTotals(); // Cập nhật tổng giá sau khi tăng
-});
+@endpush
 
-$('.qty-minus').click(function () {
-    var th = $(this).closest('.quantity').find('.qty-text');
-    if (th.val() > 1)
-        th.val(+th.val() - 1);
-    updateCartTotals(); // Cập nhật tổng giá sau khi giảm
-});
-$('.qty-text').on('input', function () {
-    updateCartTotals();
-});
-</script>
-@endsection
+
