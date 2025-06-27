@@ -4,8 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use App\Models\Vouchers;
-use App\Models\VouchersUsers;
 use App\Models\Product_variants;
+use App\Models\VouchersUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +15,7 @@ class CartController extends Controller
     //
 public function index()
 {
-    $userId = Auth::id(); 
+    $userId = Auth::id();
 
     // Nếu không có mã áp dụng, xoá giảm giá để tránh tự trừ tiền
     if (!session()->has('voucher_code')) {
@@ -56,12 +56,6 @@ public function index()
         'availableVouchers'
     ));
 }
-
-
-
-
-
-
 
    public function deleteSelected(Request $request)
 {
@@ -169,6 +163,7 @@ public function applyVoucher(Request $request)
         'discount' => number_format($voucher->max_discount, 0, ',', '.') . ' đ' // Trả về để JS cập nhật
     ]);
 }
+
 
     public function add_to_cart($id,request $request){
 
