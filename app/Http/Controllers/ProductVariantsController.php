@@ -97,9 +97,9 @@ class ProductVariantsController extends Controller
             'variants.*.listed_price.numeric' => 'Giá niêm yết phải là số.',
             'variants.*.listed_price.min' => 'Giá niêm yết không được nhỏ hơn 0.',
 
-            'variants.*.sale_price.numeric' => 'Giá khuyến mãi phải là số.',
-            'variants.*.sale_price.min' => 'Giá khuyến mãi không được nhỏ hơn 0.',
-            'variants.*.sale_price.lte' => 'Giá khuyến mãi phải nhỏ hơn hoặc bằng giá niêm yết.',
+            'variants.*.sale_price.numeric' => 'Giá bán phải là số.',
+            'variants.*.sale_price.min' => 'Giá bán không được nhỏ hơn 0.',
+            'variants.*.sale_price.lte' => 'Giá bán phải nhỏ hơn hoặc bằng giá niêm yết.',
             'variants.*.variant_image.required' => 'Vui lòng chọn ảnh cho biến thể.',
             'variants.*.variant_image.image' => 'File phải là hình ảnh.',
             'variants.*.variant_image.mimes' => 'Chỉ chấp nhận ảnh jpeg, png, jpg, gif.',

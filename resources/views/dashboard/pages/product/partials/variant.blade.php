@@ -58,7 +58,7 @@ $selectedColorId = old("variants.$index.color_id", $variant['color_id'] ?? '');
 
     {{-- Sale Price --}}
     <div class="col-lg-2">
-        <label class="form-label">Giá khuyến mãi</label>
+        <label class="form-label">Giá bán</label>
         <input type="number" class="form-control @error("variants.$index.sale_price") is-invalid @enderror"
             name="variants[{{ $index }}][sale_price]"
             value="{{ old("variants.$index.sale_price", $variant['sale_price'] ?? '') }}" min="0">
