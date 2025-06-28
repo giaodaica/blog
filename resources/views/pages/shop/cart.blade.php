@@ -21,6 +21,18 @@
     <!-- start section -->
     <section class="pt-0">
         <div class="container">
+             @if (session('success'))
+                <div class="d-none toast-message" data-message="{{ session('success') }}" data-type="success"></div>
+            @endif
+            @if (session('error'))
+                <div class="d-none toast-message" data-message="{{ session('error') }}" data-type="danger"></div>
+            
+            @endif
+              @if (session('info'))
+                <div class="d-none toast-message" data-message="{{ session('info') }}" data-type="info"></div>
+            @endif
+            <div id="toast-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999;"></div>
+
             <div class="row align-items-start">
                 <div class="col-lg-8 pe-50px md-pe-15px md-mb-50px xs-mb-35px">
                     <div class="row align-items-center">
@@ -64,7 +76,7 @@
                                             <td class="product-quantity" data-title="Quantity">
                                                 <div class="quantity" data-id="{{ $item->id }}">
                                                     <button type="button" class="qty-minus">-</button>
-                                                    <input class="qty-text" type="text" value="{{ $item->quantity }}" readonly>
+                                                    <input class="qty-text" type="text" value="{{ $item->quantity }}" >
                                                     <button type="button" class="qty-plus">+</button>
                                                 </div>
                                             </td>
@@ -79,34 +91,33 @@
                         </div>
                     </div>
                     <div class="row mt-20px">
-                        {{-- <div class="col-xl-6 col-xxl-7 col-md-6">
-                            <div class="coupon-code-panel mobile d-flex align-items-center d-block d-sm-none px-2 py-2"
-                                style="background:#fff; border-radius:4px;">
-                                <div class="flex-grow-1 text-start">Chọn tất cả</div>
-                                <div class="text-end" style="min-width:48px;">
-                                    <input type="checkbox" id="select-all-cart-mobile" class="cart-item-checkbox"
-                                        style="width: 18px;">
+                   
+                            <div class="col-xl-6 col-xxl-7 col-md-6">
+                            <form action="{{ route('cart.applyVoucher') }}" method="POST" class="row g-2 align-items-center">
+                                @csrf
+                                <div class="col-8">
+                                    <select name="code" class="form-select" required>
+                                        <option value="">-- Chọn mã giảm giá --</option>
+                                        @foreach($availableVouchers as $voucher)
+                                            <option value="{{ $voucher->code }}"
+                                                {{ session('voucher_code') == $voucher->code ? 'selected' : '' }}>
+                                                @if ($voucher->type_discount === 'percent')
+                                                    {{ $voucher->code }} - Giảm {{ $voucher->value }}%
+                                                    (tối đa {{ number_format($voucher->max_discount, 0, ',', '.') }} đ)
+                                                @else
+                                                    {{ $voucher->code }} - Giảm {{ number_format($voucher->value, 0, ',', '.') }} đ
+                                                @endif
+                                            </option>
+                                        @endforeach
+                                    </select>
                                 </div>
-                            </div>
-                        </div> --}}
-                <div class="col-xl-6 col-xxl-7 col-md-6">
-                    <div class="row g-2 align-items-center">
-                        <div class="col-8">
-                            <select id="voucher-select" class="form-select">
-                                <option value="">-- Chọn mã giảm giá --</option>
-                                @foreach($availableVouchers as $voucher)
-                                    <option value="{{ $voucher->code }}">
-                                        {{ $voucher->code }} - Giảm {{ number_format($voucher->max_discount, 0, ',', '.') }} đ
-                                    </option>
-                                @endforeach
-                            </select>
+                                <div class="col-4">
+                                    <button type="submit" class="btn btn-dark w-100">Áp dụng</button>
+                                </div>
+                            </form>
                         </div>
-                        <div class="col-4">
-                            <a href="#" class="btn btn-dark w-100" onclick="applyVoucher()">Áp dụng</a>
-                        </div>
-                    </div>
 
-</div>
+
 
 
                         <div class="col-xl-6 col-xxl-5 col-md-6 text-center text-md-end sm-mt-15px">
@@ -129,25 +140,26 @@
                                     </td>
                                 </tr>
                               
-<tr class="max_discount">
-    <th class="fw-600 text-dark-gray alt-font">
-        {{ session('voucher_code') ? 'Voucher' : 'Mã giảm giá' }}
-    </th>
-    <td data-title="Voucher">
-        @if(session('voucher_code'))
-            <span class="text-danger fw-600">
-                -{{ number_format(session('voucher_discount', 0), 0, ',', '.') }} đ
-            </span><br>
-            <small class="text-dark-gray">({{ session('voucher_code') }})</small>
-        @else
-            <span class="text-muted">Chưa áp dụng</span>
-        @endif
-    </td>
-</tr>
-
-
-
-
+                                    <tr class="max_discount">
+                                        <th class="fw-600 text-dark-gray alt-font">
+                                            {{ session('voucher_code') ? 'Voucher' : 'Mã giảm giá' }}
+                                        </th>
+                                        <td data-title="Voucher">
+                                            @if(session('voucher_code'))
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <span class="text-danger fw-600">
+                                                            -{{ number_format(session('voucher_discount', 0), 0, ',', '.') }} đ
+                                                        </span><br>
+                                                        <small class="text-dark-gray">({{ session('voucher_code') }})</small>
+                                                    </div>
+                                                    <a href="{{ route('cart.removeVoucher') }}" class="text-danger ms-3">✕</a>
+                                                </div>
+                                            @else
+                                                <span class="text-muted">Chưa áp dụng</span>
+                                            @endif
+                                        </td>
+                                    </tr>
 
                                 <tr class="total-amount">
                                     <th class="fw-600 text-dark-gray alt-font pb-0">Tổng tiền </th>
@@ -276,64 +288,91 @@ document.addEventListener('DOMContentLoaded', function () {
                     parent.closest('tr').querySelector('.product-subtotal').innerText = res.item_total;
                     document.getElementById('subtotal').innerText = res.subtotal;
                     document.getElementById('total').innerText = res.total;
+                } else {
+                    showToast(res.message || 'Có lỗi xảy ra.', 'danger');
                 }
             })
-            .catch(() => alert("Có lỗi xảy ra khi cập nhật số lượng."));
+            .catch(() => {
+                showToast("Không thể cập nhật giỏ hàng.", 'danger');
+            });
         });
     });
 });
+
 </script>
-
-<script>
-function updateShipping(fee) {
-    let subtotalText = document.getElementById('subtotal')?.innerText.replace(/\D/g, '') || 0;
-    let discountText = document.getElementById('voucher-discount')?.innerText.replace(/\D/g, '') || 0;
-
-    let subtotal = parseInt(subtotalText);
-    let discount = parseInt(discountText);
-
-    let total = subtotal - discount + fee;
-    document.getElementById('total-price').innerText = total.toLocaleString('vi-VN') + ' đ';
-}
-</script>
-
-<script>
-function applyVoucher() {
-    let code = $('#voucher-select').val();
-
-    if (!code) {
-        alert("Vui lòng chọn mã giảm giá.");
-        return;
-    }
-
-    $.ajax({
-        url: "{{ route('cart.applyVoucher') }}",
-        method: "POST",
-        data: {
-            _token: '{{ csrf_token() }}',
-            code: code
-        },
-        success: function (res) {
-            if (res.success) {
-                $('#subtotal').text(res.subtotal);
-                $('#total').text(res.total);
-
-                // Cập nhật phần hiển thị tiền giảm
-                $('#voucher-discount').text('-' + res.discount);
-
-                alert("Áp dụng mã giảm giá thành công!");
-            } else {
-                alert(res.message);
-            }
-        },
-        error: function () {
-            alert("Có lỗi xảy ra khi áp dụng mã.");
-        }
+{{-- <script>
+document.addEventListener('DOMContentLoaded', function () {
+    // Hiển thị tất cả các thông báo từ session
+    document.querySelectorAll('.toast-message').forEach(function(el) {
+        const msg = el.getAttribute('data-message');
+        const type = el.getAttribute('data-type') || 'info';
+        if (msg) showToast(msg, type);
     });
+
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = `toast align-items-center text-bg-${type} border-0 show mb-2`;
+        toast.role = 'alert';
+        toast.innerHTML = `
+            <div class="d-flex">
+                <div class="toast-body">${message}</div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        `;
+        container.appendChild(toast);
+
+        // Auto hide sau 4s
+        setTimeout(() => {
+            toast.classList.remove('show');
+            toast.classList.add('hide');
+            setTimeout(() => toast.remove(), 500);
+        }, 4000);
+
+        // Cho phép đóng bằng nút
+        toast.querySelector('.btn-close').onclick = () => toast.remove();
+    }
+});
+</script> --}}
+
+<script>
+  
+function showToast(message, type = 'info') {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
+
+    const toast = document.createElement('div');
+    toast.className = `toast align-items-center text-bg-${type} border-0 show mb-2`;
+    toast.role = 'alert';
+    toast.innerHTML = `
+        <div class="d-flex">
+            <div class="toast-body">${message}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    `;
+    container.appendChild(toast);
+
+    setTimeout(() => {
+        toast.classList.remove('show');
+        toast.classList.add('hide');
+        setTimeout(() => toast.remove(), 500);
+    }, 4000);
+
+    toast.querySelector('.btn-close').onclick = () => toast.remove();
 }
+
+// Sau đó dùng trong bất kỳ đâu
+document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.toast-message').forEach(function(el) {
+        const msg = el.getAttribute('data-message');
+        const type = el.getAttribute('data-type') || 'info';
+        if (msg) showToast(msg, type);
+    });
+});
+
 </script>
-
-
 @endsection
 @section('cdn-custom')
     <style>

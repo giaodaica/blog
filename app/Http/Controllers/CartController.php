@@ -18,29 +18,19 @@ public function index()
 {
     $userId = Auth::id();
 
-    // Nếu không có mã áp dụng, xoá giảm giá để tránh tự trừ tiền
-    if (!session()->has('voucher_code')) {
-        session()->forget('voucher_discount');
-    }
-
-
     $cartItems = Cart::with('productVariant.color')->where('user_id', $userId)->get();
 
-    // Tính tổng phụ (subtotal)
-    $subtotal = $cartItems->sum(function ($item) {
-        return $item->quantity * $item->price_at_time;
-    });
+    $subtotal = $cartItems->sum(fn($item) => $item->quantity * $item->price_at_time);
 
-    // Voucher giảm giá nếu có
-    $voucherDiscount = session('voucher_discount', 0);
+    // CHỈ lấy voucher nếu thực sự có session mã
+    $voucherDiscount = session()->has('voucher_code') && session()->has('voucher_discount')
+        ? session('voucher_discount')
+        : 0;
 
-    // Phí vận chuyển (nếu có)
     $shippingFee = session('shipping_fee', 0);
-
-    // Tổng tiền cuối cùng
     $total = $subtotal - $voucherDiscount + $shippingFee;
 
-    // Lấy danh sách voucher còn hiệu lực
+    // Lấy danh sách voucher người dùng đang có
     $availableVouchers = DB::table('vouchers')
         ->join('vouchers_users', 'vouchers.id', '=', 'vouchers_users.voucher_id')
         ->where('vouchers_users.user_id', $userId)
@@ -58,6 +48,8 @@ public function index()
     ));
 }
 
+
+
    public function deleteSelected(Request $request)
 {
     $ids = $request->input('ids');
@@ -70,35 +62,52 @@ public function index()
 
     return response()->json(['success' => false], 400);
 }
+
 public function updateQuantity(Request $request)
 {
-    $cartItem = Cart::where('id', $request->id)
-        ->where('user_id', auth()->id())
-        ->firstOrFail();
+    try {
+        $cartItem = Cart::findOrFail($request->id);
+        $variant = $cartItem->productVariant;
 
-    if ($request->action === 'increase') {
-        $cartItem->quantity += 1;
-    } elseif ($request->action === 'decrease') {
-        $cartItem->quantity = max(1, $cartItem->quantity - 1);
+        if ($request->action === 'increase') {
+            if ($cartItem->quantity >= $variant->stock) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Không thể tăng vượt quá tồn kho.'
+                ]);
+            }
+            $cartItem->quantity += 1;
+        } elseif ($request->action === 'decrease') {
+            if ($cartItem->quantity > 1) {
+                $cartItem->quantity -= 1;
+            }
+        }
+
+        $cartItem->save();
+
+        // Tính lại
+        $subtotal = Cart::where('user_id', auth()->id())->sum(DB::raw('quantity * price_at_time'));
+        $voucherDiscount = session('voucher_discount', 0);
+        $shippingFee = session('shipping_fee', 0);
+        $total = $subtotal - $voucherDiscount + $shippingFee;
+
+        return response()->json([
+            'success' => true,
+            'quantity' => $cartItem->quantity,
+            'item_total' => number_format($cartItem->quantity * $cartItem->price_at_time, 0, ',', '.') . ' đ',
+            'subtotal' => number_format($subtotal, 0, ',', '.') . ' đ',
+            'total' => number_format($total, 0, ',', '.') . ' đ',
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'message' => 'Lỗi hệ thống: ' . $e->getMessage(),
+        ], 500);
     }
-
-    $cartItem->save();
-
-    // Tính lại tổng giỏ hàng
-    $cartItems = Cart::where('user_id', auth()->id())->get();
-    $subtotal = $cartItems->sum(fn($item) => $item->quantity * $item->price_at_time);
-    $voucherDiscount = session('voucher_discount', 0);
-    $shippingFee = session('shipping_fee', 0);
-    $total = $subtotal - $voucherDiscount + $shippingFee;
-
-    return response()->json([
-        'success' => true,
-        'quantity' => $cartItem->quantity,
-        'item_total' => number_format($cartItem->quantity * $cartItem->price_at_time, 0, ',', '.') . ' đ',
-        'subtotal' => number_format($subtotal, 0, ',', '.') . ' đ',
-        'total' => number_format($total, 0, ',', '.') . ' đ'
-    ]);
 }
+
+
+
 public function calculateTotal(Request $request)
 {
     $cartItems = Cart::where('user_id', Auth::id())->get();
@@ -132,19 +141,20 @@ public function getUserVouchers()
 }
 public function applyVoucher(Request $request)
 {
-    $voucher = Vouchers::where('code', $request->code)->first();
+    $request->validate([
+        'code' => 'required|string'
+    ]);
+
+    $voucher = DB::table('vouchers')
+        ->where('code', $request->code)
+        ->where('status', 'active')
+        ->first();
 
     if (!$voucher) {
-        return response()->json(['success' => false, 'message' => 'Mã không tồn tại']);
+        return redirect()->back()->with('error', 'Mã giảm giá không hợp lệ');
     }
 
-    // Lưu session
-        session([
-            'voucher_code' => $voucher->code,
-            'voucher_discount' => $voucher->max_discount, // hoặc discount_amount nếu dùng trường này
-            // 'voucher_applied' => true,
-        ]);
-
+    // Lấy giỏ hàng để tính tổng
     $userId = Auth::id();
     $cartItems = Cart::where('user_id', $userId)->get();
 
@@ -152,17 +162,29 @@ public function applyVoucher(Request $request)
         return $item->quantity * $item->price_at_time;
     });
 
-    $shippingFee = session('shipping_fee', 0);
+    // Tính số tiền được giảm
+    $discount = 0;
+    if ($voucher->type_discount === 'percent') {
+        $discount = round($subtotal * ($voucher->value / 100));
+        if ($voucher->max_discount && $discount > $voucher->max_discount) {
+            $discount = $voucher->max_discount;
+        }
+    } else {
+        $discount = $voucher->value;
+    }
 
-    // Tính tổng tiền sau khi giảm
-    $total = $subtotal - $voucher->max_discount + $shippingFee;
-
-    return response()->json([
-        'success' => true,
-        'subtotal' => number_format($subtotal, 0, ',', '.') . ' đ',
-        'total' => number_format($total, 0, ',', '.') . ' đ',
-        'discount' => number_format($voucher->max_discount, 0, ',', '.') . ' đ' // Trả về để JS cập nhật
+    // Lưu vào session
+    session([
+        'voucher_code' => $voucher->code,
+        'voucher_discount' => $discount
     ]);
+
+    return redirect()->back()->with('success', 'Áp dụng mã giảm giá thành công!');
+}
+public function removeVoucher()
+{
+    session()->forget(['voucher_code', 'voucher_discount']);
+    return redirect()->back()->with('info', 'Đã huỷ mã giảm giá');
 }
 
 
