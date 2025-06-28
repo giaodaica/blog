@@ -18,16 +18,35 @@ class ProductVariantsController extends Controller
     public function index(Request $request)
     {
         $status = $request->query('status');
-        $productId = $request->query('product_id'); // lấy product_id từ URL
+        $productId = $request->query('product_id');
+        $keyword = $request->query('keyword');
+        $colorId = $request->query('color_id');
+        $sizeId = $request->query('size_id');
 
-        $query = Product_variants::query()->with(['product', 'size', 'color']);
+        $query = Product_variants::query()
+            ->with(['product', 'size', 'color']);
 
-        // Nếu có product_id → lọc theo sản phẩm đó
+        // Lọc theo product_id nếu có
         if ($productId) {
             $query->where('product_id', $productId);
         }
 
-        // Lọc theo trạng thái
+        // Lọc theo keyword (tên biến thể)
+        if ($keyword) {
+            $query->where('name', 'LIKE', '%' . $keyword . '%');
+        }
+
+        // Lọc theo màu
+        if ($colorId) {
+            $query->where('color_id', $colorId);
+        }
+
+        // Lọc theo size
+        if ($sizeId) {
+            $query->where('size_id', $sizeId);
+        }
+
+        // Trạng thái
         if ($status === 'all') {
             $variants = $query->withTrashed()->paginate(10);
         } elseif ($status === 'deleted') {
@@ -36,7 +55,11 @@ class ProductVariantsController extends Controller
             $variants = $query->whereNull('deleted_at')->paginate(10);
         }
 
-        return view('dashboard.pages.variants.index', compact('variants'));
+        // Để có dropdown chọn màu/size
+        $colors = Color::all();
+        $sizes = Size::all();
+
+        return view('dashboard.pages.variants.index', compact('variants', 'colors', 'sizes', 'status'));
     }
 
 
@@ -56,9 +79,9 @@ class ProductVariantsController extends Controller
             'variants' => 'required|array|min:1',
             'variants.*.size_id' => 'required|exists:sizes,id',
             'variants.*.color_id' => 'required|exists:colors,id',
-            'variants.*.import_price' => 'required|numeric|min:0',
-            'variants.*.listed_price' => 'required|numeric|min:0',
-            'variants.*.sale_price' => 'nullable|numeric|min:0|lte:variants.*.listed_price',
+            'variants.*.import_price' => 'required|numeric|min:0|max:99999999.99',
+            'variants.*.listed_price' => 'required|numeric|min:0|max:99999999.99',
+            'variants.*.sale_price' => 'nullable|numeric|min:0|max:99999999.99|lte:variants.*.listed_price',
             'variants.*.stock' => 'required|numeric|min:0',
             'variants.*.variant_image' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
         ], [
@@ -81,6 +104,10 @@ class ProductVariantsController extends Controller
             'variants.*.variant_image.image' => 'File phải là hình ảnh.',
             'variants.*.variant_image.mimes' => 'Chỉ chấp nhận ảnh jpeg, png, jpg, gif.',
             'variants.*.variant_image.max' => 'Ảnh không được vượt quá 2MB.',
+
+            'import_price.max' => 'Giá nhập không được vượt quá 99,999,999.99.',
+            'listed_price.max' => 'Giá niêm yết không được vượt quá 99,999,999.99.',
+            'sale_price.max' => 'Giá bán không được vượt quá 99,999,999.99.',
         ]);
 
         $product = Products::findOrFail($request->product_id);
@@ -185,9 +212,9 @@ class ProductVariantsController extends Controller
             'name' => 'required|string|max:255|unique:product_variants,name,' . $id,
             'color_id' => 'required|integer|exists:colors,id',
             'size_id' => 'required|integer|exists:sizes,id',
-            'import_price' => 'required|numeric|min:0',
-            'listed_price' => 'required|numeric|min:0',
-            'sale_price' => 'required|numeric|min:0|lte:listed_price',
+            'import_price' => 'required|numeric|min:0|max:99999999.99',
+            'listed_price' => 'required|numeric|min:0|max:99999999.99',
+            'sale_price' => 'required|numeric|min:0|max:99999999.99|lte:listed_price',
             'stock' => 'required|integer|min:0',
             'variant_image_url' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'is_show' => 'nullable|boolean',
@@ -225,7 +252,9 @@ class ProductVariantsController extends Controller
             'variant_image_url.image' => 'Ảnh phải là file ảnh hợp lệ.',
             'variant_image_url.mimes' => 'Ảnh chỉ được chấp nhận định dạng jpg, jpeg, png, webp.',
             'variant_image_url.max' => 'Kích thước ảnh không được vượt quá 2MB.',
-
+            'import_price.max' => 'Giá nhập không được vượt quá 99,999,999.99.',
+            'listed_price.max' => 'Giá niêm yết không được vượt quá 99,999,999.99.',
+            'sale_price.max' => 'Giá bán không được vượt quá 99,999,999.99.',
             'is_show.boolean' => 'Trạng thái hiển thị không hợp lệ.',
         ]);
 

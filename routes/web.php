@@ -37,7 +37,7 @@ Route::get('/search/filter', [SearchController::class, 'search'])->name('search.
 Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store')->middleware('auth');
 Route::get('/reviews/list/{product_id}', [ReviewController::class, 'list'])->name('reviews.list');
 
-Route::post('add-to-cart/{id}',[CartController::class,'add_to_cart']);
+Route::post('add-to-cart/{id}', [CartController::class, 'add_to_cart']);
 
 Route::get('info', [HomeController::class, 'info_customer'])->name('home.info')->middleware('auth', 'cache');
 Route::get('aonam/{slug}', [ProductDetailController::class, 'index'])->name('home.show');
@@ -87,8 +87,10 @@ Route::prefix('dashboard')->group(function () {
     Route::post('voucher/disable/{id}', [VouchersController::class, 'disable']);
     Route::post('voucher/active/{id}', [VouchersController::class, 'active']);
     Route::resource('products', ProductsController::class);
+
     Route::post('/products/{id}/restore', [ProductsController::class, 'restore'])->name('products.restore');
     Route::resource('categories', CategoriesController::class);
+    Route::post('/categories/{id}/restore', [CategoriesController::class, 'restore'])->name('categories.restore');
 
     // phần order
     Route::get('order', [OrderController::class, 'db_order'])->name('dashboard.order');
