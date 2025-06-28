@@ -89,7 +89,7 @@
                                                     {{ number_format($variant->listed_price, 0, ',', '.') }} VNĐ</p>
                                             </div>
                                             <div class="col-md-4">
-                                                <p><strong>Giá bán khuyến mãi:</strong>
+                                                <p><strong>Giá bán:</strong>
                                                     {{ number_format($variant->sale_price, 0, ',', '.') }} VNĐ</p>
                                             </div>
                                         </div>

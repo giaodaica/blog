@@ -90,10 +90,10 @@
                                                 placeholder="Giá niêm yết" min="0" required>
                                         </div>
 
-                                        <!-- Giá khuyến mãi -->
+                                        <!-- Giá bán -->
                                         <div class="col-lg-2">
                                             <input type="number" class="form-control" name="variants[0][sale_price]"
-                                                placeholder="Giá khuyến mãi" min="0">
+                                                placeholder="Giá bán" min="0">
                                         </div>
 
                                         <!-- Số lượng -->
@@ -173,7 +173,7 @@
                 <input type="number" class="form-control" name="variants[${index}][listed_price]" placeholder="Giá niêm yết" min="0" required>
             </div>
             <div class="col-lg-2">
-                <input type="number" class="form-control" name="variants[${index}][sale_price]" placeholder="Giá khuyến mãi" min="0">
+                <input type="number" class="form-control" name="variants[${index}][sale_price]" placeholder="Giá bán" min="0">
             </div>
             <div class="col-lg-2">
                 <input type="number" class="form-control" name="variants[${index}][stock]" placeholder="Số lượng" min="0" required>

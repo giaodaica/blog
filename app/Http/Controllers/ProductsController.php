@@ -128,9 +128,9 @@ class ProductsController extends Controller
             'variants.*.listed_price.numeric' => 'Giá niêm yết phải là số.',
             'variants.*.listed_price.min' => 'Giá niêm yết không được nhỏ hơn 0.',
 
-            'variants.*.sale_price.numeric' => 'Giá khuyến mãi phải là số.',
-            'variants.*.sale_price.min' => 'Giá khuyến mãi không được nhỏ hơn 0.',
-            'variants.*.sale_price.lte' => 'Giá khuyến mãi phải nhỏ hơn hoặc bằng giá niêm yết.',
+            'variants.*.sale_price.numeric' => 'Giá bán phải là số.',
+            'variants.*.sale_price.min' => 'Giá bán không được nhỏ hơn 0.',
+            'variants.*.sale_price.lte' => 'Giá bán phải nhỏ hơn hoặc bằng giá niêm yết.',
 
             'variants.*.stock.required' => 'Số lượng kho không được để trống.',
             'variants.*.stock.integer' => 'Số lượng kho phải là số nguyên.',
