@@ -160,7 +160,10 @@
                         @enderror
                     </form>
                     <div class="mb-2">
-                        <span id="stock-info" class="text-success"></span>
+                        <span id="stock-info" class="text-success d-flex align-items-center">
+                            <i class="bi bi-check-circle-fill me-2 d-none" id="stock-icon"></i>
+                            <span id="stock-text"></span>
+                        </span>
                     </div>
                     <div class="row mb-20px">
                         <div class="col-auto icon-with-text-style-08">
@@ -652,6 +655,49 @@
             color: #ffb60f;
             /* text-golden-yellow */
         }
+
+        /* Cải thiện hiệu ứng transition cho ảnh sản phẩm */
+        .product-image-slider .swiper-slide img {
+            transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+            will-change: opacity, transform;
+        }
+
+        .product-image-slider .swiper-slide img:hover {
+            transform: scale(1.02);
+        }
+
+        /* Loading indicator cho ảnh */
+        .product-image-slider .swiper-slide {
+            position: relative;
+        }
+
+        .product-image-slider .swiper-slide::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 30px;
+            height: 30px;
+            margin: -15px 0 0 -15px;
+            border: 2px solid #f3f3f3;
+            border-top: 2px solid #3498db;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            opacity: 0;
+            z-index: 10;
+            transition: opacity 0.3s ease-in-out;
+        }
+
+        .product-image-slider .swiper-slide.loading::before {
+            opacity: 1;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        
     </style>
 
     <div id="toast-container" style="position: fixed; top: 20px; right: 20px; z-index: 9999;"></div>
@@ -662,7 +708,8 @@
 @push('scripts')
 <script src="{{ asset('assets/js/shop/show.js') }}"></script>
 <script>
-    window.variantStock = @json($stockMap);
+    window.variantStock = @json($stockMap ?? []);
+    window.colorImageMap = @json($colorImageMap);
 </script>
 @endpush
 
