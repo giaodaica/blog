@@ -54,6 +54,10 @@ Route::middleware(['auth'])->group(function () {
     Route::post('checkout', [OrderController::class, 'processCheckout'])->name('home.processCheckout');
     Route::get('done', [OrderController::class, 'done'])->name('home.done');
     
+    // MOMO Payment routes
+    Route::get('momo/payment', [OrderController::class, 'momoPayment'])->name('momo.payment');
+    Route::post('momo/ipn', [OrderController::class, 'momoIpn'])->name('momo.ipn');
+    
     // Address management
     Route::get('addresses', [AddressBookController::class, 'index'])->name('addresses.index');
     Route::post('addresses', [AddressBookController::class, 'store'])->name('addresses.store');
@@ -142,3 +146,24 @@ Route::prefix('dashboard')->name('dashboard.')->group(function () {
 
 // Route cho admin trả lời bình luận
 Route::post('reviews/{id}/reply', [\App\Http\Controllers\web\ReviewController::class, 'update'])->name('reviews.reply');
+
+// Shipping type update
+Route::post('/cart/update-shipping-type', [CartController::class, 'updateShippingType'])->name('cart.updateShippingType');
+
+// Test route for debugging
+Route::get('/test-checkout', function() {
+    $userId = Auth::id();
+    $cartItems = \App\Models\Cart::with(['productVariant.color', 'productVariant.size', 'productVariant.product'])
+        ->where('user_id', $userId)
+        ->get();
+    
+    dd([
+        'user_id' => $userId,
+        'cart_count' => $cartItems->count(),
+        'cart_items' => $cartItems->toArray(),
+        'addresses' => \App\Models\AddressBook::where('user_id', $userId)->get()->toArray()
+    ]);
+})->middleware('auth');
+
+// Test checkout route
+Route::post('/test-checkout', [OrderController::class, 'testCheckout'])->name('test.checkout')->middleware('auth');

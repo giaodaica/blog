@@ -38,7 +38,14 @@
                                     @if(session('payment_method') == 'COD')
                                         <span class="badge bg-info">Thanh toán khi nhận hàng</span>
                                     @else
-                                        <span class="badge bg-success">Thanh toán qua QR</span>
+                                        <span class="badge bg-success">Thanh toán qua MOMO</span>
+                                    @endif
+                                </p>
+                                <p class="mb-2"><strong>Loại vận chuyển:</strong> 
+                                    @if(session('shipping_type') == 'basic')
+                                        <span class="badge bg-secondary">Vận chuyển cơ bản</span>
+                                    @else
+                                        <span class="badge bg-primary">Vận chuyển nhanh</span>
                                     @endif
                                 </p>
                             </div>

@@ -51,6 +51,25 @@
                 </div>
                 <form action="{{ route('home.processCheckout') }}" method="POST">
                     @csrf
+                    
+                    @if($errors->any())
+                        <div class="alert alert-danger mb-4">
+                            <h6 class="alert-heading">Có lỗi xảy ra:</h6>
+                            <ul class="mb-0">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="alert alert-danger mb-4">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
                     <div class="row align-items-start">
                         <div class="col-lg-7 pe-50px md-pe-15px md-mb-50px xs-mb-35px">
                             <span class="fs-26 alt-font fw-600 text-dark-gray mb-20px d-block">Thông tin giao hàng</span>
@@ -139,20 +158,43 @@
                                         <tr class="shipping">
                                             <th class="fw-600 text-dark-gray alt-font">Phí vận chuyển</th>
                                             <td data-title="Shipping">
-                                                <ul class="p-0">
-                                                    <li class="d-flex align-items-center">
-                                                        <input id="free_shipping" type="radio" name="shipping-option" class="d-block w-auto mb-0 me-10px p-0" checked="checked" disabled>
-                                                        <label class="md-line-height-18px" for="free_shipping">
-                                                            Miễn phí vận chuyển
+                                                <div class="mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input shipping-type-radio" type="radio" name="shipping_type" id="shipping_basic" value="basic" {{ $shippingType == 'basic' ? 'checked' : '' }}>
+                                                        <label class="form-check-label" for="shipping_basic">
+                                                            <strong>Vận chuyển cơ bản</strong><br>
+                                                            <small class="text-muted">
+                                                                @if($subtotal >= 200000)
+                                                                    Miễn phí (Đơn hàng ≥ 200k)
+                                                                @else
+                                                                    20.000 đ (Đơn hàng < 200k)
+                                                                @endif
+                                                            </small>
                                                         </label>
-                                                    </li>
-                                                </ul>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input shipping-type-radio" type="radio" name="shipping_type" id="shipping_express" value="express" {{ $shippingType == 'express' ? 'checked' : '' }}>
+                                                        <label class="form-check-label" for="shipping_express">
+                                                            <strong>Vận chuyển nhanh</strong><br>
+                                                            <small class="text-muted">
+                                                                @if($subtotal >= 200000)
+                                                                    +30.000 đ (Miễn phí cơ bản + 30k)
+                                                                @else
+                                                                    +30.000 đ (20k + 30k = 50k)
+                                                                @endif
+                                                            </small>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="shipping-fee-display">
+                                                    <strong>{{ number_format($shippingFee, 0, ',', '.') }} đ</strong>
+                                                </div>
                                             </td>
                                         </tr>
                                         <tr class="total-amount">
                                             <th class="fw-600 text-dark-gray alt-font">Tổng cộng</th>
                                             <td data-title="Total">
-                                                <h6 class="d-block fw-700 mb-0 text-dark-gray alt-font">{{ number_format($total, 0, ',', '.') }} đ</h6>
+                                                <h6 class="d-block fw-700 mb-0 text-dark-gray alt-font total-display">{{ number_format($total, 0, ',', '.') }} đ</h6>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -175,12 +217,12 @@
                                         <div class="heading active-accordion">
                                             <label class="mb-5px">
                                                 <input class="d-inline w-auto me-5px mb-0 p-0" type="radio" name="payment_method" value="QR">
-                                                <span class="d-inline-block text-dark-gray fw-500">Thanh toán qua QR Code</span>
+                                                <span class="d-inline-block text-dark-gray fw-500">Thanh toán qua QR Code (MOMO)</span>
                                                 <a class="accordion-toggle" data-bs-toggle="collapse" data-bs-parent="#accordion-style-05" href="#style-5-collapse-2"></a>
                                             </label>
                                         </div>
                                         <div id="style-5-collapse-2" class="collapse" data-bs-parent="#accordion-style-05">
-                                            <div class="p-25px bg-very-light-gray mt-20px mb-20px fs-14 lh-24">Quét mã QR để thanh toán qua ứng dụng ngân hàng.</div>
+                                            <div class="p-25px bg-very-light-gray mt-20px mb-20px fs-14 lh-24">Thanh toán qua mã QR Code MOMO.</div>
                                         </div>
                                         <!-- end tab content -->
                                     </div>
@@ -197,10 +239,43 @@
                                         <span class="btn-double-text" data-text="Đặt hàng">Đặt hàng</span>
                                     </span>
                                 </button>
+                                
+                                <!-- Test button for debugging -->
+                                <button type="button" id="test-checkout-btn" class="btn btn-warning btn-large btn-round-edge w-100 mt-10px">
+                                    Test Checkout (Debug)
+                                </button>
                             </div>
                         </div>
                     </div>
                 </form>
+                
+                <!-- Test checkout script -->
+                <script>
+                document.getElementById('test-checkout-btn').addEventListener('click', function() {
+                    if (confirm('Bạn có muốn thực hiện test checkout?')) {
+                        fetch('{{ route("test.checkout") }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json',
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Test checkout thành công! Mã đơn hàng: ' + data.order_code);
+                                window.location.href = '{{ route("home.done") }}';
+                            } else {
+                                alert('Lỗi: ' + data.error);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Có lỗi xảy ra: ' + error.message);
+                        });
+                    }
+                });
+                </script>
             </div>
         </section>
         <!-- end section -->
@@ -254,6 +329,34 @@
                     radio.closest('.address-info').querySelector('.address-card').classList.add('selected');
                 }
             });
+
+            // Cập nhật phí vận chuyển khi thay đổi loại vận chuyển
+            document.querySelectorAll('.shipping-type-radio').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    updateShippingFee(this.value);
+                });
+            });
+
+            function updateShippingFee(shippingType) {
+                fetch("{{ route('cart.updateShippingType') }}", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ shipping_type: shippingType })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.shipping_fee) {
+                        document.querySelector('.shipping-fee-display strong').innerText = data.shipping_fee;
+                        document.querySelector('.total-display').innerText = data.total;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
         </script>
         <!-- Thêm link CDN FontAwesome nếu chưa có -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>

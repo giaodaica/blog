@@ -161,6 +161,41 @@
                                         </td>
                                     </tr>
 
+                                <tr>
+                                    <th class="fw-600 text-dark-gray alt-font pb-0">Phí vận chuyển</th>
+                                    <td class="pb-0" data-title="Shipping">
+                                        <div class="mb-2">
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input shipping-type-radio" type="radio" name="shipping_type" id="shipping_basic_cart" value="basic" {{ $shippingType == 'basic' ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="shipping_basic_cart">
+                                                    <small>
+                                                        @if($subtotal >= 200000)
+                                                            Miễn phí (≥200k)
+                                                        @else
+                                                            20.000 đ (<200k)
+                                                        @endif
+                                                    </small>
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input shipping-type-radio" type="radio" name="shipping_type" id="shipping_express_cart" value="express" {{ $shippingType == 'express' ? 'checked' : '' }}>
+                                                <label class="form-check-label" for="shipping_express_cart">
+                                                    <small>
+                                                        @if($subtotal >= 200000)
+                                                            +30.000 đ
+                                                        @else
+                                                            +30.000 đ
+                                                        @endif
+                                                    </small>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <span id="shipping-fee-display" class="fw-600">
+                                            {{ number_format($shippingFee, 0, ',', '.') }} đ
+                                        </span>
+                                    </td>
+                                </tr>
+
                                 <tr class="total-amount">
                                     <th class="fw-600 text-dark-gray alt-font pb-0">Tổng tiền </th>
                                     <td class="pb-0" data-title="Total">
@@ -297,8 +332,35 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     });
+
+    // Cập nhật phí vận chuyển khi thay đổi loại vận chuyển
+    document.querySelectorAll('.shipping-type-radio').forEach(function(radio) {
+        radio.addEventListener('change', function() {
+            updateShippingFee(this.value);
+        });
+    });
 });
 
+function updateShippingFee(shippingType) {
+    fetch("{{ route('cart.updateShippingType') }}", {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ shipping_type: shippingType })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.shipping_fee) {
+            document.getElementById('shipping-fee-display').innerText = data.shipping_fee;
+            document.getElementById('total').innerText = data.total;
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
 </script>
 {{-- <script>
 document.addEventListener('DOMContentLoaded', function () {
