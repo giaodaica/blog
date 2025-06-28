@@ -46,6 +46,7 @@ Route::delete('/cart/delete-selected', [CartController::class, 'deleteSelected']
 Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])->name('cart.updateQuantity');
 Route::post('/cart/calculate-total', [CartController::class, 'calculateTotal'])->name('cart.calculateTotal');
 Route::post('/cart/apply-voucher', [CartController::class, 'applyVoucher'])->name('cart.applyVoucher');
+Route::get('/cart/remove-voucher', [CartController::class, 'removeVoucher'])->name('cart.removeVoucher');
 
 Route::get('checkout', [OrderController::class, 'index'])->name('home.checkout');
 Route::get('done', [OrderController::class, 'done'])->name('home.done');
