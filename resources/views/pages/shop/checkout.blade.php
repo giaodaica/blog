@@ -5,12 +5,12 @@
             <div class="container">
                 <div class="row align-items-center justify-content-center" data-anime='{ "el": "childs", "translateY": [-15, 0], "opacity": [0,1], "duration": 300, "delay": 0, "staggervalue": 200, "easing": "easeOutQuad" }'>
                     <div class="col-12 col-xl-8 col-lg-10 text-center position-relative page-title-extra-large">
-                        <h1 class="alt-font fw-600 text-dark-gray mb-10px">Checkout</h1>
+                        <h1 class="alt-font fw-600 text-dark-gray mb-10px">Thanh toán</h1>
                     </div>
                     <div class="col-12 breadcrumb breadcrumb-style-01 d-flex justify-content-center">
                         <ul>
-                            <li><a href="demo-fashion-store.html">Home</a></li>
-                            <li>Checkout</li>
+                            <li><a href="{{ route('home') }}">Trang chủ</a></li>
+                            <li>Thanh toán</li>
                         </ul>
                     </div>
                 </div>
@@ -27,7 +27,7 @@
                                 <i class="feather icon-feather-user top-9px position-relative text-dark-gray icon-small"></i>
                             </div>
                             <div class="feature-box-content">
-                                <span class="d-inline-block text-dark-gray align-middle alt-font fw-500">Returning customer? <a href="#" class="text-decoration-line-bottom fw-600 text-dark-gray">Click here to login</a></span>
+                                <span class="d-inline-block text-dark-gray align-middle alt-font fw-500">Khách hàng: <span class="fw-600 text-dark-gray">{{ Auth::user()->name }}</span></span>
                             </div>
                         </div>
                     </div>
@@ -40,67 +40,246 @@
                                 <i class="feather icon-feather-scissors top-9px position-relative text-dark-gray icon-small"></i>
                             </div>
                             <div class="feature-box-content">
-                                <span class="d-inline-block text-dark-gray align-middle alt-font fw-500">Have a coupon? <a href="#" class="text-decoration-line-bottom fw-600 text-dark-gray">Click here to enter your code</a></span>
+                                @if($appliedVoucher)
+                                    <span class="d-inline-block text-dark-gray align-middle alt-font fw-500">Mã giảm giá: <span class="fw-600 text-dark-gray">{{ $appliedVoucher->code }}</span></span>
+                                @else
+                                    <span class="d-inline-block text-dark-gray align-middle alt-font fw-500">Chưa có mã giảm giá</span>
+                                @endif
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="row align-items-start">
-                    <div class="col-lg-7 pe-50px md-pe-15px md-mb-50px xs-mb-35px">
-                        <span class="fs-26 alt-font fw-600 text-dark-gray mb-20px d-block">Thông tin giao hàng</span>
-                        <form class="">
-                            <div class="row">
-                                <div class="col-md-6 mb-20px">
-                                    <label class="mb-10px">First name <span class="text-red">*</span></label>
-                                    <input class="border-radius-4px input-small" type="text" aria-label="first-name" required>
-                                </div>
-                                <div class="col-md-6 mb-20px">
-                                    <label class="mb-10px">Last name <span class="text-red">*</span></label>
-                                    <input class="border-radius-4px input-small" type="text" aria-label="last-name" required>
-                                </div>
-                                <div class="col-12 mb-20px">
-                                    <label class="mb-10px">Địa chỉ</label>
-                                    <input class="border-radius-4px input-small" type="text" aria-label="company-name">
-                                </div>
-                                <div class="col-12 mb-20px">
-                                    <label class="mb-10px">Phone <span class="text-red">*</span></label>
-                                    <input class="border-radius-4px input-small" type="text" aria-label="phone" required>
-                                </div>
-                                <div class="col-12 mb-20px">
-                                    <label class="mb-10px">Email address <span class="text-red">*</span></label>
-                                    <input class="border-radius-4px input-small" type="email" aria-label="email" required>
-                                </div>
-                                <!-- start tab content -->
-                                <div class="col-md-12 mb-5px checkout-accordion">
-                                    <div class="position-relative terms-condition-box text-start d-flex align-items-center">
-                                        <label>
-                                            <input type="checkbox" name="terms_condition" value="1" class="check-box align-middle">
-                                            <span class="box">Create an account?</span>
-                                            <a class="accordion-toggle" data-bs-toggle="collapse" data-bs-parent="#accordion1" href="#collapseThree"></a>
-                                        </label>
-                                    </div>
-                                    <div id="collapseThree" class="collapse">
-                                        <div class="ps-30px mb-30px mt-15px">
-                                            <label class="mb-10px">Account username <span class="text-red">*</span></label>
-                                            <input class="border-radius-4px input-small mb-15px" type="email" required>
-                                            <label class="mb-10px">Create account password <span class="text-red">*</span></label>
-                                            <input class="border-radius-4px input-small" type="email" required>
+                <form action="{{ route('home.processCheckout') }}" method="POST">
+                    @csrf
+                    
+                    @if($errors->any())
+                        <div class="alert alert-danger mb-4">
+                            <h6 class="alert-heading">Có lỗi xảy ra:</h6>
+                            <ul class="mb-0">
+                                @foreach($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    @if(session('error'))
+                        <div class="alert alert-danger mb-4">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            {{ session('error') }}
+                        </div>
+                    @endif
+
+                    <div class="row align-items-start">
+                        <div class="col-lg-7 pe-50px md-pe-15px md-mb-50px xs-mb-35px">
+                            <span class="fs-26 alt-font fw-600 text-dark-gray mb-20px d-block">Thông tin giao hàng</span>
+                            
+                            @if($addresses->count() > 0)
+                                <div class="mb-20px">
+                                    <label class="mb-10px">Chọn địa chỉ giao hàng <span class="text-red">*</span></label>
+                                    @foreach($addresses as $address)
+                                        <div class="mb-10px">
+                                            <label class="w-100 d-block">
+                                                <input type="radio" name="address_id" value="{{ $address->id }}" class="address-radio d-none" {{ $loop->first ? 'checked' : '' }}>
+                                                <div class="address-info">
+                                                    <div class="address-card border p-3 rounded mb-2 d-flex flex-column">
+                                                        <div class="address-note">
+                                                            <i class="fas fa-home"></i>
+                                                            Địa chỉ {{ $loop->iteration }}
+                                                        </div>
+                                                        <div class="address-detail">
+                                                            <span class="fw-500">Tên người nhận:</span> {{ $address->name }}
+                                                        </div>
+                                                        <div class="address-detail">
+                                                            <span class="fw-500">Địa chỉ:</span> {{ $address->address }}
+                                                        </div>
+                                                        <div class="address-detail">
+                                                            <span class="fw-500">Số điện thoại:</span> {{ $address->phone }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </label>
                                         </div>
+                                    @endforeach
+                                </div>
+                            @else
+                                <div class="alert alert-warning">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Bạn chưa có địa chỉ giao hàng. Vui lòng thêm địa chỉ mới.
+                                </div>
+                            @endif
+
+                            <div class="col-12 mb-20px">
+                                <a href="{{ route('addresses.index') }}" class="btn btn-outline-dark-gray btn-small">
+                                    <i class="fas fa-plus me-1"></i>Thêm địa chỉ mới
+                                </a>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="mb-10px">Ghi chú đơn hàng (tùy chọn)</label>
+                                <textarea name="notes" class="border-radius-4px textarea-small" rows="5" cols="5" placeholder="Ghi chú về đơn hàng, ví dụ: ghi chú đặc biệt cho việc giao hàng."></textarea>
+                            </div>
+                        </div>
+                        <div class="col-lg-5">
+                            <div class="bg-very-light-gray border-radius-6px p-50px lg-p-25px your-order-box">
+                                <span class="fs-26 alt-font fw-600 text-dark-gray mb-5px d-block">Đơn hàng của bạn</span>
+                                <table class="w-100 total-price-table your-order-table">
+                                    <tbody>
+                                        <tr>
+                                            <th class="w-60 lg-w-55 xs-w-50 fw-600 text-dark-gray alt-font">Sản phẩm</th>
+                                            <td class="fw-600 text-dark-gray alt-font">Tổng</td>
+                                        </tr>
+                                        @foreach($cartItems as $item)
+                                            <tr class="product">
+                                                <td class="product-thumbnail">
+                                                    <a href="{{ route('home.show', $item->productVariant->product->slug) }}" class="text-dark-gray fw-500 d-block lh-initial">
+                                                        {{ $item->productVariant->product->name }} x {{ $item->quantity }}
+                                                    </a>
+                                                    <span class="fs-14 d-block">
+                                                        Màu: {{ $item->productVariant->color->color_name }} | 
+                                                        Size: {{ $item->productVariant->size->size_name }}
+                                                    </span>
+                                                </td>
+                                                <td class="product-price" data-title="Price">
+                                                    {{ number_format($item->quantity * $item->price_at_time, 0, ',', '.') }} đ
+                                                </td>
+                                            </tr>
+                                        @endforeach
+                                        <tr>
+                                            <th class="w-50 fw-600 text-dark-gray alt-font">Tạm tính</th>
+                                            <td class="text-dark-gray fw-600">{{ number_format($subtotal, 0, ',', '.') }} đ</td>
+                                        </tr>
+                                        @if($voucherDiscount > 0)
+                                            <tr>
+                                                <th class="fw-600 text-dark-gray alt-font">Giảm giá</th>
+                                                <td class="text-dark-gray fw-600">-{{ number_format($voucherDiscount, 0, ',', '.') }} đ</td>
+                                            </tr>
+                                        @endif
+                                        <tr class="shipping">
+                                            <th class="fw-600 text-dark-gray alt-font">Phí vận chuyển</th>
+                                            <td data-title="Shipping">
+                                                <div class="mb-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input shipping-type-radio" type="radio" name="shipping_type" id="shipping_basic" value="basic" {{ $shippingType == 'basic' ? 'checked' : '' }}>
+                                                        <label class="form-check-label" for="shipping_basic">
+                                                            <strong>Vận chuyển cơ bản</strong><br>
+                                                            <small class="text-muted">
+                                                                @if($subtotal >= 200000)
+                                                                    Miễn phí (Đơn hàng ≥ 200k)
+                                                                @else
+                                                                    20.000 đ (Đơn hàng < 200k)
+                                                                @endif
+                                                            </small>
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input shipping-type-radio" type="radio" name="shipping_type" id="shipping_express" value="express" {{ $shippingType == 'express' ? 'checked' : '' }}>
+                                                        <label class="form-check-label" for="shipping_express">
+                                                            <strong>Vận chuyển nhanh</strong><br>
+                                                            <small class="text-muted">
+                                                                @if($subtotal >= 200000)
+                                                                    +30.000 đ (Miễn phí cơ bản + 30k)
+                                                                @else
+                                                                    +30.000 đ (20k + 30k = 50k)
+                                                                @endif
+                                                            </small>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="shipping-fee-display">
+                                                    <strong>{{ number_format($shippingFee, 0, ',', '.') }} đ</strong>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr class="total-amount">
+                                            <th class="fw-600 text-dark-gray alt-font">Tổng cộng</th>
+                                            <td data-title="Total">
+                                                <h6 class="d-block fw-700 mb-0 text-dark-gray alt-font total-display">{{ number_format($total, 0, ',', '.') }} đ</h6>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="p-40px lg-p-25px bg-white border-radius-6px box-shadow-large mt-10px mb-30px sm-mb-25px checkout-accordion">
+                                    <div class="w-100" id="accordion-style-05">
+                                        <!-- start tab content -->
+                                        <div class="heading active-accordion">
+                                            <label class="mb-5px">
+                                                <input class="d-inline w-auto me-5px mb-0 p-0" type="radio" name="payment_method" value="COD" checked="checked">
+                                                <span class="d-inline-block text-dark-gray fw-500">Thanh toán khi nhận hàng (COD)</span>
+                                                <a class="accordion-toggle" data-bs-toggle="collapse" data-bs-parent="#accordion-style-05" href="#style-5-collapse-1"></a>
+                                            </label>
+                                        </div>
+                                        <div id="style-5-collapse-1" class="collapse show" data-bs-parent="#accordion-style-05">
+                                            <div class="p-25px bg-very-light-gray mt-20px mb-20px fs-14 lh-24">Thanh toán bằng tiền mặt khi nhận hàng.</div>
+                                        </div>
+                                        <!-- end tab content -->
+                                        <!-- start tab content -->
+                                        <div class="heading active-accordion">
+                                            <label class="mb-5px">
+                                                <input class="d-inline w-auto me-5px mb-0 p-0" type="radio" name="payment_method" value="QR">
+                                                <span class="d-inline-block text-dark-gray fw-500">Thanh toán qua QR Code (MOMO)</span>
+                                                <a class="accordion-toggle" data-bs-toggle="collapse" data-bs-parent="#accordion-style-05" href="#style-5-collapse-2"></a>
+                                            </label>
+                                        </div>
+                                        <div id="style-5-collapse-2" class="collapse" data-bs-parent="#accordion-style-05">
+                                            <div class="p-25px bg-very-light-gray mt-20px mb-20px fs-14 lh-24">Thanh toán qua mã QR Code MOMO.</div>
+                                        </div>
+                                        <!-- end tab content -->
                                     </div>
                                 </div>
-                                <!-- end tab content -->
-                                <!-- start tab content -->
-                                <div class="col-md-12 mb-20px checkout-accordion">
-                                    <div class="position-relative terms-condition-box text-start d-flex align-items-center">
-                                        <label>
-                                            <input type="checkbox" name="terms_condition" value="1" class="check-box align-middle">
-                                            <span class="box">Ship to a different address?</span>
-                                            <a class="accordion-toggle" data-bs-toggle="collapse" data-bs-parent="#accordion1" href="#collapseFour"></a>
-                                        </label>
-                                    </div>
-                                   <!-- filepath: d:\shop\shop\resources\views\pages\shop\checkout.blade.php -->
-<div id="collapseFour" class="collapse">
-    <div class="row ps-30px mb-30px mt-15px">
+                                <p class="fs-14 lh-24">Thông tin cá nhân của bạn sẽ được sử dụng để xử lý đơn hàng, hỗ trợ trải nghiệm của bạn trên trang web này và cho các mục đích khác được mô tả trong <a class="text-decoration-line-bottom text-dark-gray fw-500" href="#">chính sách bảo mật.</a></p>
+                                <div class="position-relative terms-condition-box text-start d-flex align-items-center">
+                                    <label>
+                                        <input type="checkbox" name="terms_condition" value="1" class="check-box align-middle" required>
+                                        <span class="box fs-14 lh-28">Tôi đồng ý với <a href="#" class="text-decoration-line-bottom text-dark-gray fw-500">điều khoản và điều kiện</a> của website.</span>
+                                    </label>
+                                </div>
+                                <button type="submit" class="btn btn-dark-gray btn-large btn-switch-text btn-round-edge btn-box-shadow w-100 mt-30px" {{ $addresses->count() == 0 ? 'disabled' : '' }}>
+                                    <span>
+                                        <span class="btn-double-text" data-text="Đặt hàng">Đặt hàng</span>
+                                    </span>
+                                </button>
+                                
+                                <!-- Test button for debugging -->
+                                <button type="button" id="test-checkout-btn" class="btn btn-warning btn-large btn-round-edge w-100 mt-10px">
+                                    Test Checkout (Debug)
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                
+                <!-- Test checkout script -->
+                <script>
+                document.getElementById('test-checkout-btn').addEventListener('click', function() {
+                    if (confirm('Bạn có muốn thực hiện test checkout?')) {
+                        fetch('{{ route("test.checkout") }}', {
+                            method: 'POST',
+                            headers: {
+                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                'Content-Type': 'application/json',
+                            }
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                alert('Test checkout thành công! Mã đơn hàng: ' + data.order_code);
+                                window.location.href = '{{ route("home.done") }}';
+                            } else {
+                                alert('Lỗi: ' + data.error);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Có lỗi xảy ra: ' + error.message);
+                        });
+                    }
+                });
+                </script>
+            </div>
+        </section>
+        <!-- end section -->
+
         <style>
             .address-card {
                 transition: box-shadow 0.2s, border-color 0.2s;
@@ -133,195 +312,52 @@
                 color: #555;
             }
         </style>
-        <div class="col-12 mb-20px">
-            <label class="w-100 d-block">
-                <input type="radio" name="shipping_address_id" value="1" class="address-radio d-none" checked>
-                <div class="address-info">
-                    <div class="address-card border p-3 rounded mb-2 d-flex flex-column">
-                        <div class="address-note"><i class="fas fa-home"></i>Home Address</div>
-                        <div class="address-detail"><span class="fw-500">Tên người nhận:</span> Nguyễn Văn A</div>
-                        <div class="address-detail"><span class="fw-500">Địa chỉ:</span> 123 Đường ABC, Quận 1, TP.HCM</div>
-                        <div class="address-detail"><span class="fw-500">Số điện thoại:</span> 0909123456</div>
-                    </div>
-                </div>
-            </label>
-        </div>
-        <div class="col-12 mb-20px">
-            <label class="w-100 d-block">
-                <input type="radio" name="shipping_address_id" value="2" class="address-radio d-none">
-                <div class="address-info">
-                    <div class="address-card border p-3 rounded mb-2 d-flex flex-column">
-                        <div class="address-note"><i class="fas fa-briefcase"></i>Work Address</div>
-                        <div class="address-detail"><span class="fw-500">Tên người nhận:</span> Nguyễn Văn B</div>
-                        <div class="address-detail"><span class="fw-500">Địa chỉ:</span> 456 Đường XYZ, Quận 3, TP.HCM</div>
-                        <div class="address-detail"><span class="fw-500">Số điện thoại:</span> 0911222333</div>
-                    </div>
-                </div>
-            </label>
-        </div>
-        <div class="col-12">
-            <a href="#" class=""><i class="fas fa-plus me-1"></i>Thêm địa chỉ mới</a>
-        </div>
-    </div>
-    <script>
-        // Highlight card khi chọn radio
-        document.querySelectorAll('.address-radio').forEach(function(radio) {
-            radio.addEventListener('change', function() {
-                document.querySelectorAll('.address-card').forEach(function(card) {
-                    card.classList.remove('selected');
+
+        <script>
+            // Highlight card khi chọn radio
+            document.querySelectorAll('.address-radio').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    document.querySelectorAll('.address-card').forEach(function(card) {
+                        card.classList.remove('selected');
+                    });
+                    if (radio.checked) {
+                        radio.closest('.address-info').querySelector('.address-card').classList.add('selected');
+                    }
                 });
+                // Set mặc định
                 if (radio.checked) {
                     radio.closest('.address-info').querySelector('.address-card').classList.add('selected');
                 }
             });
-            // Set mặc định
-            if (radio.checked) {
-                radio.closest('.address-info').querySelector('.address-card').classList.add('selected');
+
+            // Cập nhật phí vận chuyển khi thay đổi loại vận chuyển
+            document.querySelectorAll('.shipping-type-radio').forEach(function(radio) {
+                radio.addEventListener('change', function() {
+                    updateShippingFee(this.value);
+                });
+            });
+
+            function updateShippingFee(shippingType) {
+                fetch("{{ route('cart.updateShippingType') }}", {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                    },
+                    body: JSON.stringify({ shipping_type: shippingType })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    if (data.shipping_fee) {
+                        document.querySelector('.shipping-fee-display strong').innerText = data.shipping_fee;
+                        document.querySelector('.total-display').innerText = data.total;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
             }
-        });
-    </script>
-    <!-- Thêm link CDN FontAwesome nếu chưa có -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
-</div>
-                                </div>
-                                <!-- end tab content -->
-                                <div class="col-12">
-                                    <label class="mb-10px">Order notes (optional)</label>
-                                    <textarea class="border-radius-4px textarea-small" rows="5" cols="5" placeholder="Notes about your order, e.g. special notes for delivery."></textarea>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="col-lg-5">
-                        <div class="bg-very-light-gray border-radius-6px p-50px lg-p-25px your-order-box">
-                            <span class="fs-26 alt-font fw-600 text-dark-gray mb-5px d-block">Your order</span>
-                            <table class="w-100 total-price-table your-order-table">
-                                <tbody>
-                                    <tr>
-                                        <th class="w-60 lg-w-55 xs-w-50 fw-600 text-dark-gray alt-font">Product</th>
-                                        <td class="fw-600 text-dark-gray alt-font">Total</td>
-                                    </tr>
-                                    <tr class="product">
-                                        <td class="product-thumbnail">
-                                            <a href="demo-jewellery-store-single-product.html" class="text-dark-gray fw-500 d-block lh-initial">Textured sweater x 1</a>
-                                            <span class="fs-14 d-block">Color: Pink</span>
-                                        </td>
-                                        <td class="product-price" data-title="Price">$23.00</td>
-                                    </tr>
-                                    <tr class="product">
-                                        <td class="product-thumbnail">
-                                            <a href="demo-jewellery-store-single-product.html" class="text-dark-gray fw-500 d-block lh-initial">Bermuda shorts x 2</a>
-                                            <span class="fs-14 d-block">Color: Brown</span>
-                                        </td>
-                                        <td class="product-price" data-title="Price">$70.00</td>
-                                    </tr>
-                                    <tr class="product">
-                                        <td class="product-thumbnail">
-                                            <a href="demo-jewellery-store-single-product.html" class="text-dark-gray fw-500 d-block lh-initial">Pocket sweatshirt x 1</a>
-                                            <span class="fs-14 d-block">Color: White</span>
-                                        </td>
-                                        <td class="product-price" data-title="Price">$15.00</td>
-                                    </tr>
-                                    <tr>
-                                        <th class="w-50 fw-600 text-dark-gray alt-font">Subtotal</th>
-                                        <td class="text-dark-gray fw-600">$405.00</td>
-                                    </tr>
-                                    <tr class="shipping">
-                                        <th class="fw-600 text-dark-gray alt-font">Shipping</th>
-                                        <td data-title="Shipping">
-                                            <ul class="p-0">
-                                                <li class="d-flex align-items-center">
-                                                    <input id="free_shipping" type="radio" name="shipping-option" class="d-block w-auto mb-0 me-10px p-0" checked="checked">
-                                                    <label class="md-line-height-18px" for="free_shipping">Free shipping</label>
-                                                </li>
-                                                <li class="d-flex align-items-center">
-                                                    <input id="flat" type="radio" name="shipping-option" class="d-block w-auto mb-0 me-10px p-0">
-                                                    <label class="md-line-height-18px" for="flat">Flat: $12.00</label>
-                                                </li>
-                                                <li class="d-flex align-items-center">
-                                                    <input id="local_pickup" type="radio" name="shipping-option" class="d-block w-auto mb-0 me-10px p-0">
-                                                    <label class="md-line-height-18px" for="local_pickup">Local pickup</label>
-                                                </li>
-                                            </ul>
-                                        </td>
-                                    </tr>
-                                    <tr class="total-amount">
-                                        <th class="fw-600 text-dark-gray alt-font">Total</th>
-                                        <td data-title="Total">
-                                            <h6 class="d-block fw-700 mb-0 text-dark-gray alt-font">$405.00</h6>
-                                            <span class="fs-14">(Includes $19.29 tax)</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div class="p-40px lg-p-25px bg-white border-radius-6px box-shadow-large mt-10px mb-30px sm-mb-25px checkout-accordion">
-                                <div class="w-100" id="accordion-style-05">
-                                    <!-- start tab content -->
-                                    <div class="heading active-accordion">
-                                        <label class="mb-5px">
-                                            <input class="d-inline w-auto me-5px mb-0 p-0" type="radio" name="payment-option" checked="checked">
-                                            <span class="d-inline-block text-dark-gray fw-500">Direct bank transfer</span>
-                                            <a class="accordion-toggle" data-bs-toggle="collapse" data-bs-parent="#accordion-style-05" href="#style-5-collapse-1"></a>
-                                        </label>
-                                    </div>
-                                    <div id="style-5-collapse-1" class="collapse show" data-bs-parent="#accordion-style-05">
-                                        <div class="p-25px bg-very-light-gray mt-20px mb-20px fs-14 lh-24">Make your payment directly into our bank account. Please use your Order ID as the payment reference. Your order will not be shipped until the funds have cleared in our account.</div>
-                                    </div>
-                                    <!-- end tab content -->
-                                    <!-- start tab content -->
-                                    <div class="heading active-accordion">
-                                        <label class="mb-5px">
-                                            <input class="d-inline w-auto me-5px mb-0 p-0" type="radio" name="payment-option">
-                                            <span class="d-inline-block text-dark-gray fw-500">Check payments</span>
-                                            <a class="accordion-toggle" data-bs-toggle="collapse" data-bs-parent="#accordion-style-05" href="#style-5-collapse-2"></a>
-                                        </label>
-                                    </div>
-                                    <div id="style-5-collapse-2" class="collapse" data-bs-parent="#accordion-style-05">
-                                        <div class="p-25px bg-very-light-gray mt-20px mb-20px fs-14 lh-24">Please send a check to store name, store street, store town, store state / county, store postcode.</div>
-                                    </div>
-                                    <!-- end tab content -->
-                                    <!-- start tab content -->
-                                    <div class="heading active-accordion">
-                                        <label class="mb-5px">
-                                            <input class="d-inline w-auto me-5px mb-0 p-0" type="radio" name="payment-option">
-                                            <span class="d-inline-block text-dark-gray fw-500">Cash on delivery</span>
-                                            <a class="accordion-toggle" data-bs-toggle="collapse" data-bs-parent="#accordion-style-05" href="#style-5-collapse-3"></a>
-                                        </label>
-                                    </div>
-                                    <div id="style-5-collapse-3" class="collapse" data-bs-parent="#accordion-style-05">
-                                        <div class="p-25px bg-very-light-gray mt-20px mb-20px fs-14 lh-24">Pay with cash upon delivery.</div>
-                                    </div>
-                                    <!-- end tab content -->
-                                    <!-- start tab content -->
-                                    <div class="heading active-accordion">
-                                        <label class="mb-5px">
-                                            <input class="d-inline w-auto me-5px mb-0 p-0" type="radio" name="payment-option">
-                                            <span class="d-inline-block text-dark-gray fw-500">PayPal <img src="images/paypal-logo.jpg" class="w-120px ms-10px" alt=""/></span>
-                                            <a class="accordion-toggle" data-bs-toggle="collapse" data-bs-parent="#accordion-style-05" href="#style-5-collapse-4"></a>
-                                        </label>
-                                    </div>
-                                    <div id="style-5-collapse-4" class="collapse" data-bs-parent="#accordion-style-05">
-                                        <div class="p-25px bg-very-light-gray mt-20px fs-14 lh-24">You can pay with your credit card if you don't have a PayPal account.</div>
-                                    </div>
-                                    <!-- end tab content -->
-                                </div>
-                            </div>
-                            <p class="fs-14 lh-24">Your personal data will be used to process your order, support your experience throughout this website, and for other purposes described in our <a class="text-decoration-line-bottom text-dark-gray fw-500" href="#">privacy policy.</a></p>
-                            <div class="position-relative terms-condition-box text-start d-flex align-items-center">
-                                <label>
-                                    <input type="checkbox" name="terms_condition" value="1" class="check-box align-middle">
-                                    <span class="box fs-14 lh-28">I have agree to the website <a href="#" class="text-decoration-line-bottom text-dark-gray fw-500">terms and conditions.</a></span>
-                                </label>
-                            </div>
-                            <a href="{{route('home.done')}}" class="btn btn-dark-gray btn-large btn-switch-text btn-round-edge btn-box-shadow w-100 mt-30px">
-                                <span>
-                                    <span class="btn-double-text" data-text="Place order">Place order</span>
-                                </span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-        <!-- end section -->
+        </script>
+        <!-- Thêm link CDN FontAwesome nếu chưa có -->
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
 @endsection
