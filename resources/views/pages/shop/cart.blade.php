@@ -171,7 +171,7 @@
                                 </tr>
                             </tbody>
                         </table>
-                        <a href="CHECK OUT DON HANG"
+                        <a href="{{ route('home.checkout') }}"
                         class="btn btn-dark-gray btn-large btn-switch-text btn-round-edge btn-box-shadow w-100 mt-25px">
                             <span>
                                 <span class="btn-double-text" data-text="Đặt Hàng">Đặt Hàng</span>

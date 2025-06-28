@@ -22,6 +22,7 @@ use App\Http\Controllers\VouchersController;
 use App\Http\Controllers\web\ProductController;
 use App\Http\Controllers\web\ProductDetailController;
 use App\Http\Controllers\web\ReviewController;
+use App\Http\Controllers\AddressBookController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -48,8 +49,18 @@ Route::post('/cart/calculate-total', [CartController::class, 'calculateTotal'])-
 Route::post('/cart/apply-voucher', [CartController::class, 'applyVoucher'])->name('cart.applyVoucher');
 Route::get('/cart/remove-voucher', [CartController::class, 'removeVoucher'])->name('cart.removeVoucher');
 
-Route::get('checkout', [OrderController::class, 'index'])->name('home.checkout');
-Route::get('done', [OrderController::class, 'done'])->name('home.done');
+Route::middleware(['auth'])->group(function () {
+    Route::get('checkout', [OrderController::class, 'index'])->name('home.checkout');
+    Route::post('checkout', [OrderController::class, 'processCheckout'])->name('home.processCheckout');
+    Route::get('done', [OrderController::class, 'done'])->name('home.done');
+    
+    // Address management
+    Route::get('addresses', [AddressBookController::class, 'index'])->name('addresses.index');
+    Route::post('addresses', [AddressBookController::class, 'store'])->name('addresses.store');
+    Route::put('addresses/{id}', [AddressBookController::class, 'update'])->name('addresses.update');
+    Route::delete('addresses/{id}', [AddressBookController::class, 'destroy'])->name('addresses.destroy');
+});
+
 Route::get('dashboard', [HomeController::class, 'admin']);
 
 
