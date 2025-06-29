@@ -11,5 +11,5 @@ class OrderHistories extends Model
                 'from_status',
                 'to_status',
                 'note',
-                'time_action','users'];
+                'time_action','users','content'];
 }
