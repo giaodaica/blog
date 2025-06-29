@@ -150,7 +150,7 @@
                                     </li>
                                 </ul>
 
-                               @if(empty($data_order))
+                               @if($data_order->isEmpty())
                                     <div class="alert alert-warning text-center" role="alert">
                                         Không có đơn hàng nào để hiển thị.
                                     </div>
