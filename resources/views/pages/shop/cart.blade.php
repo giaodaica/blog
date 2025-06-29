@@ -222,20 +222,20 @@
 @endsection
 @section('js-page-custom')
   <script>
-// ...existing code...
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Desktop check all
+  
     const selectAllDesktop = document.getElementById('select-all-cart');
-    // Mobile check all
+    
     const selectAllMobile = document.getElementById('select-all-cart-mobile');
-    // Tất cả checkbox sản phẩm
+  
     const itemCheckboxes = document.querySelectorAll('.cart-item-checkbox:not(#select-all-cart):not(#select-all-cart-mobile)');
 
     function setAllCheckboxes(checked) {
         itemCheckboxes.forEach(cb => cb.checked = checked);
     }
 
-    // Khi click desktop check all
+    
     if (selectAllDesktop) {
         selectAllDesktop.addEventListener('change', function() {
             setAllCheckboxes(this.checked);
@@ -243,7 +243,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Khi click mobile check all
+    
     if (selectAllMobile) {
         selectAllMobile.addEventListener('change', function() {
             setAllCheckboxes(this.checked);
@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Khi click từng checkbox sản phẩm
+   
     itemCheckboxes.forEach(cb => {
         cb.addEventListener('change', function() {
             const allChecked = Array.from(itemCheckboxes).every(c => c.checked);
@@ -260,7 +260,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-// ...existing code...
+
 </script>
 <script>
 document.getElementById('delete-selected-btn').addEventListener('click', function (e) {
@@ -270,7 +270,7 @@ document.getElementById('delete-selected-btn').addEventListener('click', functio
     const ids = Array.from(selected).map(cb => cb.value);
 
     if (ids.length === 0) {
-        alert("Vui lòng chọn sản phẩm để xoá.");
+        showToast("Vui lòng chọn sản phẩm để xoá.", "warning");
         return;
     }
 
@@ -285,17 +285,18 @@ document.getElementById('delete-selected-btn').addEventListener('click', functio
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            alert('Đã xoá sản phẩm thành công.');
-            location.reload();
+            showToast('Đã xoá sản phẩm thành công.', 'success');
+            setTimeout(() => location.reload(), 1000); 
         } else {
-            alert('Xoá thất bại.');
+            showToast('Xoá thất bại.', 'danger');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Có lỗi xảy ra.');
+        showToast('Có lỗi xảy ra.', 'danger');
     });
 });
+
 </script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -362,42 +363,6 @@ function updateShippingFee(shippingType) {
     });
 }
 </script>
-{{-- <script>
-document.addEventListener('DOMContentLoaded', function () {
-    // Hiển thị tất cả các thông báo từ session
-    document.querySelectorAll('.toast-message').forEach(function(el) {
-        const msg = el.getAttribute('data-message');
-        const type = el.getAttribute('data-type') || 'info';
-        if (msg) showToast(msg, type);
-    });
-
-    function showToast(message, type = 'info') {
-        const container = document.getElementById('toast-container');
-        if (!container) return;
-
-        const toast = document.createElement('div');
-        toast.className = `toast align-items-center text-bg-${type} border-0 show mb-2`;
-        toast.role = 'alert';
-        toast.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">${message}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        `;
-        container.appendChild(toast);
-
-        // Auto hide sau 4s
-        setTimeout(() => {
-            toast.classList.remove('show');
-            toast.classList.add('hide');
-            setTimeout(() => toast.remove(), 500);
-        }, 4000);
-
-        // Cho phép đóng bằng nút
-        toast.querySelector('.btn-close').onclick = () => toast.remove();
-    }
-});
-</script> --}}
 
 <script>
   
@@ -425,7 +390,7 @@ function showToast(message, type = 'info') {
     toast.querySelector('.btn-close').onclick = () => toast.remove();
 }
 
-// Sau đó dùng trong bất kỳ đâu
+
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.toast-message').forEach(function(el) {
         const msg = el.getAttribute('data-message');
@@ -443,7 +408,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         @media (max-width: 575.98px) {
     .coupon-code-panel.mobile {
-        padding-right: 1px !important; /* hoặc px-3 nếu table dùng */
+        padding-right: 1px !important; 
     }
     .cart-item-checkbox {
         margin-right: 0 !important;

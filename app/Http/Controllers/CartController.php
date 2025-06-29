@@ -199,7 +199,6 @@ public function applyVoucher(Request $request)
         return redirect()->back()->with('error', 'Mã giảm giá không hợp lệ');
     }
 
-    // Lấy giỏ hàng để tính tổng
     $userId = Auth::id();
     $cartItems = Cart::where('user_id', $userId)->get();
 
@@ -207,7 +206,10 @@ public function applyVoucher(Request $request)
         return $item->quantity * $item->price_at_time;
     });
 
-    // Tính số tiền được giảm
+    if ($voucher->min_order_value && $subtotal < $voucher->min_order_value) {
+        return redirect()->back()->with('error', 'Đơn hàng phải có giá trị tối thiểu ' . number_format($voucher->min_order_value, 0, ',', '.') . ' đ để sử dụng mã giảm giá này.');
+    }
+
     $discount = 0;
     if ($voucher->type_discount === 'percent') {
         $discount = round($subtotal * ($voucher->value / 100));
@@ -218,7 +220,6 @@ public function applyVoucher(Request $request)
         $discount = $voucher->value;
     }
 
-    // Lưu vào session
     session([
         'voucher_code' => $voucher->code,
         'voucher_discount' => $discount
@@ -226,6 +227,7 @@ public function applyVoucher(Request $request)
 
     return redirect()->back()->with('success', 'Áp dụng mã giảm giá thành công!');
 }
+
 public function removeVoucher()
 {
     session()->forget(['voucher_code', 'voucher_discount']);
