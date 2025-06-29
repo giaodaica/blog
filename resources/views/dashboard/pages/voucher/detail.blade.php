@@ -116,6 +116,21 @@
                                 @endif
                             </td>
                         </tr>
+                        <tr>
+                            <th>Hình ảnh</th>
+                            <td>
+                                @if ($data_voucher->image)
+                                    <img src="{{ asset( $data_voucher->image) }}" alt="Voucher Image"
+                                        class="img-fluid" style="max-width: 200px;">
+                                @else
+                                    <span class="text-muted">Chưa có hình ảnh</span>
+                                @endif
+                            </td>
+                        </tr>
+                        <tr></tr>
+                            <th>Nơi hiển thị</th>
+                            <td>{{ $data_voucher->block ?? '' }}</td>
+                        </tr>
                     </tbody>
                 </table>
                 <div>
@@ -144,7 +159,7 @@
                                     id="close-modal"></button>
                             </div>
                             <form class="tablelist-form" name="_form" value="edit" id="myForm9" autocomplete="off"
-                                action="{{ url("dashboard/voucher/$data_voucher->id/update") }}" method="POST">
+                                action="{{ url("dashboard/voucher/$data_voucher->id/update") }}" method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <input type="hidden" name="_form" value="edit">
                                 <div class="modal-body">
@@ -240,6 +255,39 @@
                                             @enderror
                                         </div>
                                     </div>
+                                    <div class="mb-3">
+                                        <label for="block-field" class="form-label">Vị trí hiển thị</label>
+                                        <select id="block" name="block" class="form-select">
+                                            <option value="">Chọn vị trí</option>
+                                            <option value="1" {{ $data_voucher->block == 1 ? 'selected' : '' }}>1</option>
+                                            <option value="2" {{ $data_voucher->block == 2 ? 'selected' : '' }}>2</option>
+                                            <option value="3" {{ $data_voucher->block == 3 ? 'selected' : '' }}>3</option>
+                                        </select>
+                                        <div class="text-danger">
+                                            @error('block')
+                                                {{ $message }}
+                                            @enderror
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="image-field" class="form-label">Ảnh đại diện</label>
+                                        <input type="file" id="image" name="image" class="form-control"
+                                            accept=".jpg,.jpeg,.png" />
+                                        <div class="text-danger">
+                                            @error('image')
+                                                {{ $message }}
+                                            @enderror
+                                        </div>
+                                        @if ($data_voucher->image)
+                                            <div class="mt-2">
+                                                <img src="{{ asset($data_voucher->image) }}" alt="Voucher Image"
+                                                    class="img-fluid" style="max-width: 200px;">
+                                            </div>
+                                        @else
+                                            <div class="mt-2">
+                                                <span class="text-muted">Chưa có hình ảnh</span>
+                                            </div>
+                                        @endif
                                     <div class="row gy-4 mb-3">
                                         <div class="col-md-6">
                                             <div>

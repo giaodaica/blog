@@ -26,7 +26,7 @@
             @endif
             @if (session('error'))
                 <div class="d-none toast-message" data-message="{{ session('error') }}" data-type="danger"></div>
-            
+
             @endif
               @if (session('info'))
                 <div class="d-none toast-message" data-message="{{ session('info') }}" data-type="info"></div>
@@ -92,7 +92,7 @@
                         </div>
                     </div>
                     <div class="row mt-20px">
-                   
+
                             <div class="col-xl-6 col-xxl-7 col-md-6">
                             <form action="{{ route('cart.applyVoucher') }}" method="POST" class="row g-2 align-items-center">
                                 @csrf
@@ -140,7 +140,7 @@
                                         {{ number_format($subtotal, 0, ',', '.') }} đ
                                     </td>
                                 </tr>
-                              
+
                                     <tr class="max_discount">
                                         <th class="fw-600 text-dark-gray alt-font">
                                             {{ session('voucher_code') ? 'Voucher' : 'Mã giảm giá' }}
@@ -188,20 +188,20 @@
 @endsection
 @section('js-page-custom')
   <script>
-// ...existing code...
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Desktop check all
+
     const selectAllDesktop = document.getElementById('select-all-cart');
-    // Mobile check all
+
     const selectAllMobile = document.getElementById('select-all-cart-mobile');
-    // Tất cả checkbox sản phẩm
+
     const itemCheckboxes = document.querySelectorAll('.cart-item-checkbox:not(#select-all-cart):not(#select-all-cart-mobile)');
 
     function setAllCheckboxes(checked) {
         itemCheckboxes.forEach(cb => cb.checked = checked);
     }
 
-    // Khi click desktop check all
+
     if (selectAllDesktop) {
         selectAllDesktop.addEventListener('change', function() {
             setAllCheckboxes(this.checked);
@@ -209,7 +209,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Khi click mobile check all
+
     if (selectAllMobile) {
         selectAllMobile.addEventListener('change', function() {
             setAllCheckboxes(this.checked);
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Khi click từng checkbox sản phẩm
+
     itemCheckboxes.forEach(cb => {
         cb.addEventListener('change', function() {
             const allChecked = Array.from(itemCheckboxes).every(c => c.checked);
@@ -226,7 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-// ...existing code...
+
 </script>
 <script>
 document.getElementById('delete-selected-btn').addEventListener('click', function (e) {
@@ -236,7 +236,7 @@ document.getElementById('delete-selected-btn').addEventListener('click', functio
     const ids = Array.from(selected).map(cb => cb.value);
 
     if (ids.length === 0) {
-        alert("Vui lòng chọn sản phẩm để xoá.");
+        showToast("Vui lòng chọn sản phẩm để xoá.", "warning");
         return;
     }
 
@@ -251,17 +251,18 @@ document.getElementById('delete-selected-btn').addEventListener('click', functio
     .then(res => res.json())
     .then(data => {
         if (data.success) {
-            alert('Đã xoá sản phẩm thành công.');
-            location.reload();
+            showToast('Đã xoá sản phẩm thành công.', 'success');
+            setTimeout(() => location.reload(), 1000);
         } else {
-            alert('Xoá thất bại.');
+            showToast('Xoá thất bại.', 'danger');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Có lỗi xảy ra.');
+        showToast('Có lỗi xảy ra.', 'danger');
     });
 });
+
 </script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
@@ -302,7 +303,7 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <script>
-  
+
 function showToast(message, type = 'info') {
     const container = document.getElementById('toast-container');
     if (!container) return;
@@ -327,7 +328,7 @@ function showToast(message, type = 'info') {
     toast.querySelector('.btn-close').onclick = () => toast.remove();
 }
 
-// Sau đó dùng trong bất kỳ đâu
+
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.toast-message').forEach(function(el) {
         const msg = el.getAttribute('data-message');
@@ -345,7 +346,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         @media (max-width: 575.98px) {
     .coupon-code-panel.mobile {
-        padding-right: 1px !important; /* hoặc px-3 nếu table dùng */
+        padding-right: 1px !important;
     }
     .cart-item-checkbox {
         margin-right: 0 !important;

@@ -227,7 +227,7 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Có lỗi xảy ra khi đặt hàng: ' . $e->getMessage());
         }
     }
-
+   
     public function done()
     {
         return view('pages.shop.success_checkout');
@@ -237,6 +237,8 @@ class OrderController extends Controller
     {
         $action = ['pending', 'confirmed', 'shipping', 'success', 'cancelled'];
         $type = $request->query('type');
+        $count = OrderHistories::where('from_status', 'failed')->count();
+
         if ($type && !in_array($type, $action)) {
             return abort(403, 'Không có hành động này');
         }
@@ -246,18 +248,33 @@ class OrderController extends Controller
             $data_order = Order::paginate(10);
         }
         // dd($data_order);
-        return view('dashboard.pages.order.index', compact('data_order'));
+        return view('dashboard.pages.order.index', compact('data_order', 'count'));
     }
     public function db_order_change(Request $request, $id)
     {
+
         $before = $request->change;
         // dd($before);
+        $request->validate(
+            [
+                'content' => 'nullable|string|max:255',
+            ],
+            [
+                'content.max' => 'Nội dung không được quá 255 ký tự',
+                'content.string' => 'Nội dung phải là chuỗi ký tự',
+            ]
+        );
+        if (!$request->content) {
+            $content = $request->content1;
+        }
         $data_change = ['pending', 'confirmed', 'shipping', 'cancelled', 'failed', 'return'];
         if ($before && !in_array($before, $data_change)) {
             return  abort(403, "Hành động không hợp lệ");
         }
         $old_status = Order::find($id);
         $present = Order::find($id);
+        $count = OrderHistories::where('from_status', 'failed')->count();
+
         if (!$present || !$old_status) {
             return abort(403, 'Không thấy đơn hàng này vui lòng kiểm tra lại');
         }
@@ -303,7 +320,7 @@ class OrderController extends Controller
                 }
                 break;
             case 'cancelled':
-                if ($present->status == 'failed' || $present->status == 'pending' || $present->status == 'confirmed') {
+                if ($present->status == 'failed' || $present->status == 'pending' || $present->status == 'confirmed' || $count == 2) {
                     $present->status = 'cancelled';
                     $note = 'Đơn hàng đã được hủy theo yêu cầu của khách hàng';
                 } else {
@@ -319,8 +336,8 @@ class OrderController extends Controller
             'from_status' => $old_status->status,
             'to_status' => $present->status,
             'note' => $note
-
         ]);
+
 
 
         return redirect()->back()->with('success', 'Cập nhật trạng thái đơn hàng thành công!');
@@ -328,6 +345,7 @@ class OrderController extends Controller
     public function db_order_show($id)
     {
         $data_order = Order::join('vouchers', 'vouchers.id', 'orders.voucher_id')->join('address_books', 'address_books.id', 'orders.address_books_id')->join('users', 'users.id', 'orders.user_id')->select(
+
             'orders.*',
             'vouchers.code',
             'address_books.name as ad_name',
@@ -346,8 +364,7 @@ class OrderController extends Controller
         $history_3 = OrderHistories::where('from_status', 'shipping')->where('to_status', 'failed')->where('order_id', $id)->first();
         $history_4 = OrderHistories::where('from_status', 'failed')->where('to_status', 'shipping')->where('order_id', $id)->first();
         $history_5 = OrderHistories::where('from_status', 'shipping')->where('to_status', 'success')->where('order_id', $id)->first();
-
-        return view('dashboard.pages.order.detail', compact('data_order', 'data_order_items'));
+        return view('dashboard.pages.order.detail', compact('data_order', 'data_order_items', 'histoty_order'));
     }
 
     // Method để cập nhật loại vận chuyển trong checkout
@@ -410,8 +427,8 @@ class OrderController extends Controller
                 'vnp_OrderInfo.required' => 'Thông tin đơn hàng không được để trống',
                 'vnp_PayDate.required' => 'Ngày thanh toán không được để trống',
                 'vnp_SecureHash.required' => 'Chữ ký bảo mật không được để trống'
-            ]);
 
+            ]);
             $responseCode = $request->get('vnp_ResponseCode');
             $transactionStatus = $request->get('vnp_TransactionStatus');
             $txnRef = $request->get('vnp_TxnRef');

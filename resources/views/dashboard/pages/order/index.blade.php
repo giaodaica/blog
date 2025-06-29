@@ -150,7 +150,12 @@
                                     </li>
                                 </ul>
 
-                                <div class="table-responsive table-card mb-1">
+                               @if($data_order->empty())
+                                    <div class="alert alert-warning text-center" role="alert">
+                                        Không có đơn hàng nào để hiển thị.
+                                    </div>
+                                    @else
+                                                 <div class="table-responsive table-card mb-1">
                                     <table class="table table-nowrap align-middle" id="orderTable">
                                         <thead class="text-muted table-light">
                                             <tr class="text-uppercase">
@@ -160,7 +165,7 @@
                                                             value="option">
                                                     </div>
                                                 </th>
-                                                <th >Order ID</th>
+                                                <th>Order ID</th>
                                                 <th class="" data-sort="customer_name">Khách hàng</th>
                                                 <th class="" data-sort="date">Thời gian đặt</th>
                                                 <th class="" data-sort="amount">Đơn giá</th>
@@ -181,11 +186,13 @@
                                                                 name="checkAll" value="option1">
                                                         </div>
                                                     </th>
-                                                    <td class="id"><a href="{{url("dashboard/order/$render_order->id")}}"
+                                                    <td class="id"><a
+                                                            href="{{ url("dashboard/order/$render_order->id") }}"
                                                             class="fw-medium link-primary">{{ $render_order->code_order }}</a>
                                                     </td>
                                                     <td class="product_name">{{ $render_order->name }}</td>
-                                                    <td class="date">{{ formatDate($render_order->created_at) }}</small></td>
+                                                    <td class="date">{{ formatDate($render_order->created_at) }}</small>
+                                                    </td>
                                                     <td class="amount">{{ number_format($render_order->final_amount) }}
                                                     </td>
                                                     <td class="payment">{{ $render_order->pay_method }}</td>
@@ -258,7 +265,7 @@
                                                             <li class="list-inline-item" data-bs-toggle="tooltip"
                                                                 data-bs-trigger="hover" data-bs-placement="top"
                                                                 title="View">
-                                                                <a href="{{url("dashboard/order/$render_order->id")}}"
+                                                                <a href="{{ url("dashboard/order/$render_order->id") }}"
                                                                     class="text-primary d-inline-block">
                                                                     <i class="ri-eye-fill fs-16"></i>
                                                                 </a>
@@ -292,13 +299,9 @@
                                                                         <input type="hidden" name="change" value="pending">
                                                                         <button class="btn btn-success">Xác nhận</button>
                                                                     </form>
-                                                                    <form
-                                                                        action="{{ url("dashboard/order/change/$render_order->id") }}"
-                                                                        method="post">
-                                                                        @csrf
-                                                                        <input type="hidden" name="change" value="cancelled">
-                                                                        <button class="btn btn-danger">Hủy đơn</button>
-                                                                    </form>
+                                                                    <button type="button" class="btn btn-danger add-btn"
+                                                                        data-bs-toggle="modal" id="create-btn"
+                                                                        data-bs-target="#showModalcancel">Hủy đơn</button>
                                                                 </div>
                                                             @break
 
@@ -311,13 +314,9 @@
                                                                         <input type="hidden" name="change" value="confirmed">
                                                                         <button class="btn btn-success">Giao Hàng</button>
                                                                     </form>
-                                                                    <form
-                                                                        action="{{ url("dashboard/order/change/$render_order->id") }}"
-                                                                        method="post">
-                                                                        @csrf
-                                                                        <input type="hidden" name="change" value="cancelled">
-                                                                        <button class="btn btn-danger">Hủy đơn</button>
-                                                                    </form>
+                                                                    <button type="button" class="btn btn-danger add-btn"
+                                                                        data-bs-toggle="modal" id="create-btn"
+                                                                        data-bs-target="#showModalcancel">Hủy đơn</button>
                                                                 </div>
                                                             @break
 
@@ -330,13 +329,9 @@
                                                                         <input type="hidden" name="change" value="shipping">
                                                                         <button class="btn btn-success">Đã giao</button>
                                                                     </form>
-                                                                    <form
-                                                                        action="{{ url("dashboard/order/change/$render_order->id") }}"
-                                                                        method="post">
-                                                                        @csrf
-                                                                        <input type="hidden" name="change" value="failed">
-                                                                        <button class="btn btn-danger">Giao thất bại</button>
-                                                                    </form>
+                                                                  <button type="button" class="btn btn-danger add-btn"
+                                                                        data-bs-toggle="modal" id="create-btn"
+                                                                        data-bs-target="#showModalfailed">Giao Thất Bại</button>
                                                                 </div>
                                                             @break
 
@@ -349,13 +344,9 @@
                                                                         <input type="hidden" name="change" value="return">
                                                                         <button class="btn btn-success">Giao lại</button>
                                                                     </form>
-                                                                    <form
-                                                                        action="{{ url("dashboard/order/change/$render_order->id") }}"
-                                                                        method="post">
-                                                                        @csrf
-                                                                        <input type="hidden" name="change" value="cancelled">
-                                                                        <button class="btn btn-danger">Hủy đơn</button>
-                                                                    </form>
+                                                                    <button type="button" class="btn btn-danger add-btn"
+                                                                        data-bs-toggle="modal" id="create-btn"
+                                                                        data-bs-target="#showModalcancel">Hủy đơn</button>
                                                                 </div>
                                                             @break
 
@@ -389,6 +380,7 @@
                                     </div>
                                 </div>
                             </div>
+                            {{-- show modal --}}
                             <div class="modal fade" id="showModal" tabindex="-1" aria-labelledby="exampleModalLabel"
                                 aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
@@ -501,8 +493,98 @@
                                     </div>
                                 </div>
                             </div>
-
+                            <div class="modal fade" id="showModalfailed" tabindex="-1"
+                                aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-light p-3">
+                                            <h5 class="modal-title" id="exampleModalLabel">Giao hàng thất bại</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close" id="close-modal"></button>
+                                        </div>
+                                        <form action="{{ url("dashboard/order/change/$render_order->id") }}" method="post" class="tablelist-form" autocomplete="off" id="reasonFormFailed">
+                                            <div class="modal-body">
+                                                @csrf
+                                                <input type="hidden" name="change" value="failed">
+                                                <div class="mb-3">
+                                                    <label for="reason-select-failed" class="form-label">Lý do</label>
+                                                    <select id="reason-select-failed" name="content1"
+                                                        class="form-control">
+                                                        <option value="">-- Chọn lý do --</option>
+                                                        <option value="Khách không nhận hàng">Khách không nhận hàng
+                                                        </option>
+                                                        <option value="Không liên lạc được">Không liên lạc được</option>
+                                                        <option value="Địa chỉ không đúng">Địa chỉ không đúng</option>
+                                                        <option value="Lý do khác">Lý do khác</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3" id="other-reason-group-failed" style="display:none;">
+                                                    <label for="other-reason-failed" class="form-label">Nhập lý do
+                                                        khác</label>
+                                                    <input type="text" id="other-reason-failed" name="content"
+                                                        class="form-control" placeholder="Nhập lý do khác" />
+                                                </div>
+                                            </div>
+                                           <div class="modal-footer">
+                                                <div class="hstack gap-2 justify-content-end">
+                                                    <button type="button" class="btn btn-light"
+                                                        data-bs-dismiss="modal">Đóng</button>
+                                                    <button type="submit" class="btn btn-success" id="add-btn">Cập
+                                                        Nhật</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal fade" id="showModalcancel" tabindex="-1"
+                                aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered">
+                                    <div class="modal-content">
+                                        <div class="modal-header bg-light p-3">
+                                            <h5 class="modal-title" id="exampleModalLabel">
+                                                Hủy đơn hàng
+                                           </h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close" id="close-modal"></button>
+                                        </div>
+                                        <form action="{{ url("dashboard/order/change/$render_order->id") }}" class="tablelist-form" autocomplete="off" id="reasonFormCancel" method="post">
+                                            @csrf
+                                            <input type="hidden" name="change" value="cancelled">
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label for="reason-select-cancel" class="form-label">Lý do</label>
+                                                    <select id="reason-select-cancel" name="content1"
+                                                        class="form-control">
+                                                        <option value="">-- Chọn lý do --</option>
+                                                        <option value="Khách không nhận hàng">Khách không nhận hàng
+                                                        </option>
+                                                        <option value="Không liên lạc được">Không liên lạc được</option>
+                                                        <option value="Địa chỉ không đúng">Địa chỉ không đúng</option>
+                                                        <option value="Lý do khác">Lý do khác</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3" id="other-reason-group-cancel" style="display:none;">
+                                                    <label for="other-reason-cancel" class="form-label">Nhập lý do
+                                                        khác</label>
+                                                    <input type="text" id="other-reason-cancel" name="content"
+                                                        class="form-control" placeholder="Nhập lý do khác" />
+                                                </div>
+                                            </div>
+                                         <div class="modal-footer">
+                                                <div class="hstack gap-2 justify-content-end">
+                                                    <button type="button" class="btn btn-light"
+                                                        data-bs-dismiss="modal">Đóng</button>
+                                                    <button type="submit" class="btn btn-success" >Cập
+                                                        Nhật</button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
                             <!-- Modal -->
+                                    @endif
                             <div class="modal fade flip" id="deleteOrder" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">
@@ -555,4 +637,53 @@
     <script src="{{ asset('admin/assets/libs/sweetalert2/sweetalert2.min.js') }}"></script>
 
     <!-- App js -->
+    <script>
+    // ...existing code...
+['Failed', 'Cancel'].forEach(function(type) {
+    const form = document.getElementById('reasonForm' + type);
+    const reasonSelect = document.getElementById('reason-select-' + type.toLowerCase());
+    const otherReasonGroup = document.getElementById('other-reason-group-' + type.toLowerCase());
+    const otherReasonInput = document.getElementById('other-reason-' + type.toLowerCase());
+
+    if (form && reasonSelect && otherReasonGroup && otherReasonInput) {
+        reasonSelect.addEventListener('change', function() {
+            if (this.value === 'Lý do khác') {
+                otherReasonGroup.style.display = 'block';
+                setTimeout(() => otherReasonInput.focus(), 100);
+            } else {
+                otherReasonGroup.style.display = 'none';
+                otherReasonInput.value = '';
+            }
+        });
+
+        const validation = new JustValidate(form);
+
+        validation
+            .addField('#' + reasonSelect.id, [
+                {
+                    validator: (value) => {
+                        return value !== '';
+                    },
+                    errorMessage: 'Vui lòng chọn lý do',
+                }
+            ])
+            .addField('#' + otherReasonInput.id, [
+                {
+                    validator: (value) => {
+                        if (reasonSelect.value === 'Lý do khác') {
+                            return value.trim() !== '';
+                        }
+                        return true;
+                    },
+                    errorMessage: 'Vui lòng nhập lý do khác',
+                }
+            ])
+            .onSuccess((event) => {
+                event.target.submit();
+            });
+    }
+});
+
+// ...existing code...
+    </script>
 @endsection
