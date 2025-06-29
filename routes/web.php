@@ -40,7 +40,7 @@ Route::get('/reviews/list/{product_id}', [ReviewController::class, 'list'])->nam
 
 Route::post('add-to-cart/{id}', [CartController::class, 'add_to_cart']);
 
-Route::get('info', [HomeController::class, 'info_customer'])->name('home.info')->middleware('auth', 'cache');
+Route::get('info', [InfoController::class, 'account'])->name('home.info')->middleware('auth', 'cache');
 Route::get('aonam/{slug}', [ProductDetailController::class, 'index'])->name('home.show');
 Route::get('cart', [CartController::class, 'index'])->name('home.cart');
 Route::delete('/cart/delete-selected', [CartController::class, 'deleteSelected'])->name('cart.deleteSelected');

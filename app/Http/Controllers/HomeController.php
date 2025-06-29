@@ -52,16 +52,7 @@ class HomeController extends Controller
             ->paginate(5);
         return view('pages.shop.index', compact('voucher_block_3', 'bestSellers', 'featured'));
     }
-    public function info_customer()
-    {
-        $user = Auth::user();
-        $orders = Order::with(['orderItems.productVariant.color', 'orderItems.productVariant.size', 'orderItems.productVariant.product'])
-            ->where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return view('pages.shop.account', compact('orders'));
-    }
+    
     public function show($id)
     {
         return view('pages.shop.show');
