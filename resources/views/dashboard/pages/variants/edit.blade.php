@@ -121,7 +121,7 @@
                     </div>
 
                     <div class="col-lg-4">
-                        <h6 class="fw-semibold">Giá khuyến mãi</h6>
+                        <h6 class="fw-semibold">Giá bán</h6>
                         <input type="number" name="sale_price" class="form-control" min="0"
                             value="{{ old('sale_price', intval($variant->sale_price)) }}"
                             {{ $isProductDeleted ? 'disabled' : '' }}>

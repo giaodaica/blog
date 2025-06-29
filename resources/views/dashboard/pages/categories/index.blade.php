@@ -19,7 +19,7 @@
                 </div>
             </div>
             <!-- Kết thúc tiêu đề -->
-     @if (session('success'))
+            @if (session('success'))
                 <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('success') }}
                     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -30,14 +30,36 @@
                     <div class="card" id="categoryList">
                         <div class="card-header border-0">
                             <div class="row align-items-center gy-3">
-                                <div class="col-sm"></div>
+                                <div class="col-sm">
+                                    <ul class="nav nav-pills mb-3">
+                                        <li class="nav-item">
+                                            <a class="nav-link {{ $status === 'active' ? 'active' : '' }}"
+                                                href="{{ route('categories.index', ['status' => 'active']) }}">
+                                                Đang hoạt động ({{ $countActive }})
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link {{ $status === 'trashed' ? 'active' : '' }}"
+                                                href="{{ route('categories.index', ['status' => 'trashed']) }}">
+                                                Đã xóa ({{ $countTrashed }})
+                                            </a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link {{ $status === 'all' ? 'active' : '' }}"
+                                                href="{{ route('categories.index', ['status' => 'all']) }}">
+                                                Tất cả ({{ $countAll }})
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+
                                 <div class="col-sm-auto">
                                     <div class="d-flex gap-1 flex-wrap">
                                         <a href="{{ route('categories.create') }}" class="btn btn-success"
                                             id="addCategory-btn">
                                             <i class="ri-add-line align-bottom me-1"></i> Thêm danh mục
                                         </a>
-                                       
+
                                         {{-- Nút xóa nhiều chưa có logic --}}
                                     </div>
                                 </div>
@@ -79,7 +101,8 @@
                                                 <td class="name">{{ $category->name }}</td>
                                                 <td class="image">
                                                     @if ($category->image)
-                                                        <img src="{{ asset($category->image) }}" alt="{{ $category->name }}"
+                                                        <img src="{{ asset($category->image) }}"
+                                                            alt="{{ $category->name }}"
                                                             style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;">
                                                     @else
                                                         <span class="text-muted">Không có ảnh</span>
@@ -93,35 +116,57 @@
                                                     @endif
                                                 </td>
                                                 <td>
+
                                                     <ul class="list-inline hstack gap-2 mb-0">
-                                                        <li class="list-inline-item" data-bs-toggle="tooltip"
-                                                            data-bs-trigger="hover" data-bs-placement="top" title="Xem">
-                                                            <a href="{{ route('categories.show', $category->id) }}"
-                                                                class="text-primary d-inline-block">
-                                                                <i class="ri-eye-fill fs-16"></i>
-                                                            </a>
-                                                        </li>
-                                                        <li class="list-inline-item edit" data-bs-toggle="tooltip"
-                                                            data-bs-trigger="hover" data-bs-placement="top"
-                                                            title="Chỉnh sửa">
-                                                            <a href="{{ route('categories.edit', $category->id) }}"
-                                                                class="text-primary d-inline-block">
-                                                                <i class="ri-pencil-fill fs-16"></i>
-                                                            </a>
-                                                        </li>
-                                                        <li class="list-inline-item" data-bs-toggle="tooltip"
-                                                            data-bs-trigger="hover" data-bs-placement="top" title="Xóa">
-                                                            <form action="{{ route('categories.destroy', $category->id) }}"
-                                                                method="POST" class="delete-form">
-                                                                @csrf
-                                                                @method('DELETE')
-                                                                <button type="submit"
-                                                                    class="btn btn-link p-0 text-danger d-inline-block remove-item-btn"
-                                                                    style="border:none; background:none;" >
-                                                                    <i class="ri-delete-bin-5-fill fs-16"></i>
-                                                                </button>
-                                                            </form>
-                                                        </li>
+                                                        @if ($status === 'trashed')
+                                                            {{-- Nút Khôi phục --}}
+                                                            <li class="list-inline-item" data-bs-toggle="tooltip"
+                                                                data-bs-trigger="hover" data-bs-placement="top"
+                                                                title="Khôi phục">
+                                                                <form
+                                                                    action="{{ route('categories.restore', $category->id) }}"
+                                                                    method="POST" class="restore-form">
+                                                                    @csrf
+                                                                    <button type="submit"
+                                                                        class="btn btn-link p-0 text-success d-inline-block"
+                                                                        style="border:none; background:none;">
+                                                                        <i class="ri-arrow-go-back-fill fs-16"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </li>
+                                                        @else
+                                                            <li class="list-inline-item" data-bs-toggle="tooltip"
+                                                                data-bs-trigger="hover" data-bs-placement="top"
+                                                                title="Xem">
+                                                                <a href="{{ route('categories.show', $category->id) }}"
+                                                                    class="text-primary d-inline-block">
+                                                                    <i class="ri-eye-fill fs-16"></i>
+                                                                </a>
+                                                            </li>
+                                                            <li class="list-inline-item edit" data-bs-toggle="tooltip"
+                                                                data-bs-trigger="hover" data-bs-placement="top"
+                                                                title="Chỉnh sửa">
+                                                                <a href="{{ route('categories.edit', $category->id) }}"
+                                                                    class="text-primary d-inline-block">
+                                                                    <i class="ri-pencil-fill fs-16"></i>
+                                                                </a>
+                                                            </li>
+                                                            <li class="list-inline-item" data-bs-toggle="tooltip"
+                                                                data-bs-trigger="hover" data-bs-placement="top"
+                                                                title="Xóa">
+                                                                <form
+                                                                    action="{{ route('categories.destroy', $category->id) }}"
+                                                                    method="POST" class="delete-form">
+                                                                    @csrf
+                                                                    @method('DELETE')
+                                                                    <button type="submit"
+                                                                        class="btn btn-link p-0 text-danger d-inline-block remove-item-btn"
+                                                                        style="border:none; background:none;">
+                                                                        <i class="ri-delete-bin-5-fill fs-16"></i>
+                                                                    </button>
+                                                                </form>
+                                                            </li>
+                                                            @endif
                                                     </ul>
                                                 </td>
                                             </tr>

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Vouchers;
 use App\Models\Products;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Order;
 
 class HomeController extends Controller
 {
@@ -25,8 +27,8 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $voucher_id = Vouchers::where('type_discount', 'percent')->where('status', 'active')->where('value', 15)->where('max_used', '>=', 1)->first();
-        // Sản Phẩm Bán Chạy Nhất   
+        $voucher_block_3 = Vouchers::where('status', 'active')->where('block', 3)->where('max_used', '>=', 1)->first();
+        // Sản Phẩm Bán Chạy Nhất
         $bestSellers = Products::with(['category', 'variants.color', 'variants.size'])
             ->whereHas('category', function ($query) {
                 $query->where('status', '1');
@@ -48,11 +50,17 @@ class HomeController extends Controller
             ->whereNull('deleted_at')
             ->orderBy('created_at', 'desc')
             ->paginate(5);
-        return view('pages.shop.index', compact('voucher_id', 'bestSellers', 'featured'));
+        return view('pages.shop.index', compact('voucher_block_3', 'bestSellers', 'featured'));
     }
     public function info_customer()
     {
-        return view('pages.shop.account');
+        $user = Auth::user();
+        $orders = Order::with(['orderItems.productVariant.color', 'orderItems.productVariant.size', 'orderItems.productVariant.product'])
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('pages.shop.account', compact('orders'));
     }
     public function show($id)
     {

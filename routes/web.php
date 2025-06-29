@@ -22,6 +22,7 @@ use App\Http\Controllers\VouchersController;
 use App\Http\Controllers\web\ProductController;
 use App\Http\Controllers\web\ProductDetailController;
 use App\Http\Controllers\web\ReviewController;
+use App\Http\Controllers\AddressBookController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
@@ -37,7 +38,7 @@ Route::get('/search/filter', [SearchController::class, 'search'])->name('search.
 Route::post('/reviews', [ReviewController::class, 'store'])->name('reviews.store')->middleware('auth');
 Route::get('/reviews/list/{product_id}', [ReviewController::class, 'list'])->name('reviews.list');
 
-Route::post('add-to-cart/{id}',[CartController::class,'add_to_cart']);
+Route::post('add-to-cart/{id}', [CartController::class, 'add_to_cart']);
 
 Route::get('info', [HomeController::class, 'info_customer'])->name('home.info')->middleware('auth', 'cache');
 Route::get('aonam/{slug}', [ProductDetailController::class, 'index'])->name('home.show');
@@ -50,8 +51,19 @@ Route::get('/cart/remove-voucher', [CartController::class, 'removeVoucher'])->na
 Route::post('/cart/update-selected-ajax', [CartController::class, 'ajaxUpdateSelected'])->name('cart.ajaxUpdateSelected');
 Route::get('/aonam/{slug}', [ProductDetailController::class, 'index'])->name('home.show');
 
-Route::get('checkout', [OrderController::class, 'index'])->name('home.checkout');
-Route::get('done', [OrderController::class, 'done'])->name('home.done');
+Route::middleware(['auth'])->group(function () {
+    Route::get('checkout', [OrderController::class, 'index'])->name('home.checkout');
+    Route::post('checkout', [OrderController::class, 'processCheckout'])->name('home.processCheckout');
+    Route::post('checkout/update-shipping-type', [OrderController::class, 'updateShippingType'])->name('checkout.updateShippingType');
+    Route::get('done', [OrderController::class, 'done'])->name('home.done');
+    
+    // Address management
+    Route::get('addresses', [AddressBookController::class, 'index'])->name('addresses.index');
+    Route::post('addresses', [AddressBookController::class, 'store'])->name('addresses.store');
+    Route::put('addresses/{id}', [AddressBookController::class, 'update'])->name('addresses.update');
+    Route::delete('addresses/{id}', [AddressBookController::class, 'destroy'])->name('addresses.destroy');
+});
+
 Route::get('dashboard', [HomeController::class, 'admin']);
 
 
@@ -90,8 +102,10 @@ Route::prefix('dashboard')->group(function () {
     Route::post('voucher/disable/{id}', [VouchersController::class, 'disable']);
     Route::post('voucher/active/{id}', [VouchersController::class, 'active']);
     Route::resource('products', ProductsController::class);
+
     Route::post('/products/{id}/restore', [ProductsController::class, 'restore'])->name('products.restore');
     Route::resource('categories', CategoriesController::class);
+    Route::post('/categories/{id}/restore', [CategoriesController::class, 'restore'])->name('categories.restore');
 
     // phần order
     Route::get('order', [OrderController::class, 'db_order'])->name('dashboard.order');
@@ -129,5 +143,5 @@ Route::prefix('dashboard')->name('dashboard.')->group(function () {
     //  Route::post('permission/order', [RoleController::class, 'order'])->name('permission.order');
 });
 
-// Route cho admin trả lời bình luận
-Route::post('reviews/{id}/reply', [\App\Http\Controllers\web\ReviewController::class, 'update'])->name('reviews.reply');
+// VNPAY Payment Routes
+Route::post('/vnpay/ipn', [OrderController::class, 'vnpayIpn'])->name('vnpay.ipn');

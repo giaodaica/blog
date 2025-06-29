@@ -7,12 +7,33 @@ use Illuminate\Http\Request;
 
 class CategoriesController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $categories = Categories::paginate(10);
-        return view('dashboard.pages.categories.index', compact('categories'));
-    }
+        $status = $request->get('status', 'active'); // mặc định là active
 
+        if ($status === 'trashed') {
+            $categories = Categories::onlyTrashed()->paginate(10);
+        } elseif ($status === 'all') {
+            $categories = Categories::withTrashed()->paginate(10);
+        } else {
+            $categories = Categories::paginate(10); // chỉ lấy active
+        }
+
+        // Đếm số lượng
+        $countActive = Categories::count();
+        $countTrashed = Categories::onlyTrashed()->count();
+        $countAll = $countActive + $countTrashed;
+
+        return view('dashboard.pages.categories.index', compact('categories', 'status', 'countActive', 'countTrashed', 'countAll'));
+    }
+    public function restore($id)
+    {
+        $category = Categories::onlyTrashed()->findOrFail($id);
+        $category->restore();
+
+        return redirect()->route('categories.index', ['status' => 'active'])
+            ->with('success', 'Khôi phục danh mục thành công.');
+    }
     public function create()
     {
         return view('dashboard.pages.categories.create');

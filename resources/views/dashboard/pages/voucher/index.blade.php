@@ -310,7 +310,7 @@
                                         <form class="tablelist-form" name="_form" value="add" id="myForm"
                                             autocomplete="off"
                                             action="{{ url('dashboard/voucher/add_voucher?action=' . $id) }}"
-                                            method="POST">
+                                            method="POST" enctype="multipart/form-data">
                                             @csrf
                                             <input type="hidden" name="_form" value="add">
 
@@ -411,6 +411,27 @@
                                                         @enderror
                                                     </div>
                                                 </div>
+                                                <div class="mb-3">
+                                                    <label for="block-field" class="form-label">Nơi hiển thị<span>( <a
+                                                                href="http://example.com" target="_blank"
+                                                                rel="noopener noreferrer">Xem thêm</a> )</span></label>
+                                                    <select name="block" id="block" class="form-select">
+                                                        <option value="">Chọn nơi hiển thị</option>
+                                                        <option value="1">1</option>
+                                                        <option value="2">2</option>
+                                                        <option value="3">3</option>
+                                                    </select>
+                                                </div>
+                                                <div class="mb-3">
+                                                    <label for="image-field" class="form-label">Ảnh đại diện</label>
+                                                    <input type="file" id="image" name="image"
+                                                        class="form-control" accept=".jpg, .jpeg, .png" />
+                                                    <div class="text-danger">
+                                                        @error('image')
+                                                            {{ $message }}
+                                                        @enderror
+                                                    </div>
+                                                </div>
                                                 <div class="row gy-4 mb-3">
                                                     <div class="col-md-6">
                                                         <div>
@@ -470,6 +491,26 @@
     </div>
 @endsection
 @section('js-content')
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+
+        @if (session('success'))
+            Swal.fire({
+                icon: 'success',
+                title: 'Thành công!',
+                text: "{{ session('success') }}",
+            });
+        @endif
+
+        @if (session('error'))
+            Swal.fire({
+                icon: 'error',
+                title: 'Lỗi!',
+                text: "{{ session('error') }}",
+            });
+        @endif
+    </script>
     <script>
         const validation = new JustValidate('#myForm');
 
@@ -515,7 +556,7 @@
                 }
             ])
 
-        
+
             .addField('#category_id', [{
                 rule: 'required',
                 errorMessage: 'Vui lòng chọn danh mục',

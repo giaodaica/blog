@@ -52,11 +52,11 @@
                                                 <td>
                                                     <div class="d-flex">
                                                         <div class="flex-shrink-0 avatar-md bg-light rounded p-1">
-                                                            <img src="assets/images/products/img-8.png" alt=""
+                                                            <img src="{{ asset($rende_order_items->product_image_url) }}" alt=""
                                                                 class="img-fluid d-block">
                                                         </div>
                                                         <div class="flex-grow-1 ms-3">
-                                                            <h5 class="fs-15"><a href=""
+                                                            <h5 class="fs-15"><a rel="noopener noreferrer" target="_blank" href="{{url('dashboard/variants/'.$rende_order_items->product_variant_id)}}"
                                                                     class="link-primary">{{ $rende_order_items->product_name . ' ' . $rende_order_items->color_name }}</a>
                                                             </h5>
                                                             <p class="text-muted mb-0">Màu: <span
@@ -86,7 +86,7 @@
                                                                 {{ number_format($data_order->total_amount) }}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Giảm giá : 15% <br>
+                                                            <td>Giảm giá :  <br>
                                                                 <b><a rel="noopener noreferrer" target="_blank"
                                                                         href="{{ url("dashboard/voucher/s/$data_order->voucher_id") }}">{{ $data_order->code }}</a></b>
                                                             </td>
@@ -95,7 +95,7 @@
                                                                 -{{ number_format($data_order->discount_amount) }}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Phí giao hàng :</td>
+                                                            <td>Phí giao hàng <span>{{ $data_order->shipping_method == 'express' ? '(Giao hàng nhanh)' : '(Giao hàng tiêu chuẩn)' }}</span> : </td>
                                                             <td class="text-end">
                                                                 {{ number_format($data_order->shipping_fee) }}</td>
                                                         </tr>
@@ -131,123 +131,51 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <div class="profile-timeline">
-                                <div class="accordion accordion-flush" id="accordionFlushExample">
-                                    <div class="accordion-item border-0">
-                                        <div class="accordion-header" id="headingOne">
-                                            <a class="accordion-button p-2 shadow-none" data-bs-toggle="collapse"
-                                                href="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="flex-shrink-0 avatar-xs">
-                                                        <div class="avatar-title bg-success rounded-circle">
-                                                            <i class="ri-shopping-bag-line"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex-grow-1 ms-3">
-                                                        <h6 class="fs-15 mb-0 fw-semibold">Đặt hàng -  {{formatDate($data_order->created_at) }}</h6>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </div>
-                                        <div id="collapseOne" class="accordion-collapse collapse show"
-                                            aria-labelledby="headingOne" data-bs-parent="#accordionExample">
-                                            <div class="accordion-body ms-2 ps-5 pt-0">
-                                                <h6 class="mb-1">Đơn hàng đã được đặt lúc.</h6>
-                                                <p class="text-muted">{{formatDate($data_order->created_at) }}</p>
-
-                                                <h6 class="mb-1">Người bán đã tiếp nhận đơn lúc.</h6>
-                                                <p class="text-muted mb-0">Thu, 16 Dec 2021 - 5:48AM</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-item border-0">
-                                        <div class="accordion-header" id="headingTwo">
-                                            <a class="accordion-button p-2 shadow-none" data-bs-toggle="collapse"
-                                                href="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="flex-shrink-0 avatar-xs">
-                                                        <div class="avatar-title bg-success rounded-circle">
-                                                            <i class="mdi mdi-gift-outline"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex-grow-1 ms-3">
-                                                        <h6 class="fs-15 mb-1 fw-semibold">Packed - <span
-                                                                class="fw-normal">Thu, 16 Dec 2021</span></h6>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </div>
-                                        <div id="collapseTwo" class="accordion-collapse collapse show"
-                                            aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
-                                            <div class="accordion-body ms-2 ps-5 pt-0">
-                                                <h6 class="mb-1">Your Item has been picked up by courier partner</h6>
-                                                <p class="text-muted mb-0">Fri, 17 Dec 2021 - 9:45AM</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-item border-0">
-                                        <div class="accordion-header" id="headingThree">
-                                            <a class="accordion-button p-2 shadow-none" data-bs-toggle="collapse"
-                                                href="#collapseThree" aria-expanded="false"
-                                                aria-controls="collapseThree">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="flex-shrink-0 avatar-xs">
-                                                        <div class="avatar-title bg-success rounded-circle">
-                                                            <i class="ri-truck-line"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex-grow-1 ms-3">
-                                                        <h6 class="fs-15 mb-1 fw-semibold">Shipping - <span
-                                                                class="fw-normal">Thu, 16 Dec 2021</span></h6>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </div>
-                                        <div id="collapseThree" class="accordion-collapse collapse show"
-                                            aria-labelledby="headingThree" data-bs-parent="#accordionExample">
-                                            <div class="accordion-body ms-2 ps-5 pt-0">
-                                                <h6 class="fs-14">RQK Logistics - MFDS1400457854</h6>
-                                                <h6 class="mb-1">Your item has been shipped.</h6>
-                                                <p class="text-muted mb-0">Sat, 18 Dec 2021 - 4.54PM</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-item border-0">
-                                        <div class="accordion-header" id="headingFour">
-                                            <a class="accordion-button p-2 shadow-none" data-bs-toggle="collapse"
-                                                href="#collapseFour" aria-expanded="false">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="flex-shrink-0 avatar-xs">
-                                                        <div class="avatar-title bg-light text-success rounded-circle">
-                                                            <i class="ri-takeaway-fill"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex-grow-1 ms-3">
-                                                        <h6 class="fs-14 mb-0 fw-semibold">Out For Delivery</h6>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div class="accordion-item border-0">
-                                        <div class="accordion-header" id="headingFive">
-                                            <a class="accordion-button p-2 shadow-none" data-bs-toggle="collapse"
-                                                href="#collapseFile" aria-expanded="false">
-                                                <div class="d-flex align-items-center">
-                                                    <div class="flex-shrink-0 avatar-xs">
-                                                        <div class="avatar-title bg-light text-success rounded-circle">
-                                                            <i class="mdi mdi-package-variant"></i>
-                                                        </div>
-                                                    </div>
-                                                    <div class="flex-grow-1 ms-3">
-                                                        <h6 class="fs-14 mb-0 fw-semibold">Delivered</h6>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                                <!--end accordion-->
+                            <div class="table-responsive">
+                                <table class="table table-bordered align-middle mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col">STT</th>
+                                            <th scope="col">Người duyệt</th>
+                                            <th scope="col">Thời gian duyệt</th>
+                                            <th scope="col">Trạng thái thay đổi</th>
+                                            <th scope="col">Nội dung</th>
+                                            <th scope="col">Ghi chú</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @forelse ($histoty_order as $key => $history)
+                                            <tr>
+                                            <td>{{ count($histoty_order) - $key }}</td>
+                                                <td>{{ $history->user_name }}</td>
+                                                <td>{{ formatDate($history->created_at) }}</td>
+                                                @php
+                                                    $statusMap = [
+                                                        'pending' => 'Chờ duyệt',
+                                                        'confirmed' => 'Đã duyệt',
+                                                        'shipping' => 'Đang giao',
+                                                        'success' => 'Hoàn thành',
+                                                        'failed' => 'Giao thất bại',
+                                                        'cancelled' => 'Đã hủy',
+                                                        // Thêm các trạng thái khác nếu có
+                                                    ];
+                                                @endphp
+                                                <td>
+                                                    {{ $statusMap[$history->from_status] ?? $history->from_status }}
+                                                    =>
+                                                    {{ $statusMap[$history->to_status] ?? $history->to_status }}
+                                                </td>
+                                                <td>{{ $history->note }}</td>
+                                                <td>{{ $history->content }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr>
+                                                <td colspan="5" class="text-center text-muted">Chưa có lịch sử duyệt đơn
+                                                    hàng</td>
+                                            </tr>
+                                        @endforelse
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -259,21 +187,16 @@
                         <div class="card-header">
                             <div class="d-flex">
                                 <h5 class="card-title flex-grow-1 mb-0"><i
-                                        class="mdi mdi-truck-fast-outline align-middle me-1 text-muted"></i> Logistics
-                                    Details</h5>
-                                <div class="flex-shrink-0">
-                                    <a href="javascript:void(0);" class="badge bg-primary-subtle text-primary fs-11">Track
-                                        Order</a>
-                                </div>
+                                        class="mdi mdi-truck-fast-outline align-middle me-1 text-muted"></i> Vận chuyển</h5>
                             </div>
                         </div>
                         <div class="card-body">
                             <div class="text-center">
                                 <lord-icon src="https://cdn.lordicon.com/uetqnvvg.json" trigger="loop"
                                     colors="primary:#405189,secondary:#0ab39c" style="width:80px;height:80px"></lord-icon>
-                                <h5 class="fs-16 mt-2">RQK Logistics</h5>
-                                <p class="text-muted mb-0">ID: MFDS1400457854</p>
-                                <p class="text-muted mb-0">Payment Mode : Debit Card</p>
+                                <h5 class="fs-16 mt-2">Giaodaica Logistics</h5>
+                                <p class="text-muted mb-0">ID: {{ $data_order->code_order}}</p>
+                                <p class="text-muted mb-0">Phương thức thanh toán : {{ $data_order->pay_method }}</p>
                             </div>
                         </div>
                     </div>
@@ -293,7 +216,7 @@
                                 <li>
                                     <div class="d-flex align-items-center">
                                         <div class="flex-shrink-0">
-                                            <img src="assets/images/users/avatar-3.jpg" alt=""
+                                            <img src="{{asset('assets/images/avt.jpg')}}" alt=""
                                                 class="avatar-sm rounded">
                                         </div>
                                         <div class="flex-grow-1 ms-3">
@@ -335,9 +258,9 @@
                         </div>
                         <div class="card-body">
                             <ul class="list-unstyled vstack gap-2 fs-13 mb-0">
-                                <li class="fw-medium fs-14">Họ Tên : {{ $data_order->ad_name }}</li>
-                                <li>Số điện thoại : {{ $data_order->ad_phone }}</li>
-                                <li>Địa chỉ : {{ $data_order->ad_address }}</li>
+                                <li class="fw-medium fs-14">Họ Tên : {{ $data_order->ad_name ?? $data_order->name }}</li>
+                                <li>Số điện thoại : {{ $data_order->ad_phone ?? $data_order->phone }}</li>
+                                <li>Địa chỉ : {{ $data_order->ad_address ?? $data_order->address }}</li>
                                 {{-- <li>California - 24567</li> --}}
                                 {{-- <li>United States</li> --}}
                             </ul>

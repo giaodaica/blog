@@ -10,7 +10,7 @@
                 </div>
                 <div class="col-12 breadcrumb breadcrumb-style-01 d-flex justify-content-center">
                     <ul>
-                        <li><a href="demo-fashion-store.html">Trang chủ</a></li>
+                        <li><a href="{{ route('home') }}">Trang chủ</a></li>
                         <li>Giỏ Hàng</li>
                     </ul>
                 </div>
@@ -26,7 +26,7 @@
             @endif
             @if (session('error'))
                 <div class="d-none toast-message" data-message="{{ session('error') }}" data-type="danger"></div>
-            
+
             @endif
               @if (session('info'))
                 <div class="d-none toast-message" data-message="{{ session('info') }}" data-type="info"></div>
@@ -71,14 +71,11 @@
                                                 </a>
                                             </td>
                                             <td class="product-name">
-                                               <a href="{{ route('home.show', $item->productVariant->product->slug) }}" class="truncate-text text-dark-gray fw-500 d-block lh-initial">
-                                                           {{ $item->productVariant->name }}
-</a>
+                                                <a href="demo-jewellery-store-single-product.html" class="text-dark-gray fw-500 d-block lh-initial">
+                                                    {{ $item->productVariant->name }}
+                                                </a>
                                               <span class="fs-14">
-                                                    Màu: {{ $item->productVariant->color->color_name ?? 'N/A'   }}
-                                                </span> <br>
-                                                 <span class="fs-14">
-                                                    Size: {{ $item->productVariant->size->size_name ?? 'N/A' }}
+                                                    Màu: {{ $item->productVariant->color->color_name ?? 'N/A' }}
                                                 </span>
                                                 {{-- @dd($item->productVariant->color->color_name, $item->productVariant->size->size_name) --}}
                                             </td>
@@ -103,7 +100,7 @@
                         </div>
                     </div>
                     <div class="row mt-20px">
-                   
+
                             <div class="col-xl-6 col-xxl-7 col-md-6">
                             <form action="{{ route('cart.applyVoucher') }}" method="POST" class="row g-2 align-items-center">
                                 @csrf
@@ -142,33 +139,33 @@
                         <span class="fs-26 alt-font fw-600 text-dark-gray mb-5px d-block">	Tổng đơn hàng</span>
                         <table class="w-100 total-price-table">
                             <tbody>
-                              <tr>
-    <th class="w-45 fw-600 text-dark-gray alt-font">Tạm tính</th>
-    <td class="text-dark-gray fw-600" id="subtotal">
-        {{ number_format($subtotal, 0, ',', '.') }} đ
-    </td>
-</tr>
-
-<tr class="max_discount">
-    <th class="fw-600 text-dark-gray alt-font">
-        {{ session('voucher_code') ? 'Voucher' : 'Mã giảm giá' }}
-    </th>
-    <td data-title="Voucher" id="voucher-row">
-        @if(session('voucher_code'))
-            <div class="d-flex justify-content-between align-items-center">
-                <div>
-                    <span id="voucher-discount" class="text-danger fw-600">
-                        -{{ number_format(session('voucher_discount', 0), 0, ',', '.') }} đ
-                    </span><br>
-                    <small class="text-dark-gray">({{ session('voucher_code') }})</small>
-                </div>
-                <a href="{{ route('cart.removeVoucher') }}" class="text-danger ms-3">✕</a>
-            </div>
-        @else
-           <span id="voucher-discount" class="text-muted">0 đ</span>
-        @endif
-    </td>
-</tr>
+                                <tr>
+                                    <th class="w-45 fw-600 text-dark-gray alt-font">Tạm tính</th>
+                                    <td class="text-dark-gray fw-600" id="subtotal">
+                                        {{ number_format($subtotal, 0, ',', '.') }} đ
+                                    </td>
+                                </tr>
+                              
+                                    <tr class="max_discount">
+                                        <th class="fw-600 text-dark-gray alt-font">
+                                            {{ session('voucher_code') ? 'Voucher' : 'Mã giảm giá' }}
+                                        </th>
+                                        <td data-title="Voucher">
+                                            @if(session('voucher_code'))
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <div>
+                                                        <span class="text-danger fw-600">
+                                                            -{{ number_format(session('voucher_discount', 0), 0, ',', '.') }} đ
+                                                        </span><br>
+                                                        <small class="text-dark-gray">({{ session('voucher_code') }})</small>
+                                                    </div>
+                                                    <a href="{{ route('cart.removeVoucher') }}" class="text-danger ms-3">✕</a>
+                                                </div>
+                                            @else
+                                                <span class="text-muted">Chưa áp dụng</span>
+                                            @endif
+                                        </td>
+                                    </tr>
 
 <tr class="total-amount">
     <th class="fw-600 text-dark-gray alt-font pb-0">Tổng tiền </th>
@@ -181,7 +178,7 @@
 
                             </tbody>
                         </table>
-                        <a href="CHECK OUT DON HANG"
+                        <a href="{{ route('home.checkout') }}"
                         class="btn btn-dark-gray btn-large btn-switch-text btn-round-edge btn-box-shadow w-100 mt-25px">
                             <span>
                                 <span class="btn-double-text" data-text="Đặt Hàng">Đặt Hàng</span>
@@ -199,18 +196,18 @@
   <script>
 
 document.addEventListener('DOMContentLoaded', function() {
-  
+
     const selectAllDesktop = document.getElementById('select-all-cart');
-    
+
     const selectAllMobile = document.getElementById('select-all-cart-mobile');
-  
+
     const itemCheckboxes = document.querySelectorAll('.cart-item-checkbox:not(#select-all-cart):not(#select-all-cart-mobile)');
 
     function setAllCheckboxes(checked) {
         itemCheckboxes.forEach(cb => cb.checked = checked);
     }
 
-    
+
     if (selectAllDesktop) {
         selectAllDesktop.addEventListener('change', function() {
             setAllCheckboxes(this.checked);
@@ -218,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    
+
     if (selectAllMobile) {
         selectAllMobile.addEventListener('change', function() {
             setAllCheckboxes(this.checked);
@@ -226,7 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-   
+
     itemCheckboxes.forEach(cb => {
         cb.addEventListener('change', function() {
             const allChecked = Array.from(itemCheckboxes).every(c => c.checked);
@@ -261,7 +258,7 @@ document.getElementById('delete-selected-btn').addEventListener('click', functio
     .then(data => {
         if (data.success) {
             showToast('Đã xoá sản phẩm thành công.', 'success');
-            setTimeout(() => location.reload(), 1000); 
+            setTimeout(() => location.reload(), 1000);
         } else {
             showToast('Xoá thất bại.', 'danger');
         }
@@ -309,7 +306,6 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 });
-
 </script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -369,7 +365,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 <script>
-  
+
 function showToast(message, type = 'info') {
     const container = document.getElementById('toast-container');
     if (!container) return;
@@ -423,7 +419,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         @media (max-width: 575.98px) {
     .coupon-code-panel.mobile {
-        padding-right: 1px !important; 
+        padding-right: 1px !important;
     }
     .cart-item-checkbox {
         margin-right: 0 !important;

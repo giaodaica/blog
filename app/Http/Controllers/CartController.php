@@ -20,6 +20,7 @@ public function index()
 
    
     $cartItems = Cart::with('productVariant.color')->where('user_id', $userId)->get();
+    $cartItems = Cart::with('productVariant.color', 'productVariant.size', 'productVariant.product')->where('user_id', $userId)->get();
 
    
     $selectedIds = session('cart_selected_ids', []);
@@ -28,6 +29,12 @@ public function index()
     $selectedItems = $cartItems->whereIn('id', $selectedIds);
 
     $subtotal = $selectedItems->sum(fn($item) => $item->quantity * $item->price_at_time);
+    // CHỈ lấy voucher nếu thực sự có session mã
+    $voucherDiscount = session()->has('voucher_code') && session()->has('voucher_discount')
+        ? session('voucher_discount')
+        : 0;
+    
+    $total = $subtotal - $voucherDiscount;
 
     $voucherDiscount = 0;
 
@@ -175,10 +182,9 @@ public function updateQuantity(Request $request)
         $cartItem->save();
 
         // Tính lại
-        $subtotal = Cart::where('user_id', auth()->id())->sum(DB::raw('quantity * price_at_time'));
+        $subtotal = Cart::where('user_id', Auth::id())->sum(DB::raw('quantity * price_at_time'));
         $voucherDiscount = session('voucher_discount', 0);
-        $shippingFee = session('shipping_fee', 0);
-        $total = $subtotal - $voucherDiscount + $shippingFee;
+        $total = $subtotal - $voucherDiscount;
 
         return response()->json([
             'success' => true,
@@ -195,8 +201,6 @@ public function updateQuantity(Request $request)
     }
 }
 
-
-
 public function calculateTotal(Request $request)
 {
     $cartItems = Cart::where('user_id', Auth::id())->get();
@@ -204,10 +208,8 @@ public function calculateTotal(Request $request)
         return $item->quantity * $item->price_at_time;
     });
 
-    $voucherDiscount = session('max_discount', 0);
-    $shippingFee = $request->shipping_fee ?? session('shipping_fee', 0);
-
-    $total = $subtotal - $voucherDiscount + $shippingFee;
+    $voucherDiscount = session('voucher_discount', 0);
+    $total = $subtotal - $voucherDiscount;
 
     return response()->json([
         'subtotal' => number_format($subtotal, 0, ',', '.') . ' đ',
@@ -228,6 +230,7 @@ public function getUserVouchers()
 
     return response()->json($vouchers);
 }
+
 public function applyVoucher(Request $request)
 {
     $request->validate([
@@ -265,7 +268,6 @@ public function applyVoucher(Request $request)
         return redirect()->back()->with('error', 'Bạn chưa nhận được mã giảm giá này.');
     }
 
-    // 🔥 Lấy các cart item được tick
     $selectedIds = session('cart_selected_ids', []);
 
     if (empty($selectedIds)) {
@@ -280,17 +282,14 @@ public function applyVoucher(Request $request)
         return redirect()->back()->with('error', 'Không thể áp dụng mã vì không có sản phẩm hợp lệ được chọn.');
     }
 
-    // ✅ Tính tổng tiền các sản phẩm đã chọn
     $subtotal = $cartItems->sum(function ($item) {
         return $item->quantity * $item->price_at_time;
     });
 
-    // 💥 Kiểm tra đơn hàng tối thiểu
     if ($voucher->min_order_value && $subtotal < $voucher->min_order_value) {
         return redirect()->back()->with('error', 'Đơn hàng phải tối thiểu ' . number_format($voucher->min_order_value, 0, ',', '.') . ' đ để sử dụng mã này.');
     }
 
-    // ✅ Tính giảm giá
     $discount = 0;
     if ($voucher->type_discount === 'percent') {
         $discount = round($subtotal * ($voucher->value / 100));
@@ -301,7 +300,6 @@ public function applyVoucher(Request $request)
         $discount = $voucher->value;
     }
 
-    // 🔒 Lưu session giảm giá
     session([
         'voucher_code' => $voucher->code,
         'voucher_discount' => $discount
@@ -317,7 +315,6 @@ public function removeVoucher()
     session()->forget(['voucher_code', 'voucher_discount']);
     return redirect()->back()->with('info', 'Đã huỷ mã giảm giá');
 }
-
 
     public function add_to_cart($id,request $request){
 
