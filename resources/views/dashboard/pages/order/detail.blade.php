@@ -52,7 +52,7 @@
                                                 <td>
                                                     <div class="d-flex">
                                                         <div class="flex-shrink-0 avatar-md bg-light rounded p-1">
-                                                            <img src="assets/images/products/img-8.png" alt=""
+                                                            <img src="{{ asset($rende_order_items->product_image_url) }}" alt=""
                                                                 class="img-fluid d-block">
                                                         </div>
                                                         <div class="flex-grow-1 ms-3">
@@ -95,7 +95,7 @@
                                                                 -{{ number_format($data_order->discount_amount) }}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Phí giao hàng :</td>
+                                                            <td>Phí giao hàng <span>{{ $data_order->shipping_method == 'express' ? '(Giao hàng nhanh)' : '(Giao hàng tiêu chuẩn)' }}</span> : </td>
                                                             <td class="text-end">
                                                                 {{ number_format($data_order->shipping_fee) }}</td>
                                                         </tr>
@@ -187,21 +187,16 @@
                         <div class="card-header">
                             <div class="d-flex">
                                 <h5 class="card-title flex-grow-1 mb-0"><i
-                                        class="mdi mdi-truck-fast-outline align-middle me-1 text-muted"></i> Logistics
-                                    Details</h5>
-                                <div class="flex-shrink-0">
-                                    <a href="javascript:void(0);" class="badge bg-primary-subtle text-primary fs-11">Track
-                                        Order</a>
-                                </div>
+                                        class="mdi mdi-truck-fast-outline align-middle me-1 text-muted"></i> Vận chuyển</h5>
                             </div>
                         </div>
                         <div class="card-body">
                             <div class="text-center">
                                 <lord-icon src="https://cdn.lordicon.com/uetqnvvg.json" trigger="loop"
                                     colors="primary:#405189,secondary:#0ab39c" style="width:80px;height:80px"></lord-icon>
-                                <h5 class="fs-16 mt-2">RQK Logistics</h5>
-                                <p class="text-muted mb-0">ID: MFDS1400457854</p>
-                                <p class="text-muted mb-0">Payment Mode : Debit Card</p>
+                                <h5 class="fs-16 mt-2">Giaodaica Logistics</h5>
+                                <p class="text-muted mb-0">ID: {{ $data_order->code_order}}</p>
+                                <p class="text-muted mb-0">Phương thức thanh toán : {{ $data_order->pay_method }}</p>
                             </div>
                         </div>
                     </div>
@@ -221,7 +216,7 @@
                                 <li>
                                     <div class="d-flex align-items-center">
                                         <div class="flex-shrink-0">
-                                            <img src="assets/images/users/avatar-3.jpg" alt=""
+                                            <img src="{{asset('assets/images/avt.jpg')}}" alt=""
                                                 class="avatar-sm rounded">
                                         </div>
                                         <div class="flex-grow-1 ms-3">
