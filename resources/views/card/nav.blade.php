@@ -89,29 +89,38 @@
                                         </ul>
                                     </div>
                                 </div>
-                             @if(!empty($vouchers))
-                                @else
-                                  <div class="row row-cols-1 row-cols-sm-2">
-                                    <div class="col">
-                                        <form action="{{ url('accept_voucher/' . $vouchers[1]->id) }}" method="post">
-                                            @csrf
-                                            <button style="border:none; background:none; padding:0;">
-                                                <img src="{{ asset($vouchers[1]->image ?? 'assets/images/shop/demo-fashion-store-menu-banner-01.jpg') }}"
-                                                    alt="">
-                                            </button>
-                                        </form>
-                                    </div>
-                                    <div class="col">
-                                        <form action="{{ url('accept_voucher/' . $vouchers[2]->id) }}" method="post">
-                                            @csrf
-                                            <button style="border:none; background:none; padding:0;">
-                                                <img src="{{ asset($vouchers[2]->image ?? 'assets/images/shop/demo-fashion-store-menu-banner-01.jpg') }}"
-                                                    alt="">
-                                            </button>
-                                        </form>
-                                    </div>
+                                <div class="row row-cols-1 row-cols-sm-2">
+                                    @if (!empty($vouchers[1]))
+                                        <div class="col">
+                                            <form action="{{ url('accept_voucher/' . $vouchers[1]->id) }}"
+                                                method="post">
+                                                @csrf
+                                                <button style="border:none; background:none; padding:0;">
+                                                    <img src="{{ asset($vouchers[1]->image ?? 'assets/images/shop/demo-fashion-store-menu-banner-01.jpg') }}"
+                                                        alt="">
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @else
+                                        <img src="{{ asset('assets/images/shop/demo-fashion-store-menu-banner-01.jpg') }}"
+                                            alt="">
+                                    @endif
+                                    @if (!empty($vouchers[2]))
+                                        <div class="col">
+                                            <form action="{{ url('accept_voucher/' . $vouchers[2]->id) }}"
+                                                method="post">
+                                                @csrf
+                                                <button style="border:none; background:none; padding:0;">
+                                                    <img src="{{ asset($vouchers[2]->image ?? 'assets/images/shop/demo-fashion-store-menu-banner-01.jpg') }}"
+                                                        alt="">
+                                                </button>
+                                            </form>
+                                        </div>
+                                    @else
+                                        <img src="{{ asset('assets/images/shop/demo-fashion-store-menu-banner-01.jpg') }}"
+                                            alt="">
+                                    @endif
                                 </div>
-                             @endif
                             </div>
                         </div>
                     </li>
