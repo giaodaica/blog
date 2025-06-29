@@ -24,6 +24,8 @@ class OrderController extends Controller
     {
         $action = ['pending', 'confirmed', 'shipping', 'success', 'cancelled'];
         $type = $request->query('type');
+        $count = OrderHistories::where('from_status', 'failed')->count();
+
         if ($type && !in_array($type, $action)) {
             return abort(403, 'Không có hành động này');
         }
@@ -33,18 +35,33 @@ class OrderController extends Controller
             $data_order = Order::paginate(10);
         }
         // dd($data_order);
-        return view('dashboard.pages.order.index', compact('data_order'));
+        return view('dashboard.pages.order.index', compact('data_order', 'count'));
     }
     public function db_order_change(Request $request, $id)
     {
+
         $before = $request->change;
         // dd($before);
+        $request->validate(
+            [
+                'content' => 'nullable|string|max:255',
+            ],
+            [
+                'content.max' => 'Nội dung không được quá 255 ký tự',
+                'content.string' => 'Nội dung phải là chuỗi ký tự',
+            ]
+        );
+        if (!$request->content) {
+            $content = $request->content1;
+        }
         $data_change = ['pending', 'confirmed', 'shipping', 'cancelled', 'failed', 'return'];
         if ($before && !in_array($before, $data_change)) {
             return  abort(403, "Hành động không hợp lệ");
         }
         $old_status = Order::find($id);
         $present = Order::find($id);
+        $count = OrderHistories::where('from_status', 'failed')->count();
+
         if (!$present || !$old_status) {
             return abort(403, 'Không thấy đơn hàng này vui lòng kiểm tra lại');
         }
@@ -90,7 +107,7 @@ class OrderController extends Controller
                 }
                 break;
             case 'cancelled':
-                if ($present->status == 'failed' || $present->status == 'pending' || $present->status == 'confirmed') {
+                if ($present->status == 'failed' || $present->status == 'pending' || $present->status == 'confirmed' || $count == 2) {
                     $present->status = 'cancelled';
                     $note = 'Đơn hàng đã được hủy theo yêu cầu của khách hàng';
                 } else {
@@ -99,53 +116,60 @@ class OrderController extends Controller
                 break;
         }
 
+        $present->save();
+        OrderHistories::create([
+            'users' => Auth::user()->id,
+            'order_id' => $id,
+            'from_status' => $old_status->status,
+            'to_status' => $present->status,
+            'note' => $note,
+            'content' => $request->content ?? $content,
+
+
+        ]);
+
+        if($count >= 2 && $present->status == 'failed') {
+            $present->status = 'cancelled';
             $present->save();
             OrderHistories::create([
                 'users' => Auth::user()->id,
                 'order_id' => $id,
-                'from_status' => $old_status->status,
-                'to_status' => $present->status,
-                'note' => $note
-
+                'from_status' => 'failed',
+                'to_status' => 'cancelled',
+                'note' => 'Đơn hàng đã tự động hủy do giao thất bại 3 lần',
+                'content' => "",
             ]);
-
+        }
 
         return redirect()->back()->with('success', 'Cập nhật trạng thái đơn hàng thành công!');
     }
     public function db_order_show($id)
     {
-        $data_order = Order::join('vouchers','vouchers.id','orders.voucher_id')->
-        join('address_books','address_books.id','orders.address_books_id')->
-        join('users','users.id','orders.user_id')->
-        select(
+        $data_order = Order::Join('vouchers', 'vouchers.id', 'orders.voucher_id')->leftJoin('address_books', 'address_books.id', 'orders.address_books_id')->join('users', 'users.id', 'orders.user_id')->select(
             'orders.*',
             'vouchers.code',
             'address_books.name as ad_name',
             'address_books.address as ad_address',
             'address_books.phone as ad_phone',
             'users.email',
-        )->where('orders.id',$id)
-        ->first();
-        $data_order_items = OrderItem::join('orders', 'orders.id', 'order_items.order_id')->
-        join('product_variants', 'product_variants.id', 'order_items.product_variant_id')->
-        join('sizes', 'sizes.id', 'product_variants.size_id')->
-        join('colors', 'colors.id', 'product_variants.color_id')->
-        where('order_id', $id)->
-        select(
-                'order_items.*',
-                'sizes.size_name',
-                'colors.color_name',
-            )->get();
-            $history_1 = OrderHistories::where('from_status','pending')->where('to_status','confirmed')->where('order_id',$id)->first();
-            $history_2 = OrderHistories::where('from_status','confirmed')->where('to_status','shipping')->where('order_id',$id)->first();
-            $history_3 = OrderHistories::where('from_status','shipping')->where('to_status','failed')->where('order_id',$id)->first();
-            $history_4 = OrderHistories::where('from_status','failed')->where('to_status','shipping')->where('order_id',$id)->first();
-            $history_5 = OrderHistories::where('from_status','shipping')->where('to_status','success')->where('order_id',$id)->first();
+        )->where('orders.id', $id)
+            ->first();
+        $data_order_items = OrderItem::join('orders', 'orders.id', 'order_items.order_id')->join('product_variants', 'product_variants.id', 'order_items.product_variant_id')->join('sizes', 'sizes.id', 'product_variants.size_id')->join('colors', 'colors.id', 'product_variants.color_id')->where('order_id', $id)->select(
+            'order_items.*',
+            'sizes.size_name',
+            'colors.color_name',
+        )->get();
+        $histoty_order = OrderHistories::join('users', 'users.id', 'order_histories.users')->where('order_id', $id)->select(
+            'order_histories.*',
+            'users.name as user_name'
+        )->orderBy('created_at', 'desc')->get();
+        // dd($data_order);
+        // dd($histoty_order);
         // $historyItems = OrderHistories::where('order_id', $id)->get()->keyBy('from_status');
         // dd($historyItems);
         // dd($data_order);
         // dd($data_order_items);
 
-        return view('dashboard.pages.order.detail', compact('data_order', 'data_order_items'));
+        return view('dashboard.pages.order.detail', compact('data_order', 'data_order_items', 'histoty_order'));
     }
 }

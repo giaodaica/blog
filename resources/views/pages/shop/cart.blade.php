@@ -26,7 +26,7 @@
             @endif
             @if (session('error'))
                 <div class="d-none toast-message" data-message="{{ session('error') }}" data-type="danger"></div>
-            
+
             @endif
               @if (session('info'))
                 <div class="d-none toast-message" data-message="{{ session('info') }}" data-type="info"></div>
@@ -91,7 +91,7 @@
                         </div>
                     </div>
                     <div class="row mt-20px">
-                   
+
                             <div class="col-xl-6 col-xxl-7 col-md-6">
                             <form action="{{ route('cart.applyVoucher') }}" method="POST" class="row g-2 align-items-center">
                                 @csrf
@@ -139,7 +139,7 @@
                                         {{ number_format($subtotal, 0, ',', '.') }} đ
                                     </td>
                                 </tr>
-                              
+
                                     <tr class="max_discount">
                                         <th class="fw-600 text-dark-gray alt-font">
                                             {{ session('voucher_code') ? 'Voucher' : 'Mã giảm giá' }}
@@ -189,18 +189,18 @@
   <script>
 
 document.addEventListener('DOMContentLoaded', function() {
-  
+
     const selectAllDesktop = document.getElementById('select-all-cart');
-    
+
     const selectAllMobile = document.getElementById('select-all-cart-mobile');
-  
+
     const itemCheckboxes = document.querySelectorAll('.cart-item-checkbox:not(#select-all-cart):not(#select-all-cart-mobile)');
 
     function setAllCheckboxes(checked) {
         itemCheckboxes.forEach(cb => cb.checked = checked);
     }
 
-    
+
     if (selectAllDesktop) {
         selectAllDesktop.addEventListener('change', function() {
             setAllCheckboxes(this.checked);
@@ -208,7 +208,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    
+
     if (selectAllMobile) {
         selectAllMobile.addEventListener('change', function() {
             setAllCheckboxes(this.checked);
@@ -216,7 +216,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-   
+
     itemCheckboxes.forEach(cb => {
         cb.addEventListener('change', function() {
             const allChecked = Array.from(itemCheckboxes).every(c => c.checked);
@@ -251,7 +251,7 @@ document.getElementById('delete-selected-btn').addEventListener('click', functio
     .then(data => {
         if (data.success) {
             showToast('Đã xoá sản phẩm thành công.', 'success');
-            setTimeout(() => location.reload(), 1000); 
+            setTimeout(() => location.reload(), 1000);
         } else {
             showToast('Xoá thất bại.', 'danger');
         }
@@ -303,7 +303,7 @@ document.addEventListener('DOMContentLoaded', function () {
 </script>
 
 <script>
-  
+
 function showToast(message, type = 'info') {
     const container = document.getElementById('toast-container');
     if (!container) return;
@@ -346,7 +346,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
         @media (max-width: 575.98px) {
     .coupon-code-panel.mobile {
-        padding-right: 1px !important; 
+        padding-right: 1px !important;
     }
     .cart-item-checkbox {
         margin-right: 0 !important;
