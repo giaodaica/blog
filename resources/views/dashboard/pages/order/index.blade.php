@@ -150,7 +150,12 @@
                                     </li>
                                 </ul>
 
-                                <div class="table-responsive table-card mb-1">
+                               @if($data_order->empty())
+                                    <div class="alert alert-warning text-center" role="alert">
+                                        Không có đơn hàng nào để hiển thị.
+                                    </div>
+                                    @else
+                                                 <div class="table-responsive table-card mb-1">
                                     <table class="table table-nowrap align-middle" id="orderTable">
                                         <thead class="text-muted table-light">
                                             <tr class="text-uppercase">
@@ -579,6 +584,7 @@
                                 </div>
                             </div>
                             <!-- Modal -->
+                                    @endif
                             <div class="modal fade flip" id="deleteOrder" tabindex="-1" aria-hidden="true">
                                 <div class="modal-dialog modal-dialog-centered">
                                     <div class="modal-content">

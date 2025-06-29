@@ -89,7 +89,9 @@
                                         </ul>
                                     </div>
                                 </div>
-                                <div class="row row-cols-1 row-cols-sm-2">
+                             @if(!empty($vouchers))
+                                @else
+                                  <div class="row row-cols-1 row-cols-sm-2">
                                     <div class="col">
                                         <form action="{{ url('accept_voucher/' . $vouchers[1]->id) }}" method="post">
                                             @csrf
@@ -109,6 +111,7 @@
                                         </form>
                                     </div>
                                 </div>
+                             @endif
                             </div>
                         </div>
                     </li>
