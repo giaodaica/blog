@@ -216,7 +216,7 @@ class OrderController extends Controller
             if ($request->payment_method === 'VNPAY') {
                 // Tạo URL thanh toán VNPAY
                 $paymentUrl = $this->createVnpayPaymentUrl($order, $finalAmount);
-                
+
                 // Redirect trực tiếp đến VNPAY
                 return redirect($paymentUrl);
             } else {
@@ -227,7 +227,7 @@ class OrderController extends Controller
             return redirect()->back()->with('error', 'Có lỗi xảy ra khi đặt hàng: ' . $e->getMessage());
         }
     }
-   
+
     public function done()
     {
         return view('pages.shop.success_checkout');
@@ -344,8 +344,7 @@ class OrderController extends Controller
     }
     public function db_order_show($id)
     {
-        $data_order = Order::join('vouchers', 'vouchers.id', 'orders.voucher_id')->join('address_books', 'address_books.id', 'orders.address_books_id')->join('users', 'users.id', 'orders.user_id')->select(
-
+        $data_order = Order::leftJoin('vouchers', 'vouchers.id', 'orders.voucher_id')->leftJoin('address_books', 'address_books.id', 'orders.address_books_id')->join('users', 'users.id', 'orders.user_id')->select(
             'orders.*',
             'vouchers.code',
             'address_books.name as ad_name',
@@ -359,11 +358,17 @@ class OrderController extends Controller
             'sizes.size_name',
             'colors.color_name',
         )->get();
-        $history_1 = OrderHistories::where('from_status', 'pending')->where('to_status', 'confirmed')->where('order_id', $id)->first();
-        $history_2 = OrderHistories::where('from_status', 'confirmed')->where('to_status', 'shipping')->where('order_id', $id)->first();
-        $history_3 = OrderHistories::where('from_status', 'shipping')->where('to_status', 'failed')->where('order_id', $id)->first();
-        $history_4 = OrderHistories::where('from_status', 'failed')->where('to_status', 'shipping')->where('order_id', $id)->first();
-        $history_5 = OrderHistories::where('from_status', 'shipping')->where('to_status', 'success')->where('order_id', $id)->first();
+        $histoty_order = OrderHistories::join('users', 'users.id', 'order_histories.users')->where('order_id', $id)->select(
+            'order_histories.*',
+            'users.name as user_name'
+        )->orderBy('created_at', 'desc')->get();
+        // dd($data_order);
+        // dd($histoty_order);
+        // $historyItems = OrderHistories::where('order_id', $id)->get()->keyBy('from_status');
+        // dd($historyItems);
+        // dd($data_order);
+        // dd($data_order_items);
+
         return view('dashboard.pages.order.detail', compact('data_order', 'data_order_items', 'histoty_order'));
     }
 
@@ -480,11 +485,11 @@ class OrderController extends Controller
 
                 // Tạo thông báo lỗi chi tiết
                 $errorMsg = 'Thanh toán thất bại! Mã đơn hàng: ' . $txnRef;
-                
+
                 // Thêm thông tin lỗi cụ thể
                 if ($responseCode) {
                     $errorMsg .= ' (Mã lỗi: ' . $responseCode . ')';
-                    
+
                     // Giải thích mã lỗi
                     switch ($responseCode) {
                         case '01':
@@ -528,12 +533,12 @@ class OrderController extends Controller
                             break;
                     }
                 }
-                
+
                 // Thêm thông tin ngân hàng nếu có
                 if ($bankCode) {
                     $errorMsg .= ' - Ngân hàng: ' . $bankCode;
                 }
-                
+
                 return redirect()->route('home.done')->with('error', $errorMsg);
             }
 
@@ -549,26 +554,26 @@ class OrderController extends Controller
     {
         $environment = Config::get('vnpay.environment', 'test');
         $config = Config::get("vnpay.{$environment}");
-        
+
         $vnp_TmnCode = $config['tmn_code'];
         $vnp_HashSecret = $config['hash_secret'];
         $vnp_Url = $config['url'];
-        
+
         // Sử dụng domain thực tế thay vì localhost
         $vnp_Returnurl = url('/checkout');
-        
+
         // Nếu đang ở localhost, thử sử dụng IP thực tế
         if (strpos($vnp_Returnurl, 'localhost') !== false || strpos($vnp_Returnurl, '127.0.0.1') !== false) {
             // Thử lấy IP thực tế
             $serverIP = $_SERVER['SERVER_ADDR'] ?? $_SERVER['LOCAL_ADDR'] ?? '127.0.0.1';
             $serverPort = $_SERVER['SERVER_PORT'] ?? '80';
             $protocol = isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https' : 'http';
-            
+
             if ($serverIP !== '127.0.0.1' && $serverIP !== '::1') {
                 $vnp_Returnurl = $protocol . '://' . $serverIP . ':' . $serverPort . '/checkout';
             }
         }
-        
+
         $vnp_TxnRef = $order->code_order;
         $vnp_OrderInfo = 'Thanh toán đơn hàng ' . $order->code_order;
         $vnp_OrderType = 'other'; // Thay đổi về 'other' thay vì 'billpayment'
@@ -577,7 +582,7 @@ class OrderController extends Controller
         $vnp_IpAddr = request()->ip();
         $vnp_CreateDate = date('YmdHis');
         $vnp_ExpireDate = date('YmdHis', strtotime('+15 minutes')); // Thời gian hết hạn
-        
+
         $inputData = array(
             "vnp_Version" => "2.1.0",
             "vnp_TmnCode" => $vnp_TmnCode,
@@ -593,7 +598,7 @@ class OrderController extends Controller
             "vnp_TxnRef" => $vnp_TxnRef,
             "vnp_ExpireDate" => $vnp_ExpireDate,
         );
-        
+
         ksort($inputData);
         $query = "";
         $i = 0;
@@ -607,16 +612,16 @@ class OrderController extends Controller
             }
             $query .= urlencode($key) . "=" . urlencode($value) . '&';
         }
-        
+
         $vnp_Url = $vnp_Url . "?" . $query;
         if (isset($vnp_HashSecret)) {
             $vnpSecureHash = hash_hmac('sha512', $hashdata, $vnp_HashSecret);
             $vnp_Url .= 'vnp_SecureHash=' . $vnpSecureHash;
         }
-        
+
         return $vnp_Url;
     }
-    
+
     /**
      * Xác thực callback từ VNPAY
      */
@@ -625,16 +630,16 @@ class OrderController extends Controller
         $environment = Config::get('vnpay.environment', 'test');
         $config = Config::get("vnpay.{$environment}");
         $vnp_HashSecret = $config['hash_secret'];
-        
+
         $inputData = array();
         $data = $request->all();
-        
+
         foreach ($data as $key => $value) {
             if (substr($key, 0, 4) == "vnp_") {
                 $inputData[$key] = $value;
             }
         }
-        
+
         $vnp_SecureHash = $inputData['vnp_SecureHash'] ?? '';
         unset($inputData['vnp_SecureHash']);
         ksort($inputData);
@@ -648,12 +653,12 @@ class OrderController extends Controller
                 $i = 1;
             }
         }
-        
+
         $secureHash = hash_hmac('sha512', $hashData, $vnp_HashSecret);
-        
+
         $isValidSignature = ($vnp_SecureHash == $secureHash);
         $isSuccess = ($inputData['vnp_ResponseCode'] ?? '') == '00';
-        
+
         return [
             'success' => $isValidSignature && $isSuccess,
             'data' => $inputData,
@@ -662,7 +667,7 @@ class OrderController extends Controller
             'calculated_hash' => $secureHash
         ];
     }
-    
+
     /**
      * Truy vấn trạng thái giao dịch VNPAY
      */
@@ -670,18 +675,18 @@ class OrderController extends Controller
     {
         $environment = Config::get('vnpay.environment', 'test');
         $config = Config::get("vnpay.{$environment}");
-        
+
         $vnp_TmnCode = $config['tmn_code'];
         $vnp_HashSecret = $config['hash_secret'];
         $vnp_apiUrl = $config['api_url'];
-        
+
         $vnp_RequestId = time() . "";
         $vnp_Version = Config::get('vnpay.version', '2.1.0');
         $vnp_Command = "querydr";
         $vnp_TxnRef = $orderCode;
         $vnp_OrderInfo = "Truy van GD:" . $orderCode;
         $vnp_TxnDate = date('YmdHis');
-        
+
         $inputData = array(
             "vnp_RequestId" => $vnp_RequestId,
             "vnp_Version" => $vnp_Version,
@@ -691,7 +696,7 @@ class OrderController extends Controller
             "vnp_OrderInfo" => $vnp_OrderInfo,
             "vnp_TxnDate" => $vnp_TxnDate,
         );
-        
+
         ksort($inputData);
         $query = "";
         $i = 0;
@@ -705,24 +710,24 @@ class OrderController extends Controller
             }
             $query .= urlencode($key) . "=" . urlencode($value) . '&';
         }
-        
+
         $vnp_Url = $vnp_apiUrl . "?" . $query;
         if (isset($vnp_HashSecret)) {
             $vnpSecureHash = hash_hmac('sha512', $hashdata, $vnp_HashSecret);
             $vnp_Url .= 'vnp_SecureHash=' . $vnpSecureHash;
         }
-        
+
         $ch = curl_init();
         curl_setopt($ch, CURLOPT_URL, $vnp_Url);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_HEADER, false);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($ch, CURLOPT_TIMEOUT, 30);
-        
+
         $response = curl_exec($ch);
         $error = curl_error($ch);
         curl_close($ch);
-        
+
         return [
             'response' => $response,
             'error' => $error,
