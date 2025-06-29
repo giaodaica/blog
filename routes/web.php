@@ -47,6 +47,8 @@ Route::post('/cart/update-quantity', [CartController::class, 'updateQuantity'])-
 Route::post('/cart/calculate-total', [CartController::class, 'calculateTotal'])->name('cart.calculateTotal');
 Route::post('/cart/apply-voucher', [CartController::class, 'applyVoucher'])->name('cart.applyVoucher');
 Route::get('/cart/remove-voucher', [CartController::class, 'removeVoucher'])->name('cart.removeVoucher');
+Route::post('/cart/update-selected-ajax', [CartController::class, 'ajaxUpdateSelected'])->name('cart.ajaxUpdateSelected');
+Route::get('/aonam/{slug}', [ProductDetailController::class, 'index'])->name('home.show');
 
 Route::get('checkout', [OrderController::class, 'index'])->name('home.checkout');
 Route::get('done', [OrderController::class, 'done'])->name('home.done');
