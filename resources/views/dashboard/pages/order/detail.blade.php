@@ -56,7 +56,7 @@
                                                                 class="img-fluid d-block">
                                                         </div>
                                                         <div class="flex-grow-1 ms-3">
-                                                            <h5 class="fs-15"><a href=""
+                                                            <h5 class="fs-15"><a rel="noopener noreferrer" target="_blank" href="{{url('dashboard/variants/'.$rende_order_items->product_variant_id)}}"
                                                                     class="link-primary">{{ $rende_order_items->product_name . ' ' . $rende_order_items->color_name }}</a>
                                                             </h5>
                                                             <p class="text-muted mb-0">Màu: <span
