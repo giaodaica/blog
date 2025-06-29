@@ -86,7 +86,7 @@
                                                                 {{ number_format($data_order->total_amount) }}</td>
                                                         </tr>
                                                         <tr>
-                                                            <td>Giảm giá : 15% <br>
+                                                            <td>Giảm giá :  <br>
                                                                 <b><a rel="noopener noreferrer" target="_blank"
                                                                         href="{{ url("dashboard/voucher/s/$data_order->voucher_id") }}">{{ $data_order->code }}</a></b>
                                                             </td>

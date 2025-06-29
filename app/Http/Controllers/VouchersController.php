@@ -35,6 +35,14 @@ class VouchersController extends Controller
         $action = $voucherRequest->query('action');
         $data = $voucherRequest->validated();
         $data['code'] = strtoupper($data['code']);
+        if ($voucherRequest->hasFile('image')) {
+            $file = $voucherRequest->file('image');
+            $filename = time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('uploads/vouchers'), $filename);
+            $data['image'] = 'uploads/vouchers/' . $filename;
+        } else {
+            $data['image'] = null;
+        }
         Vouchers::create($data);
         return redirect()->back();
     }
@@ -47,16 +55,29 @@ class VouchersController extends Controller
         }
         return view('dashboard.pages.voucher.detail', compact('data_voucher', 'action', 'categories'));
     }
-    public function update(VoucherRequest $request, $id)
-    {
-        $data_voucher = Vouchers::findOrFail($id);
-        if ($data_voucher->status !== 'draft') {
-            abort(403, 'Không được phép sửa');
-        } else {
-            $data_voucher->update($request->validated());
-            return redirect()->back();
-        }
+ public function update(VoucherRequest $request, $id)
+{
+    $data_voucher = Vouchers::findOrFail($id);
+
+    if ($data_voucher->status !== 'draft') {
+        abort(403, 'Không được phép sửa');
     }
+
+    $data = $request->validated();
+
+    if ($request->hasFile('image')) {
+        $file = $request->file('image');
+        $filename = time() . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('uploads/vouchers'), $filename);
+        $data['image'] = 'uploads/vouchers/' . $filename;
+    } else {
+        $data['image'] = $data_voucher->image;
+    }
+
+    $data_voucher->update($data);
+    return redirect()->back();
+}
+
     public function ads(AdsRequest $request)
     {
         $data = $request->validated();
@@ -75,8 +96,20 @@ class VouchersController extends Controller
     public function active($id)
     {
         $data = Vouchers::findOrFail($id);
+        $result = Vouchers::where('block', $data->block)->where('status', 'active')->first();
+        if ($result) {
+            return redirect()->back()->with('error', "Voucher {$result->code} đang hoạt động ở khu vực này");
+        }
         if ($data->status !== 'draft') {
             abort(403, 'Không thể làm hành động này');
+        }
+        if (!$data->block) {
+            return redirect()->back()->with('error', 'Vui lòng chọn nơi hiển thị cho voucher này');
+        }
+        if ($data->block == 1 || $data->block == 2) {
+            if (!$data->image) {
+                return redirect()->back()->with('error', 'Bắt buộc phải có ảnh đại diện cho khu vực 1 và 2');
+            }
         }
         $data->update(['status' => 'active']);
         return redirect()->back();

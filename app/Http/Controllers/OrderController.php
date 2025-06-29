@@ -24,7 +24,7 @@ class OrderController extends Controller
         }
 
         $userId = Auth::id();
-        
+
         // Lấy giỏ hàng
         $cartItems = Cart::with(['productVariant.color', 'productVariant.size', 'productVariant.product'])
             ->where('user_id', $userId)
@@ -66,19 +66,19 @@ class OrderController extends Controller
     private function calculateShippingFee($subtotal, $shippingType = 'basic')
     {
         $baseShippingFee = 0;
-        
+
         // Tính phí cơ bản
         if ($subtotal >= 200000) {
             $baseShippingFee = 0; // Free shipping cho đơn hàng >= 200k
         } else {
             $baseShippingFee = 20000; // 20k cho đơn hàng < 200k
         }
-        
+
         // Thêm phí vận chuyển nhanh nếu chọn
         if ($shippingType === 'express') {
             $baseShippingFee += 30000; // Thêm 30k cho vận chuyển nhanh
         }
-        
+
         return $baseShippingFee;
     }
 
@@ -106,7 +106,7 @@ class OrderController extends Controller
             ]);
 
             $userId = Auth::id();
-            
+
             // Lấy giỏ hàng
             $cartItems = Cart::with(['productVariant.color', 'productVariant.size', 'productVariant.product'])
                 ->where('user_id', $userId)
@@ -261,7 +261,7 @@ class OrderController extends Controller
     {
         // Tạo URL thanh toán MOMO (giả lập)
         $momoUrl = "https://payment.momo.vn/v2/gateway/api/create";
-        
+
         // Trong thực tế, bạn sẽ tích hợp với API MOMO thật
         // Đây chỉ là demo
         $paymentData = [
@@ -287,7 +287,7 @@ class OrderController extends Controller
     {
         $order = session('order');
         $paymentData = session('momo_payment_data');
-        
+
         if (!$order || !$paymentData) {
             return redirect()->route('home.cart')->with('error', 'Không tìm thấy thông tin thanh toán');
         }
@@ -300,17 +300,17 @@ class OrderController extends Controller
     {
         // Xử lý callback từ MOMO
         // Trong thực tế, bạn sẽ verify signature và cập nhật trạng thái đơn hàng
-        
+
         $orderId = $request->input('orderId');
         $resultCode = $request->input('resultCode');
-        
+
         $order = Order::where('code_order', $orderId)->first();
-        
+
         if ($order) {
             if ($resultCode == 0) {
                 // Thanh toán thành công
                 $order->update(['status_pay' => 'paid']);
-                
+
                 // Gửi email xác nhận
                 // Mail::to($order->user->email)->send(new OrderConfirmation($order));
             } else {
@@ -318,7 +318,7 @@ class OrderController extends Controller
                 $order->update(['status_pay' => 'failed']);
             }
         }
-        
+
         return response()->json(['status' => 'success']);
     }
 
@@ -452,7 +452,7 @@ class OrderController extends Controller
     }
     public function db_order_show($id)
     {
-        $data_order = Order::Join('vouchers', 'vouchers.id', 'orders.voucher_id')->leftJoin('address_books', 'address_books.id', 'orders.address_books_id')->join('users', 'users.id', 'orders.user_id')->select(
+        $data_order = Order::leftJoin('vouchers', 'vouchers.id', 'orders.voucher_id')->leftJoin('address_books', 'address_books.id', 'orders.address_books_id')->join('users', 'users.id', 'orders.user_id')->select(
             'orders.*',
             'vouchers.code',
             'address_books.name as ad_name',
@@ -485,12 +485,12 @@ class OrderController extends Controller
     {
         try {
             $userId = Auth::id();
-            
+
             // Lấy giỏ hàng với relationship
             $cartItems = Cart::with(['productVariant.color', 'productVariant.size', 'productVariant.product'])
                 ->where('user_id', $userId)
                 ->get();
-            
+
             if ($cartItems->isEmpty()) {
                 return response()->json(['error' => 'Giỏ hàng trống'], 400);
             }
@@ -501,7 +501,7 @@ class OrderController extends Controller
 
             // Lấy địa chỉ đầu tiên
             $address = AddressBook::where('user_id', $userId)->first();
-            
+
             if (!$address) {
                 return response()->json(['error' => 'Không có địa chỉ giao hàng'], 400);
             }
