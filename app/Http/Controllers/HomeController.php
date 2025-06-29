@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Vouchers;
 use App\Models\Products;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Order;
 
 class HomeController extends Controller
 {
@@ -52,7 +54,13 @@ class HomeController extends Controller
     }
     public function info_customer()
     {
-        return view('pages.shop.account');
+        $user = Auth::user();
+        $orders = Order::with(['orderItems.productVariant.color', 'orderItems.productVariant.size', 'orderItems.productVariant.product'])
+            ->where('user_id', $user->id)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return view('pages.shop.account', compact('orders'));
     }
     public function show($id)
     {

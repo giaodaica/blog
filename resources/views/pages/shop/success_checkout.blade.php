@@ -19,6 +19,12 @@
                                 {{ session('success') }}
                             </div>
                         @endif
+                        @if(session('error'))
+                            <div class="alert alert-danger mb-30px">
+                                <i class="fas fa-times-circle me-2"></i>
+                                {{ session('error') }}
+                            </div>
+                        @endif
 
                         <div class="bg-white p-4 rounded shadow-sm mb-30px">
                             <h5 class="text-dark-gray fw-600 mb-3">Thông tin đơn hàng</h5>
@@ -37,8 +43,10 @@
                                 <p class="mb-2"><strong>Phương thức thanh toán:</strong> 
                                     @if(session('payment_method') == 'COD')
                                         <span class="badge bg-info">Thanh toán khi nhận hàng</span>
+                                    @elseif(session('payment_method') == 'VNPAY')
+                                        <span class="badge bg-success">Thanh toán qua VNPAY</span>
                                     @else
-                                        <span class="badge bg-success">Thanh toán qua MOMO</span>
+                                        <span class="badge bg-secondary">Không xác định</span>
                                     @endif
                                 </p>
                                 <p class="mb-2"><strong>Loại vận chuyển:</strong> 

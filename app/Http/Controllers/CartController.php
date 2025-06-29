@@ -18,7 +18,7 @@ public function index()
 {
     $userId = Auth::id();
 
-    $cartItems = Cart::with('productVariant.color')->where('user_id', $userId)->get();
+    $cartItems = Cart::with('productVariant.color', 'productVariant.size', 'productVariant.product')->where('user_id', $userId)->get();
 
     $subtotal = $cartItems->sum(fn($item) => $item->quantity * $item->price_at_time);
 
@@ -26,12 +26,8 @@ public function index()
     $voucherDiscount = session()->has('voucher_code') && session()->has('voucher_discount')
         ? session('voucher_discount')
         : 0;
-
-    // Tính phí vận chuyển
-    $shippingType = session('shipping_type', 'basic'); // basic hoặc express
-    $shippingFee = $this->calculateShippingFee($subtotal, $shippingType);
     
-    $total = $subtotal - $voucherDiscount + $shippingFee;
+    $total = $subtotal - $voucherDiscount;
 
     // Lấy danh sách voucher người dùng đang có
     $availableVouchers = DB::table('vouchers')
@@ -45,54 +41,9 @@ public function index()
         'cartItems',
         'subtotal',
         'voucherDiscount',
-        'shippingFee',
-        'shippingType',
         'total',
         'availableVouchers'
     ));
-}
-
-// Thêm method tính phí vận chuyển
-private function calculateShippingFee($subtotal, $shippingType = 'basic')
-{
-    $baseShippingFee = 0;
-    
-    // Tính phí cơ bản
-    if ($subtotal >= 200000) {
-        $baseShippingFee = 0; // Free shipping cho đơn hàng >= 200k
-    } else {
-        $baseShippingFee = 20000; // 20k cho đơn hàng < 200k
-    }
-    
-    // Thêm phí vận chuyển nhanh nếu chọn
-    if ($shippingType === 'express') {
-        $baseShippingFee += 30000; // Thêm 30k cho vận chuyển nhanh
-    }
-    
-    return $baseShippingFee;
-}
-
-// Thêm method để cập nhật loại vận chuyển
-public function updateShippingType(Request $request)
-{
-    $request->validate([
-        'shipping_type' => 'required|in:basic,express'
-    ]);
-
-    session(['shipping_type' => $request->shipping_type]);
-    
-    $userId = Auth::id();
-    $cartItems = Cart::where('user_id', $userId)->get();
-    $subtotal = $cartItems->sum(fn($item) => $item->quantity * $item->price_at_time);
-    $voucherDiscount = session('voucher_discount', 0);
-    $shippingFee = $this->calculateShippingFee($subtotal, $request->shipping_type);
-    $total = $subtotal - $voucherDiscount + $shippingFee;
-
-    return response()->json([
-        'shipping_fee' => number_format($shippingFee, 0, ',', '.') . ' đ',
-        'total' => number_format($total, 0, ',', '.') . ' đ',
-        'shipping_type' => $request->shipping_type
-    ]);
 }
 
    public function deleteSelected(Request $request)
@@ -131,10 +82,9 @@ public function updateQuantity(Request $request)
         $cartItem->save();
 
         // Tính lại
-        $subtotal = Cart::where('user_id', auth()->id())->sum(DB::raw('quantity * price_at_time'));
+        $subtotal = Cart::where('user_id', Auth::id())->sum(DB::raw('quantity * price_at_time'));
         $voucherDiscount = session('voucher_discount', 0);
-        $shippingFee = session('shipping_fee', 0);
-        $total = $subtotal - $voucherDiscount + $shippingFee;
+        $total = $subtotal - $voucherDiscount;
 
         return response()->json([
             'success' => true,
@@ -151,8 +101,6 @@ public function updateQuantity(Request $request)
     }
 }
 
-
-
 public function calculateTotal(Request $request)
 {
     $cartItems = Cart::where('user_id', Auth::id())->get();
@@ -160,10 +108,8 @@ public function calculateTotal(Request $request)
         return $item->quantity * $item->price_at_time;
     });
 
-    $voucherDiscount = session('max_discount', 0);
-    $shippingFee = $request->shipping_fee ?? session('shipping_fee', 0);
-
-    $total = $subtotal - $voucherDiscount + $shippingFee;
+    $voucherDiscount = session('voucher_discount', 0);
+    $total = $subtotal - $voucherDiscount;
 
     return response()->json([
         'subtotal' => number_format($subtotal, 0, ',', '.') . ' đ',
@@ -184,6 +130,7 @@ public function getUserVouchers()
 
     return response()->json($vouchers);
 }
+
 public function applyVoucher(Request $request)
 {
     $request->validate([
@@ -233,7 +180,6 @@ public function removeVoucher()
     session()->forget(['voucher_code', 'voucher_discount']);
     return redirect()->back()->with('info', 'Đã huỷ mã giảm giá');
 }
-
 
     public function add_to_cart($id,request $request){
 

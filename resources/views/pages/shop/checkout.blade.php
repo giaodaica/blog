@@ -82,19 +82,18 @@
                                             <label class="w-100 d-block">
                                                 <input type="radio" name="address_id" value="{{ $address->id }}" class="address-radio d-none" {{ $loop->first ? 'checked' : '' }}>
                                                 <div class="address-info">
-                                                    <div class="address-card border p-3 rounded mb-2 d-flex flex-column">
-                                                        <div class="address-note">
-                                                            <i class="fas fa-home"></i>
-                                                            Địa chỉ {{ $loop->iteration }}
+                                                    <div class="address-card border p-3 rounded mb-2">
+                                                        <div class="mb-2">
+                                                            <strong>Địa chỉ {{ $loop->iteration }}</strong>
                                                         </div>
-                                                        <div class="address-detail">
-                                                            <span class="fw-500">Tên người nhận:</span> {{ $address->name }}
+                                                        <div class="mb-1">
+                                                            <strong>Tên người nhận:</strong> {{ $address->name }}
                                                         </div>
-                                                        <div class="address-detail">
-                                                            <span class="fw-500">Địa chỉ:</span> {{ $address->address }}
+                                                        <div class="mb-1">
+                                                            <strong>Địa chỉ:</strong> {{ $address->address }}
                                                         </div>
-                                                        <div class="address-detail">
-                                                            <span class="fw-500">Số điện thoại:</span> {{ $address->phone }}
+                                                        <div class="mb-0">
+                                                            <strong>Số điện thoại:</strong> {{ $address->phone }}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -158,34 +157,6 @@
                                         <tr class="shipping">
                                             <th class="fw-600 text-dark-gray alt-font">Phí vận chuyển</th>
                                             <td data-title="Shipping">
-                                                <div class="mb-3">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input shipping-type-radio" type="radio" name="shipping_type" id="shipping_basic" value="basic" {{ $shippingType == 'basic' ? 'checked' : '' }}>
-                                                        <label class="form-check-label" for="shipping_basic">
-                                                            <strong>Vận chuyển cơ bản</strong><br>
-                                                            <small class="text-muted">
-                                                                @if($subtotal >= 200000)
-                                                                    Miễn phí (Đơn hàng ≥ 200k)
-                                                                @else
-                                                                    20.000 đ (Đơn hàng < 200k)
-                                                                @endif
-                                                            </small>
-                                                        </label>
-                                                    </div>
-                                                    <div class="form-check">
-                                                        <input class="form-check-input shipping-type-radio" type="radio" name="shipping_type" id="shipping_express" value="express" {{ $shippingType == 'express' ? 'checked' : '' }}>
-                                                        <label class="form-check-label" for="shipping_express">
-                                                            <strong>Vận chuyển nhanh</strong><br>
-                                                            <small class="text-muted">
-                                                                @if($subtotal >= 200000)
-                                                                    +30.000 đ (Miễn phí cơ bản + 30k)
-                                                                @else
-                                                                    +30.000 đ (20k + 30k = 50k)
-                                                                @endif
-                                                            </small>
-                                                        </label>
-                                                    </div>
-                                                </div>
                                                 <div class="shipping-fee-display">
                                                     <strong>{{ number_format($shippingFee, 0, ',', '.') }} đ</strong>
                                                 </div>
@@ -201,30 +172,70 @@
                                 </table>
                                 <div class="p-40px lg-p-25px bg-white border-radius-6px box-shadow-large mt-10px mb-30px sm-mb-25px checkout-accordion">
                                     <div class="w-100" id="accordion-style-05">
-                                        <!-- start tab content -->
+                                        <!-- start shipping tab content -->
+                                        <div class="heading active-accordion">
+                                            <label class="mb-5px">
+                                                <input class="d-inline w-auto me-5px mb-0 p-0" type="radio" name="shipping_type" value="basic" {{ $shippingType == 'basic' ? 'checked' : '' }}>
+                                                <span class="d-inline-block text-dark-gray fw-500">Vận chuyển cơ bản</span>
+                                                <a class="accordion-toggle" data-bs-toggle="collapse" data-bs-parent="#accordion-style-05" href="#style-5-collapse-shipping-1"></a>
+                                            </label>
+                                        </div>
+                                        <div id="style-5-collapse-shipping-1" class="collapse show" data-bs-parent="#accordion-style-05">
+                                            <div class="p-25px bg-very-light-gray mt-20px mb-20px fs-14 lh-24">
+                                                @if($subtotal >= 200000)
+                                                    Miễn phí vận chuyển cho đơn hàng từ 200.000 đ trở lên.
+                                                @else
+                                                    Phí vận chuyển: 20.000 đ cho đơn hàng dưới 200.000 đ.
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <!-- end shipping tab content -->
+                                        <!-- start shipping tab content -->
+                                        <div class="heading active-accordion">
+                                            <label class="mb-5px">
+                                                <input class="d-inline w-auto me-5px mb-0 p-0" type="radio" name="shipping_type" value="express" {{ $shippingType == 'express' ? 'checked' : '' }}>
+                                                <span class="d-inline-block text-dark-gray fw-500">Vận chuyển nhanh</span>
+                                                <a class="accordion-toggle" data-bs-toggle="collapse" data-bs-parent="#accordion-style-05" href="#style-5-collapse-shipping-2"></a>
+                                            </label>
+                                        </div>
+                                        <div id="style-5-collapse-shipping-2" class="collapse" data-bs-parent="#accordion-style-05">
+                                            <div class="p-25px bg-very-light-gray mt-20px mb-20px fs-14 lh-24">
+                                                @if($subtotal >= 200000)
+                                                    Phí vận chuyển nhanh: +30.000 đ (miễn phí cơ bản + 30.000 đ).
+                                                @else
+                                                    Phí vận chuyển nhanh: 50.000 đ (20.000 đ cơ bản + 30.000 đ).
+                                                @endif
+                                            </div>
+                                        </div>
+                                        <!-- end shipping tab content -->
+                                    </div>
+                                </div>
+                                <div class="p-40px lg-p-25px bg-white border-radius-6px box-shadow-large mt-10px mb-30px sm-mb-25px checkout-accordion">
+                                    <div class="w-100" id="accordion-style-06">
+                                        <!-- start payment tab content -->
                                         <div class="heading active-accordion">
                                             <label class="mb-5px">
                                                 <input class="d-inline w-auto me-5px mb-0 p-0" type="radio" name="payment_method" value="COD" checked="checked">
                                                 <span class="d-inline-block text-dark-gray fw-500">Thanh toán khi nhận hàng (COD)</span>
-                                                <a class="accordion-toggle" data-bs-toggle="collapse" data-bs-parent="#accordion-style-05" href="#style-5-collapse-1"></a>
+                                                <a class="accordion-toggle" data-bs-toggle="collapse" data-bs-parent="#accordion-style-06" href="#style-6-collapse-1"></a>
                                             </label>
                                         </div>
-                                        <div id="style-5-collapse-1" class="collapse show" data-bs-parent="#accordion-style-05">
+                                        <div id="style-6-collapse-1" class="collapse show" data-bs-parent="#accordion-style-06">
                                             <div class="p-25px bg-very-light-gray mt-20px mb-20px fs-14 lh-24">Thanh toán bằng tiền mặt khi nhận hàng.</div>
                                         </div>
-                                        <!-- end tab content -->
-                                        <!-- start tab content -->
+                                        <!-- end payment tab content -->
+                                        <!-- start payment tab content -->
                                         <div class="heading active-accordion">
                                             <label class="mb-5px">
-                                                <input class="d-inline w-auto me-5px mb-0 p-0" type="radio" name="payment_method" value="QR">
-                                                <span class="d-inline-block text-dark-gray fw-500">Thanh toán qua QR Code (MOMO)</span>
-                                                <a class="accordion-toggle" data-bs-toggle="collapse" data-bs-parent="#accordion-style-05" href="#style-5-collapse-2"></a>
+                                                <input class="d-inline w-auto me-5px mb-0 p-0" type="radio" name="payment_method" value="VNPAY">
+                                                <span class="d-inline-block text-dark-gray fw-500">Thanh toán qua VNPAY</span>
+                                                <a class="accordion-toggle" data-bs-toggle="collapse" data-bs-parent="#accordion-style-06" href="#style-6-collapse-2"></a>
                                             </label>
                                         </div>
-                                        <div id="style-5-collapse-2" class="collapse" data-bs-parent="#accordion-style-05">
-                                            <div class="p-25px bg-very-light-gray mt-20px mb-20px fs-14 lh-24">Thanh toán qua mã QR Code MOMO.</div>
+                                        <div id="style-6-collapse-2" class="collapse" data-bs-parent="#accordion-style-06">
+                                            <div class="p-25px bg-very-light-gray mt-20px mb-20px fs-14 lh-24">Thanh toán qua cổng thanh toán VNPAY (ATM, thẻ tín dụng, ví điện tử).</div>
                                         </div>
-                                        <!-- end tab content -->
+                                        <!-- end payment tab content -->
                                     </div>
                                 </div>
                                 <p class="fs-14 lh-24">Thông tin cá nhân của bạn sẽ được sử dụng để xử lý đơn hàng, hỗ trợ trải nghiệm của bạn trên trang web này và cho các mục đích khác được mô tả trong <a class="text-decoration-line-bottom text-dark-gray fw-500" href="#">chính sách bảo mật.</a></p>
@@ -239,43 +250,10 @@
                                         <span class="btn-double-text" data-text="Đặt hàng">Đặt hàng</span>
                                     </span>
                                 </button>
-                                
-                                <!-- Test button for debugging -->
-                                <button type="button" id="test-checkout-btn" class="btn btn-warning btn-large btn-round-edge w-100 mt-10px">
-                                    Test Checkout (Debug)
-                                </button>
                             </div>
                         </div>
                     </div>
                 </form>
-                
-                <!-- Test checkout script -->
-                <script>
-                document.getElementById('test-checkout-btn').addEventListener('click', function() {
-                    if (confirm('Bạn có muốn thực hiện test checkout?')) {
-                        fetch('{{ route("test.checkout") }}', {
-                            method: 'POST',
-                            headers: {
-                                'X-CSRF-TOKEN': '{{ csrf_token() }}',
-                                'Content-Type': 'application/json',
-                            }
-                        })
-                        .then(response => response.json())
-                        .then(data => {
-                            if (data.success) {
-                                alert('Test checkout thành công! Mã đơn hàng: ' + data.order_code);
-                                window.location.href = '{{ route("home.done") }}';
-                            } else {
-                                alert('Lỗi: ' + data.error);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('Có lỗi xảy ra: ' + error.message);
-                        });
-                    }
-                });
-                </script>
             </div>
         </section>
         <!-- end section -->
@@ -295,22 +273,6 @@
                 border-color: #343a40;
                 background: #f8f9fa;
             }
-            .address-note {
-                font-size: 1rem;
-                color: #343a40;
-                font-weight: 600;
-                margin-bottom: 4px;
-                display: flex;
-                align-items: center;
-            }
-            .address-note i {
-                margin-right: 6px;
-                color: #0d6efd;
-            }
-            .address-detail {
-                font-size: 0.97rem;
-                color: #555;
-            }
         </style>
 
         <script>
@@ -329,34 +291,6 @@
                     radio.closest('.address-info').querySelector('.address-card').classList.add('selected');
                 }
             });
-
-            // Cập nhật phí vận chuyển khi thay đổi loại vận chuyển
-            document.querySelectorAll('.shipping-type-radio').forEach(function(radio) {
-                radio.addEventListener('change', function() {
-                    updateShippingFee(this.value);
-                });
-            });
-
-            function updateShippingFee(shippingType) {
-                fetch("{{ route('cart.updateShippingType') }}", {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                    },
-                    body: JSON.stringify({ shipping_type: shippingType })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.shipping_fee) {
-                        document.querySelector('.shipping-fee-display strong').innerText = data.shipping_fee;
-                        document.querySelector('.total-display').innerText = data.total;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
-            }
         </script>
         <!-- Thêm link CDN FontAwesome nếu chưa có -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"/>
