@@ -60,7 +60,7 @@ class VoucherRequest extends FormRequest
 {
     return [
         'code.required' => 'Mã giảm giá không được để trống.',
-        'code.alpha' => 'Mã giảm giá chỉ được chứa chữ cái (a-z).',
+        'code.alpha_num' => 'Mã giảm giá chỉ được chứa chữ cái (a-z) hoặc số (0-9).',
         'code.min' => 'Mã giảm giá phải có ít nhất :min ký tự.',
         'code.max' => 'Mã giảm giá không được vượt quá :max ký tự.',
         'code.unique' => 'Mã giảm giá không được trùng.',
