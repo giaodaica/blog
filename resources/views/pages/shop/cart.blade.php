@@ -10,7 +10,7 @@
                 </div>
                 <div class="col-12 breadcrumb breadcrumb-style-01 d-flex justify-content-center">
                     <ul>
-                        <li><a href="demo-fashion-store.html">Trang chủ</a></li>
+                        <li><a href="{{ route('home') }}">Trang chủ</a></li>
                         <li>Giỏ Hàng</li>
                     </ul>
                 </div>
@@ -58,16 +58,17 @@
 
                                             </td>
                                            <td class="product-thumbnail">
-                                                <a href="demo-jewellery-store-single-product.html">
+                                                <a href="{{ route('home.show', $item->productVariant->product->slug) }}">
                                                     <img class="cart-product-image" src="{{ $item->productVariant->variant_image_url }}" alt="">
                                                 </a>
                                             </td>
                                             <td class="product-name">
-                                                <a href="demo-jewellery-store-single-product.html" class="text-dark-gray fw-500 d-block lh-initial">
-                                                    {{ $item->productVariant->name }}
+                                                <a href="{{ route('home.show', $item->productVariant->product->slug) }}" class="text-dark-gray fw-500 d-block lh-initial">
+                                                    {{ $item->productVariant->product->name }}
                                                 </a>
                                               <span class="fs-14">
-                                                    Màu: {{ $item->productVariant->color->color_name ?? 'N/A' }}
+                                                    Màu: {{ $item->productVariant->color->color_name ?? 'N/A' }} | 
+                                                    Size: {{ $item->productVariant->size->size_name ?? 'N/A' }}
                                                 </span>
                                             </td>
                                             <td class="product-price" data-title="Price">
@@ -160,41 +161,6 @@
                                             @endif
                                         </td>
                                     </tr>
-
-                                <tr>
-                                    <th class="fw-600 text-dark-gray alt-font pb-0">Phí vận chuyển</th>
-                                    <td class="pb-0" data-title="Shipping">
-                                        <div class="mb-2">
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input shipping-type-radio" type="radio" name="shipping_type" id="shipping_basic_cart" value="basic" {{ $shippingType == 'basic' ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="shipping_basic_cart">
-                                                    <small>
-                                                        @if($subtotal >= 200000)
-                                                            Miễn phí (≥200k)
-                                                        @else
-                                                            20.000 đ (<200k)
-                                                        @endif
-                                                    </small>
-                                                </label>
-                                            </div>
-                                            <div class="form-check form-check-inline">
-                                                <input class="form-check-input shipping-type-radio" type="radio" name="shipping_type" id="shipping_express_cart" value="express" {{ $shippingType == 'express' ? 'checked' : '' }}>
-                                                <label class="form-check-label" for="shipping_express_cart">
-                                                    <small>
-                                                        @if($subtotal >= 200000)
-                                                            +30.000 đ
-                                                        @else
-                                                            +30.000 đ
-                                                        @endif
-                                                    </small>
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <span id="shipping-fee-display" class="fw-600">
-                                            {{ number_format($shippingFee, 0, ',', '.') }} đ
-                                        </span>
-                                    </td>
-                                </tr>
 
                                 <tr class="total-amount">
                                     <th class="fw-600 text-dark-gray alt-font pb-0">Tổng tiền </th>
@@ -332,72 +298,8 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     });
-
-    // Cập nhật phí vận chuyển khi thay đổi loại vận chuyển
-    document.querySelectorAll('.shipping-type-radio').forEach(function(radio) {
-        radio.addEventListener('change', function() {
-            updateShippingFee(this.value);
-        });
-    });
 });
-
-function updateShippingFee(shippingType) {
-    fetch("{{ route('cart.updateShippingType') }}", {
-        method: "POST",
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({ shipping_type: shippingType })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.shipping_fee) {
-            document.getElementById('shipping-fee-display').innerText = data.shipping_fee;
-            document.getElementById('total').innerText = data.total;
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-    });
-}
 </script>
-{{-- <script>
-document.addEventListener('DOMContentLoaded', function () {
-    // Hiển thị tất cả các thông báo từ session
-    document.querySelectorAll('.toast-message').forEach(function(el) {
-        const msg = el.getAttribute('data-message');
-        const type = el.getAttribute('data-type') || 'info';
-        if (msg) showToast(msg, type);
-    });
-
-    function showToast(message, type = 'info') {
-        const container = document.getElementById('toast-container');
-        if (!container) return;
-
-        const toast = document.createElement('div');
-        toast.className = `toast align-items-center text-bg-${type} border-0 show mb-2`;
-        toast.role = 'alert';
-        toast.innerHTML = `
-            <div class="d-flex">
-                <div class="toast-body">${message}</div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-            </div>
-        `;
-        container.appendChild(toast);
-
-        // Auto hide sau 4s
-        setTimeout(() => {
-            toast.classList.remove('show');
-            toast.classList.add('hide');
-            setTimeout(() => toast.remove(), 500);
-        }, 4000);
-
-        // Cho phép đóng bằng nút
-        toast.querySelector('.btn-close').onclick = () => toast.remove();
-    }
-});
-</script> --}}
 
 <script>
   

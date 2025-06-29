@@ -19,7 +19,9 @@ class Order extends Model
         'code_order',
         'pay_method',
         'status_pay',
-        'notes'
+        'notes',
+        'shipping_fee',
+        'shipping_method'
     ];
 
     public function user()
