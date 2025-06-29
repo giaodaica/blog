@@ -146,6 +146,7 @@ public function ajaxUpdateSelected(Request $request)
 
 
 
+
    public function deleteSelected(Request $request)
 {
     $ids = $request->input('ids');
@@ -268,6 +269,7 @@ public function applyVoucher(Request $request)
         return redirect()->back()->with('error', 'Bạn chưa nhận được mã giảm giá này.');
     }
 
+
     $selectedIds = session('cart_selected_ids', []);
 
     if (empty($selectedIds)) {
@@ -282,14 +284,17 @@ public function applyVoucher(Request $request)
         return redirect()->back()->with('error', 'Không thể áp dụng mã vì không có sản phẩm hợp lệ được chọn.');
     }
 
+    
     $subtotal = $cartItems->sum(function ($item) {
         return $item->quantity * $item->price_at_time;
     });
 
+   
     if ($voucher->min_order_value && $subtotal < $voucher->min_order_value) {
         return redirect()->back()->with('error', 'Đơn hàng phải tối thiểu ' . number_format($voucher->min_order_value, 0, ',', '.') . ' đ để sử dụng mã này.');
     }
 
+   
     $discount = 0;
     if ($voucher->type_discount === 'percent') {
         $discount = round($subtotal * ($voucher->value / 100));
@@ -300,6 +305,7 @@ public function applyVoucher(Request $request)
         $discount = $voucher->value;
     }
 
+   
     session([
         'voucher_code' => $voucher->code,
         'voucher_discount' => $discount

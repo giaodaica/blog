@@ -71,11 +71,14 @@
                                                 </a>
                                             </td>
                                             <td class="product-name">
-                                                <a href="demo-jewellery-store-single-product.html" class="text-dark-gray fw-500 d-block lh-initial">
+                                                <a href="{{ route('home.show', $item->productVariant->product->slug) }}" class="truncate-text text-dark-gray fw-500 d-block lh-initial">
                                                     {{ $item->productVariant->name }}
                                                 </a>
                                               <span class="fs-14">
                                                     Màu: {{ $item->productVariant->color->color_name ?? 'N/A' }}
+                                                </span> <br>
+                                                 <span class="fs-14">
+                                                    Màu: {{ $item->productVariant->size->size_name ?? 'N/A' }}
                                                 </span>
                                                 {{-- @dd($item->productVariant->color->color_name, $item->productVariant->size->size_name) --}}
                                             </td>
@@ -145,36 +148,36 @@
                                         {{ number_format($subtotal, 0, ',', '.') }} đ
                                     </td>
                                 </tr>
-                              
-                                    <tr class="max_discount">
-                                        <th class="fw-600 text-dark-gray alt-font">
-                                            {{ session('voucher_code') ? 'Voucher' : 'Mã giảm giá' }}
-                                        </th>
-                                        <td data-title="Voucher">
-                                            @if(session('voucher_code'))
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <div>
-                                                        <span class="text-danger fw-600">
-                                                            -{{ number_format(session('voucher_discount', 0), 0, ',', '.') }} đ
-                                                        </span><br>
-                                                        <small class="text-dark-gray">({{ session('voucher_code') }})</small>
-                                                    </div>
-                                                    <a href="{{ route('cart.removeVoucher') }}" class="text-danger ms-3">✕</a>
-                                                </div>
-                                            @else
-                                                <span class="text-muted">Chưa áp dụng</span>
-                                            @endif
-                                        </td>
-                                    </tr>
 
-<tr class="total-amount">
-    <th class="fw-600 text-dark-gray alt-font pb-0">Tổng tiền </th>
-    <td class="pb-0" data-title="Total">
-        <h6 id="total" class="d-block fw-700 mb-0 text-dark-gray alt-font">
-            {{ number_format($total, 0, ',', '.') }} đ
-        </h6>
-    </td>
-</tr>
+                                <tr class="max_discount">
+                                    <th class="fw-600 text-dark-gray alt-font">
+                                        {{ session('voucher_code') ? 'Voucher' : 'Mã giảm giá' }}
+                                    </th>
+                                    <td data-title="Voucher" id="voucher-row">
+                                        @if(session('voucher_code'))
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <span id="voucher-discount" class="text-danger fw-600">
+                                                        -{{ number_format(session('voucher_discount', 0), 0, ',', '.') }} đ
+                                                    </span><br>
+                                                    <small class="text-dark-gray">({{ session('voucher_code') }})</small>
+                                                </div>
+                                                <a href="{{ route('cart.removeVoucher') }}" class="text-danger ms-3">✕</a>
+                                            </div>
+                                        @else
+                                            <span id="voucher-discount" class="text-muted">-0 đ</span>
+                                        @endif
+                                    </td>
+                                </tr>
+
+                                <tr class="total-amount">
+                                    <th class="fw-600 text-dark-gray alt-font pb-0">Tổng tiền </th>
+                                    <td class="pb-0" data-title="Total">
+                                        <h6 id="total" class="d-block fw-700 mb-0 text-dark-gray alt-font">
+                                            {{ number_format($total, 0, ',', '.') }} đ
+                                        </h6>
+                                    </td>
+                                </tr>
 
                             </tbody>
                         </table>
@@ -360,6 +363,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+
 
 
 
