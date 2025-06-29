@@ -1,16 +1,15 @@
 <nav class="navbar navbar-expand-lg header-light bg-white disable-fixed">
     <div class="container-fluid">
-        
+
         <div class="col-auto col-xxl-3 col-lg-2 menu-logo">
-             <button class="navbar-toggler float-end" type="button" data-bs-toggle="collapse"
-                    data-bs-target="#navbarNav" aria-controls="navbarNav" aria-label="Toggle navigation"
-                    aria-expanded="false">
-                    <span class="navbar-toggler-line"></span>
-                    <span class="navbar-toggler-line"></span>
-                    <span class="navbar-toggler-line"></span>
-                    <span class="navbar-toggler-line"></span>
-                </button>
-                
+            <button class="navbar-toggler float-end" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-label="Toggle navigation" aria-expanded="false">
+                <span class="navbar-toggler-line"></span>
+                <span class="navbar-toggler-line"></span>
+                <span class="navbar-toggler-line"></span>
+                <span class="navbar-toggler-line"></span>
+            </button>
+
             <a class="navbar-brand" href="{{ route('home') }}">
                 <img src="{{ asset('assets/images/logooutfitly.png') }}"
                     data-at2x="{{ asset('assets/images/logooutfitly.png') }}" alt="" class="default-logo">
@@ -92,14 +91,22 @@
                                 </div>
                                 <div class="row row-cols-1 row-cols-sm-2">
                                     <div class="col">
-                                        <a href="demo-fashion-store-shop.html"><img
-                                                src="{{ asset('assets/images/shop/demo-fashion-store-menu-banner-01.jpg') }}"
-                                                alt=""></a>
+                                        <form action="{{ url('accept_voucher/' . $vouchers[1]->id) }}" method="post">
+                                            @csrf
+                                            <button style="border:none; background:none; padding:0;">
+                                                <img src="{{ asset($vouchers[1]->image ?? 'assets/images/shop/demo-fashion-store-menu-banner-01.jpg') }}"
+                                                    alt="">
+                                            </button>
+                                        </form>
                                     </div>
                                     <div class="col">
-                                        <a href="demo-fashion-store-shop.html"><img
-                                                src="{{ asset(path: 'assets/images/shop/demo-fashion-store-menu-banner-01.jpg') }}"
-                                                alt=""></a>
+                                        <form action="{{ url('accept_voucher/' . $vouchers[2]->id) }}" method="post">
+                                            @csrf
+                                            <button style="border:none; background:none; padding:0;">
+                                                <img src="{{ asset($vouchers[2]->image ?? 'assets/images/shop/demo-fashion-store-menu-banner-01.jpg') }}"
+                                                    alt="">
+                                            </button>
+                                        </form>
                                     </div>
                                 </div>
                             </div>
@@ -129,10 +136,11 @@
                             style="background: none; border: none; color: #007bff; font-size: 14px; cursor: pointer; display: non; te;">Xóa
                             tất cả</button>
                     </div>
-                    <div class="autocomplete-results bg-white border rounded shadow mt-2 position-absolute w-100" id="autocomplete-results" style="z-index: 999; display: none;">
+                    <div class="autocomplete-results bg-white border rounded shadow mt-2 position-absolute w-100"
+                        id="autocomplete-results" style="z-index: 999; display: none;">
                         <!-- Sản phẩm gợi ý sẽ được thêm bằng JS -->
                     </div>
-                    
+
                     <div class="trending-searches mb-3">
                         <h6 class="mb-2 fw-bold text-dark" style="font-size: 16px;">Xu hướng tìm kiếm</h6>
                         <div class="d-flex flex-wrap gap-2 trending-list">
@@ -203,7 +211,7 @@
                 </div>
             </div>
             <div class="col-auto col-xxl-3 col-lg-2 d-flex align-items-center">
-               
+
             </div>
         </div>
 

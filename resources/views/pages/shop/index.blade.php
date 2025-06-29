@@ -127,14 +127,20 @@
     @include('card.best_sale_product')
     <!-- end section -->
     <!-- start section -->
-    @if (!empty($voucher_id) && $voucher_id->max_used >= 1)
+    @if (!empty($voucher_block_3) && $voucher_block_3->max_used >= 1)
         <section class="p-15px bg-dark-gray text-white">
             <div class="container">
                 <div class="row">
                     <div class="col-12 text-center">
-                        <span class="fs-15 text-uppercase fw-500">Mã giảm giá 15% tối đa 500k <span
+                        <span class="fs-15 text-uppercase fw-500">Mã giảm giá
+                            @if($voucher_block_3->type_discount == 'percent')
+                                {{$voucher_block_3->value .'%' .' tối đa '. ($voucher_block_3->max_discount)/1000 . 'k'}}
+                                @else
+                                {{($voucher_block_3->value)/1000 .'k'}}
+                            @endif
+                             <span
                                 class="fs-14 fw-700 lh-28 alt-font text-dark-gray text-uppercase d-inline-block border-radius-30px ps-15px pe-15px ms-5px align-middle">
-                                <form action="{{ url('accept_voucher/' . $voucher_id->id) }}" method="post">
+                                <form action="{{ url('accept_voucher/' . $voucher_block_3->id) }}" method="post">
                                     @csrf
                                     <button
                                         class="btn btn-gradient border-0 px-3 py-1 rounded-pill fw-600 shadow-sm align-middle"

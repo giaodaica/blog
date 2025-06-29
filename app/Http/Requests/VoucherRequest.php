@@ -44,7 +44,7 @@ class VoucherRequest extends FormRequest
                     }
                 }
             ],
-            'start_date' => 'required|date',
+            'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after:start_date',
             'used' => 'prohibited',
             'max_used' => 'required|numeric|min:0|max:1000',
@@ -52,6 +52,8 @@ class VoucherRequest extends FormRequest
             'status' => 'prohibited',
             'category_id' => 'required|exists:categories_vouchers,id',
             'max_discount' => 'nullable|numeric|min:10000|max:50000000',
+            'block' => 'nullable|string|in:1,2,3',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         ];
     }
    public function messages(): array
@@ -73,6 +75,7 @@ class VoucherRequest extends FormRequest
         'end_date.required' => 'Ngày kết thúc là bắt buộc.',
         'end_date.date' => 'Ngày kết thúc không đúng định dạng ngày.',
         'end_date.after' => 'Ngày kết thúc phải sau ngày bắt đầu.',
+        'start_date.after_or_equal' => "Không thể là quá khứ",
 
         'used.prohibited' => 'Trường này không được phép gửi.',
 
@@ -93,6 +96,12 @@ class VoucherRequest extends FormRequest
         'min_order_value.max' => 'Quá giới hạn cho phép là 50.000.000.',
         'max_used.max' => 'Quá giới hạn cho phép là 1000.',
         'max_discount.max' => 'Quá giới hạn cho phép là 50.000.000.',
+        'block.string' => 'Nơi hiển thị phải là chuỗi.',
+        'block.in' => 'Nơi hiển thị không hợp lệ.',
+        'image.image' => 'Ảnh đại diện phải là một tệp hình ảnh.',
+        'image.mimes' => 'Ảnh đại diện chỉ chấp nhận định dạng jpg, jpeg, png.',
+        'image.max' => 'Ảnh đại diện không được vượt quá 2MB.',
+
 
     ];
 }
