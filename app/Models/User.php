@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
@@ -15,7 +16,7 @@ class User extends Authenticatable implements MustVerifyEmail
     use HasFactory, Notifiable;
     use HasRoles;
     use HasPermissions;
-
+    use SoftDeletes;
     /**
      * The attributes that are mass assignable.
      *
@@ -53,17 +54,15 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
-            'total_spent' => 'float', 
+            'total_spent' => 'float',
             'point' => 'integer',
         ];
     }
-    
+
     public function vouchers()
     {
         return $this->belongsToMany(Vouchers::class, 'vouchers_users')
             ->withPivot('status', 'is_used', 'issued_date')
             ->withTimestamps();
     }
-
-    
 }

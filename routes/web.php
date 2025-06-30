@@ -56,7 +56,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('checkout', [OrderController::class, 'processCheckout'])->name('home.processCheckout');
     Route::post('checkout/update-shipping-type', [OrderController::class, 'updateShippingType'])->name('checkout.updateShippingType');
     Route::get('done', [OrderController::class, 'done'])->name('home.done');
-    
+
     // Address management
     Route::get('addresses', [AddressBookController::class, 'index'])->name('addresses.index');
     Route::post('addresses', [AddressBookController::class, 'store'])->name('addresses.store');
@@ -130,7 +130,8 @@ Route::prefix('dashboard')->group(function () {
     Route::post('/products/upload-temp-image', [ProductsController::class, 'uploadTempImage'])->name('products.uploadTempImage');
     Route::post('/products/upload-temp-variant-image', [ProductsController::class, 'uploadTempVariantImage'])->name('products.uploadTempVariantImage');
     Route::resource('users', UserController::class);
-    Route::delete('/users/bulk-delete', [UserController::class, 'bulkDelete'])->name('users.bulkDelete');
+    Route::get('/users/{id}', [UserController::class, 'show'])->name('users.show');
+    Route::post('/users/bulk-delete', [UserController::class, 'bulkDelete'])->name('users.bulk-delete');
 });
 
 
@@ -144,4 +145,3 @@ Route::prefix('dashboard')->name('dashboard.')->group(function () {
 
 // VNPAY Payment Routes
 Route::post('/vnpay/ipn', [OrderController::class, 'vnpayIpn'])->name('vnpay.ipn');
-
