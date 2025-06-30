@@ -18,10 +18,17 @@ public function index()
 {
     $userId = Auth::id();
 
+   
+    $cartItems = Cart::with('productVariant.color')->where('user_id', $userId)->get();
     $cartItems = Cart::with('productVariant.color', 'productVariant.size', 'productVariant.product')->where('user_id', $userId)->get();
 
-    $subtotal = $cartItems->sum(fn($item) => $item->quantity * $item->price_at_time);
+   
+    $selectedIds = session('cart_selected_ids', []);
 
+   
+    $selectedItems = $cartItems->whereIn('id', $selectedIds);
+
+    $subtotal = $selectedItems->sum(fn($item) => $item->quantity * $item->price_at_time);
     // CHỈ lấy voucher nếu thực sự có session mã
     $voucherDiscount = session()->has('voucher_code') && session()->has('voucher_discount')
         ? session('voucher_discount')
@@ -29,7 +36,31 @@ public function index()
     
     $total = $subtotal - $voucherDiscount;
 
-    // Lấy danh sách voucher người dùng đang có
+    $voucherDiscount = 0;
+
+    
+    if (count($selectedItems) > 0 && session()->has('voucher_code')) {
+        $voucherCode = session('voucher_code');
+        $voucher = DB::table('vouchers')
+            ->where('code', $voucherCode)
+            ->where('status', 'active')
+            ->first();
+
+        if ($voucher && $subtotal >= ($voucher->min_order_value ?? 0)) {
+            if ($voucher->type_discount === 'percent') {
+                $voucherDiscount = round($subtotal * ($voucher->value / 100));
+                if ($voucher->max_discount && $voucherDiscount > $voucher->max_discount) {
+                    $voucherDiscount = $voucher->max_discount;
+                }
+            } else {
+                $voucherDiscount = $voucher->value;
+            }
+        }
+    }
+
+    $total = $subtotal - $voucherDiscount;
+
+    
     $availableVouchers = DB::table('vouchers')
         ->join('vouchers_users', 'vouchers.id', '=', 'vouchers_users.voucher_id')
         ->where('vouchers_users.user_id', $userId)
@@ -39,12 +70,82 @@ public function index()
 
     return view('pages.shop.cart', compact(
         'cartItems',
+        'selectedIds', 
         'subtotal',
         'voucherDiscount',
         'total',
         'availableVouchers'
     ));
 }
+
+
+public function ajaxUpdateSelected(Request $request)
+{
+    $userId = Auth::id();
+    $ids = $request->input('ids', []);
+
+    session(['cart_selected_ids' => $ids]);
+
+    $cartItems = Cart::with('productVariant.color')
+        ->where('user_id', $userId)
+        ->whereIn('id', $ids)
+        ->get();
+
+    $subtotal = $cartItems->sum(fn($item) => $item->quantity * $item->price_at_time);
+
+    $voucherDiscount = 0;
+    $voucherRemoved = false;
+
+    if (session()->has('voucher_code')) {
+        $voucher = DB::table('vouchers')
+            ->where('code', session('voucher_code'))
+            ->where('status', 'active')
+            ->first();
+
+        if ($voucher && $voucher->type_discount === 'percent') {
+            $voucherDiscount = round($subtotal * ($voucher->value / 100));
+            if ($voucher->max_discount && $voucherDiscount > $voucher->max_discount) {
+                $voucherDiscount = $voucher->max_discount;
+            }
+
+            if ($voucher->min_order_value && $subtotal < $voucher->min_order_value) {
+                session()->forget(['voucher_code', 'voucher_discount']);
+                $voucherDiscount = 0;
+                $voucherRemoved = true;
+            } else {
+                session(['voucher_discount' => $voucherDiscount]);
+            }
+        } elseif ($voucher) {
+            $voucherDiscount = $voucher->value;
+            if ($voucher->min_order_value && $subtotal < $voucher->min_order_value) {
+                session()->forget(['voucher_code', 'voucher_discount']);
+                $voucherDiscount = 0;
+                $voucherRemoved = true;
+            } else {
+                session(['voucher_discount' => $voucherDiscount]);
+            }
+        } else {
+            session()->forget(['voucher_code', 'voucher_discount']);
+            $voucherDiscount = 0;
+            $voucherRemoved = true;
+        }
+    }
+
+    $total = $subtotal - $voucherDiscount;
+
+    return response()->json([
+        'success' => true,
+        'subtotal' => number_format($subtotal, 0, ',', '.'),
+        'voucher_discount' => number_format($voucherDiscount, 0, ',', '.'),
+        'total' => number_format($total, 0, ',', '.'),
+        'voucher_removed' => $voucherRemoved,
+    ]);
+}
+
+
+
+
+
 
    public function deleteSelected(Request $request)
 {
@@ -137,26 +238,63 @@ public function applyVoucher(Request $request)
         'code' => 'required|string'
     ]);
 
+    $userId = Auth::id();
+    $now = now();
+
     $voucher = DB::table('vouchers')
         ->where('code', $request->code)
         ->where('status', 'active')
         ->first();
 
     if (!$voucher) {
-        return redirect()->back()->with('error', 'Mã giảm giá không hợp lệ');
+        return redirect()->back()->with('error', 'Mã giảm giá không hợp lệ hoặc không hoạt động.');
     }
 
-    $userId = Auth::id();
-    $cartItems = Cart::where('user_id', $userId)->get();
+    if (($voucher->start_date && $now->lt($voucher->start_date)) ||
+        ($voucher->end_date && $now->gt($voucher->end_date))) {
+        return redirect()->back()->with('error', 'Mã giảm giá đã hết hạn hoặc chưa đến thời gian sử dụng.');
+    }
 
+    if ($voucher->max_used !== null && $voucher->used >= $voucher->max_used) {
+        return redirect()->back()->with('error', 'Mã giảm giá đã được sử dụng hết lượt.');
+    }
+
+    $userHasVoucher = DB::table('vouchers_users')
+        ->where('user_id', $userId)
+        ->where('voucher_id', $voucher->id)
+        ->where('status', 'available')
+        ->exists();
+
+    if (!$userHasVoucher) {
+        return redirect()->back()->with('error', 'Bạn chưa nhận được mã giảm giá này.');
+    }
+
+
+    $selectedIds = session('cart_selected_ids', []);
+
+    if (empty($selectedIds)) {
+        return redirect()->back()->with('error', 'Vui lòng chọn sản phẩm để áp dụng mã giảm giá.');
+    }
+
+    $cartItems = Cart::where('user_id', $userId)
+        ->whereIn('id', $selectedIds)
+        ->get();
+
+    if ($cartItems->isEmpty()) {
+        return redirect()->back()->with('error', 'Không thể áp dụng mã vì không có sản phẩm hợp lệ được chọn.');
+    }
+
+    
     $subtotal = $cartItems->sum(function ($item) {
         return $item->quantity * $item->price_at_time;
     });
 
+   
     if ($voucher->min_order_value && $subtotal < $voucher->min_order_value) {
-        return redirect()->back()->with('error', 'Đơn hàng phải có giá trị tối thiểu ' . number_format($voucher->min_order_value, 0, ',', '.') . ' đ để sử dụng mã giảm giá này.');
+        return redirect()->back()->with('error', 'Đơn hàng phải tối thiểu ' . number_format($voucher->min_order_value, 0, ',', '.') . ' đ để sử dụng mã này.');
     }
 
+   
     $discount = 0;
     if ($voucher->type_discount === 'percent') {
         $discount = round($subtotal * ($voucher->value / 100));
@@ -167,6 +305,7 @@ public function applyVoucher(Request $request)
         $discount = $voucher->value;
     }
 
+   
     session([
         'voucher_code' => $voucher->code,
         'voucher_discount' => $discount
@@ -174,6 +313,8 @@ public function applyVoucher(Request $request)
 
     return redirect()->back()->with('success', 'Áp dụng mã giảm giá thành công!');
 }
+
+
 
 public function removeVoucher()
 {

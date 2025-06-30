@@ -31,6 +31,7 @@
               @if (session('info'))
                 <div class="d-none toast-message" data-message="{{ session('info') }}" data-type="info"></div>
             @endif
+         
             <div id="toast-container" class="position-fixed bottom-0 end-0 p-3" style="z-index: 9999;"></div>
 
             <div class="row align-items-start">
@@ -51,10 +52,17 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                       @if ($cartItems->isEmpty())
+                                            <small class="text-danger d-block mt-1">Giỏ hàng trống kìa</small>
+                                        @endif
+
                                      @foreach($cartItems as $item)
                                         <tr>
-                                            <td class="product-remove">
-                                               <input type="checkbox" class="cart-item-checkbox" value="{{ $item->id }}">
+                                            
+                                            <td>
+                                                <input type="checkbox" class="cart-item-checkbox"
+                                                    name="selected_ids[]" value="{{ $item->id }}"
+                                                    {{ in_array($item->id, $selectedIds ?? []) ? 'checked' : '' }}>
 
                                             </td>
                                            <td class="product-thumbnail">
@@ -63,13 +71,16 @@
                                                 </a>
                                             </td>
                                             <td class="product-name">
-                                                <a href="{{ route('home.show', $item->productVariant->product->slug) }}" class="text-dark-gray fw-500 d-block lh-initial">
-                                                    {{ $item->productVariant->product->name }}
+                                                <a href="{{ route('home.show', $item->productVariant->product->slug) }}" class="truncate-text text-dark-gray fw-500 d-block lh-initial">
+                                                    {{ $item->productVariant->name }}
                                                 </a>
                                               <span class="fs-14">
-                                                    Màu: {{ $item->productVariant->color->color_name ?? 'N/A' }} | 
-                                                    Size: {{ $item->productVariant->size->size_name ?? 'N/A' }}
+                                                    Màu: {{ $item->productVariant->color->color_name ?? 'N/A' }}
+                                                </span> <br>
+                                                 <span class="fs-14">
+                                                    Màu: {{ $item->productVariant->size->size_name ?? 'N/A' }}
                                                 </span>
+                                                {{-- @dd($item->productVariant->color->color_name, $item->productVariant->size->size_name) --}}
                                             </td>
                                             <td class="product-price" data-title="Price">
                                                 {{ number_format($item->price_at_time, 0, ',', '.') }} đ
@@ -97,7 +108,7 @@
                             <form action="{{ route('cart.applyVoucher') }}" method="POST" class="row g-2 align-items-center">
                                 @csrf
                                 <div class="col-8">
-                                    <select name="code" class="form-select" required>
+                                    <select name="code" class="form-select" {{ $cartItems->isEmpty() ? 'disabled' : '' }} required>
                                         <option value="">-- Chọn mã giảm giá --</option>
                                         @foreach($availableVouchers as $voucher)
                                             <option value="{{ $voucher->code }}"
@@ -111,16 +122,13 @@
                                             </option>
                                         @endforeach
                                     </select>
+
                                 </div>
                                 <div class="col-4">
                                     <button type="submit" class="btn btn-dark w-100">Áp dụng</button>
                                 </div>
                             </form>
                         </div>
-
-
-
-
                         <div class="col-xl-6 col-xxl-5 col-md-6 text-center text-md-end sm-mt-15px">
                           <a href="#" id="delete-selected-btn"
                                 class="btn btn-small border-1 btn-round-edge btn-transparent-light-gray text-transform-none me-15px lg-me-5px">
@@ -141,26 +149,26 @@
                                     </td>
                                 </tr>
 
-                                    <tr class="max_discount">
-                                        <th class="fw-600 text-dark-gray alt-font">
-                                            {{ session('voucher_code') ? 'Voucher' : 'Mã giảm giá' }}
-                                        </th>
-                                        <td data-title="Voucher">
-                                            @if(session('voucher_code'))
-                                                <div class="d-flex justify-content-between align-items-center">
-                                                    <div>
-                                                        <span class="text-danger fw-600">
-                                                            -{{ number_format(session('voucher_discount', 0), 0, ',', '.') }} đ
-                                                        </span><br>
-                                                        <small class="text-dark-gray">({{ session('voucher_code') }})</small>
-                                                    </div>
-                                                    <a href="{{ route('cart.removeVoucher') }}" class="text-danger ms-3">✕</a>
+                                <tr class="max_discount">
+                                    <th class="fw-600 text-dark-gray alt-font">
+                                        {{ session('voucher_code') ? 'Voucher' : 'Mã giảm giá' }}
+                                    </th>
+                                    <td data-title="Voucher" id="voucher-row">
+                                        @if(session('voucher_code'))
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <div>
+                                                    <span id="voucher-discount" class="text-danger fw-600">
+                                                        -{{ number_format(session('voucher_discount', 0), 0, ',', '.') }} đ
+                                                    </span><br>
+                                                    <small class="text-dark-gray">({{ session('voucher_code') }})</small>
                                                 </div>
-                                            @else
-                                                <span class="text-muted">Chưa áp dụng</span>
-                                            @endif
-                                        </td>
-                                    </tr>
+                                                <a href="{{ route('cart.removeVoucher') }}" class="text-danger ms-3">✕</a>
+                                            </div>
+                                        @else
+                                            <span id="voucher-discount" class="text-muted">-0 đ</span>
+                                        @endif
+                                    </td>
+                                </tr>
 
                                 <tr class="total-amount">
                                     <th class="fw-600 text-dark-gray alt-font pb-0">Tổng tiền </th>
@@ -170,6 +178,7 @@
                                         </h6>
                                     </td>
                                 </tr>
+
                             </tbody>
                         </table>
                         <a href="{{ route('home.checkout') }}"
@@ -301,6 +310,63 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const checkboxes = document.querySelectorAll('.cart-item-checkbox');
+    const selectAll = document.getElementById('select-all-cart');
+
+    function updateCartSelected() {
+        let selectedIds = Array.from(document.querySelectorAll('.cart-item-checkbox:checked'))
+            .map(cb => cb.value);
+
+        fetch("{{ route('cart.ajaxUpdateSelected') }}", {
+            method: "POST",
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ ids: selectedIds })
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.success) {
+                document.getElementById('subtotal').innerText = res.subtotal;
+                document.getElementById('total').innerText = res.total;
+
+                const voucherRow = document.getElementById('voucher-row');
+                const voucherDiscountEl = document.getElementById('voucher-discount');
+
+                if (res.voucher_removed) {
+                    voucherRow.innerHTML = `<span class="text-muted">Chưa áp dụng</span>`;
+                } else if (voucherDiscountEl) {
+                    voucherDiscountEl.innerText = '-' + res.voucher_discount;
+                }
+            }
+        })
+        .catch(err => {
+            console.error('Lỗi khi cập nhật giỏ hàng:', err);
+        });
+    }
+
+    checkboxes.forEach(function (checkbox) {
+        checkbox.addEventListener('change', function () {
+            selectAll.checked = document.querySelectorAll('.cart-item-checkbox:checked').length === checkboxes.length;
+            updateCartSelected();
+        });
+    });
+
+    selectAll.addEventListener('change', function () {
+        checkboxes.forEach(function (cb) {
+            cb.checked = selectAll.checked;
+        });
+        updateCartSelected();
+    });
+});
+</script>
+
+
+
+
 
 <script>
 
@@ -338,9 +404,20 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 </script>
+
 @endsection
 @section('cdn-custom')
     <style>
+
+ .truncate-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: block;
+        max-width: 200px; 
+    }
+
+
         .coupon-code-panel.d-block.d-sm-none::before {
             content: none;
         }
@@ -352,5 +429,6 @@ document.addEventListener('DOMContentLoaded', function () {
         margin-right: 0 !important;
     }
 }
+
     </style>
 @endsection
