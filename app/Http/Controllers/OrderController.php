@@ -31,9 +31,26 @@ class OrderController extends Controller
 
         $userId = Auth::id();
 
-        // Lấy giỏ hàng
+        // Lấy các sản phẩm được chọn từ giỏ hàng
+        $selectedIds = session('cart_selected_ids', []);
+        
+        // Nếu chưa có sản phẩm nào được chọn, tự động chọn tất cả
+        if (empty($selectedIds)) {
+            $allCartItems = Cart::where('user_id', $userId)->pluck('id')->toArray();
+            if (!empty($allCartItems)) {
+                session(['cart_selected_ids' => $allCartItems]);
+                $selectedIds = $allCartItems;
+            }
+        }
+        
+        if (empty($selectedIds)) {
+            return redirect()->route('home.cart')->with('error', 'Vui lòng chọn sản phẩm để thanh toán!');
+        }
+
+        // Lấy giỏ hàng chỉ các sản phẩm được chọn
         $cartItems = Cart::with(['productVariant.color', 'productVariant.size', 'productVariant.product'])
             ->where('user_id', $userId)
+            ->whereIn('id', $selectedIds)
             ->get();
 
         if ($cartItems->isEmpty()) {
@@ -110,9 +127,26 @@ class OrderController extends Controller
 
             $userId = Auth::id();
 
-            // Lấy giỏ hàng
+            // Lấy các sản phẩm được chọn từ giỏ hàng
+            $selectedIds = session('cart_selected_ids', []);
+            
+            // Nếu chưa có sản phẩm nào được chọn, tự động chọn tất cả
+            if (empty($selectedIds)) {
+                $allCartItems = Cart::where('user_id', $userId)->pluck('id')->toArray();
+                if (!empty($allCartItems)) {
+                    session(['cart_selected_ids' => $allCartItems]);
+                    $selectedIds = $allCartItems;
+                }
+            }
+            
+            if (empty($selectedIds)) {
+                return redirect()->route('home.cart')->with('error', 'Vui lòng chọn sản phẩm để thanh toán!');
+            }
+
+            // Lấy giỏ hàng chỉ các sản phẩm được chọn
             $cartItems = Cart::with(['productVariant.color', 'productVariant.size', 'productVariant.product'])
                 ->where('user_id', $userId)
+                ->whereIn('id', $selectedIds)
                 ->get();
 
             if ($cartItems->isEmpty()) {
@@ -181,14 +215,17 @@ class OrderController extends Controller
                 $orderItemData = [
                     'order_id' => $order->id,
                     'product_variant_id' => $item->product_variants_id,
+                    'flash_sale_items_id' => $item->flash_sale_items_id ?? null,
                     'product_id' => $item->productVariant->product_id,
                     'product_name' => $item->productVariant->product->name,
-                    'product_image_url' => $item->productVariant->product->image_url ?? '',
+                    'product_image_url' => $item->productVariant->variant_image_url ?? $item->productVariant->product->image_url ?? '',
                     'import_price' => $item->productVariant->import_price,
                     'listed_price' => $item->productVariant->listed_price,
                     'sale_price' => $item->price_at_time,
                     'quantity' => $item->quantity,
-                    'promotion_type' => '0'
+                    'promotion_type' => $item->promotion_type ?? '0',
+                    'color_name' => $item->productVariant->color->color_name ?? '',
+                    'size_name' => $item->productVariant->size->size_name ?? ''
                 ];
 
                 OrderItem::create($orderItemData);
@@ -197,11 +234,22 @@ class OrderController extends Controller
                 $item->productVariant->decrement('stock', $item->quantity);
             }
 
-            // Xóa giỏ hàng
-            Cart::where('user_id', $userId)->delete();
+            // Xóa các sản phẩm đã được chọn khỏi giỏ hàng
+            Cart::whereIn('id', $selectedIds)->delete();
 
-            // Xóa session voucher
-            session()->forget(['voucher_code', 'voucher_discount', 'shipping_fee']);
+            // Cập nhật trạng thái voucher đã sử dụng
+            if (session('voucher_code')) {
+                $voucher = Vouchers::where('code', session('voucher_code'))->first();
+                if ($voucher) {
+                    DB::table('vouchers_users')
+                        ->where('user_id', $userId)
+                        ->where('voucher_id', $voucher->id)
+                        ->update(['is_used' => 'used']);
+                }
+            }
+
+            // Xóa session voucher và cart_selected_ids
+            session()->forget(['voucher_code', 'voucher_discount', 'shipping_fee', 'cart_selected_ids']);
 
             // Lưu thông tin thanh toán vào session để hiển thị ở trang thành công
             session([
@@ -388,8 +436,15 @@ class OrderController extends Controller
 
         // Tính toán lại phí vận chuyển và tổng tiền
         $userId = Auth::id();
+        $selectedIds = session('cart_selected_ids', []);
+        
+        if (empty($selectedIds)) {
+            return response()->json(['error' => 'Không có sản phẩm nào được chọn'], 400);
+        }
+
         $cartItems = Cart::with(['productVariant.color', 'productVariant.size', 'productVariant.product'])
             ->where('user_id', $userId)
+            ->whereIn('id', $selectedIds)
             ->get();
 
         $subtotal = $cartItems->sum(fn($item) => $item->quantity * $item->price_at_time);
@@ -463,6 +518,7 @@ class OrderController extends Controller
                 // Thanh toán thành công
                 $order->update([
                     'status_pay' => 'paid',
+                    'status' => 'confirmed',
                     'payment_date' => now()
                 ]);
 
@@ -756,6 +812,7 @@ class OrderController extends Controller
             if ($responseCode === '00' && $transactionStatus === '00') {
                 $order->update([
                     'status_pay' => 'paid',
+                    'status' => 'confirmed',
                     'payment_date' => now()
                 ]);
 
