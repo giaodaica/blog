@@ -394,7 +394,6 @@ function showToast(message, type = 'info') {
     toast.querySelector('.btn-close').onclick = () => toast.remove();
 }
 
-
 document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('.toast-message').forEach(function(el) {
         const msg = el.getAttribute('data-message');
