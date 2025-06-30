@@ -2,7 +2,6 @@
 @section('cdn-custom')
     <link rel="stylesheet" href="{{ asset('assets/css/info.css') }}">
     <link href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css" rel="stylesheet">
-
 @endsection
 @section('js-page-custom')
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -31,32 +30,32 @@
     <section class="position-relative">
         <div class="container">
             <!-- Alert Section -->
-            @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
-                <i class="bi bi-check-circle-fill me-2"></i>
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+            @if (session('success'))
+                <div class="alert alert-success alert-dismissible fade show mb-4" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             @endif
 
-            @if(session('error'))
-            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
-                <i class="bi bi-exclamation-circle-fill me-2"></i>
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+            @if (session('error'))
+                <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                    <i class="bi bi-exclamation-circle-fill me-2"></i>
+                    {{ session('error') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             @endif
 
-            @if($errors->any())
-            <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
-                <i class="bi bi-exclamation-circle-fill me-2"></i>
-                <ul class="mb-0">
-                    @foreach($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+            @if ($errors->any())
+                <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+                    <i class="bi bi-exclamation-circle-fill me-2"></i>
+                    <ul class="mb-0">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
             @endif
 
             <div class="row">
@@ -96,7 +95,8 @@
                             <li class="nav-item">
                                 <form action="{{ route('logout') }}" method="POST" class="d-inline">
                                     @csrf
-                                    <a href="#" onclick="event.preventDefault(); this.closest('form').submit();" class="nav-link">
+                                    <a href="#" onclick="event.preventDefault(); this.closest('form').submit();"
+                                        class="nav-link">
                                         <span>
                                             <span class="me-5px"><i class="bi bi-power"></i></span>
                                             <span>Đăng xuất</span>
@@ -124,7 +124,8 @@
                                                 class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-4">
                                                 <h6 class="text-primary text-uppercase fs-5 mb-0">Thông
                                                     tin khách hàng</h6>
-                                                <a href="#" class="badge bg-light text-primary fw-normal" data-bs-toggle="modal" data-bs-target="#editCustomerInfoModal"    ><i
+                                                <a href="#" class="badge bg-light text-primary fw-normal"
+                                                    data-bs-toggle="modal" data-bs-target="#editCustomerInfoModal"><i
                                                         class="bi bi-pencil-fill me-1"></i>Chỉnh sửa</a>
                                             </div>
 
@@ -158,7 +159,9 @@
                                                             <td class="text-muted">Mật khẩu</td>
                                                             <td class="fw-semibold">
                                                                 <span class="password-mask">***********</span>
-                                                                <a href="#" class="badge bg-light text-primary fw-normal ms-2" id="showChangePasswordForm">
+                                                                <a href="#"
+                                                                    class="badge bg-light text-primary fw-normal ms-2"
+                                                                    id="showChangePasswordForm">
                                                                     <i class="bi bi-key-fill me-1"></i>Đổi mật khẩu
                                                                 </a>
                                                             </td>
@@ -178,25 +181,39 @@
                                                             <div class="row g-3">
                                                                 <div class="col-md-12">
                                                                     <div class="mb-3">
-                                                                        <label for="current_password" class="form-label">Mật khẩu hiện tại</label>
-                                                                        <input type="password" class="form-control" id="current_password" name="current_password" required>
+                                                                        <label for="current_password"
+                                                                            class="form-label">Mật khẩu hiện tại</label>
+                                                                        <input type="password" class="form-control"
+                                                                            id="current_password" name="current_password"
+                                                                            required>
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6">
                                                                     <div class="mb-3">
-                                                                        <label for="new_password" class="form-label">Mật khẩu mới</label>
-                                                                        <input type="password" class="form-control" id="new_password" name="new_password" required>
+                                                                        <label for="new_password" class="form-label">Mật
+                                                                            khẩu mới</label>
+                                                                        <input type="password" class="form-control"
+                                                                            id="new_password" name="new_password"
+                                                                            required>
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-md-6">
                                                                     <div class="mb-3">
-                                                                        <label for="new_password_confirmation" class="form-label">Xác nhận mật khẩu mới</label>
-                                                                        <input type="password" class="form-control" id="new_password_confirmation" name="new_password_confirmation" required>
+                                                                        <label for="new_password_confirmation"
+                                                                            class="form-label">Xác nhận mật khẩu
+                                                                            mới</label>
+                                                                        <input type="password" class="form-control"
+                                                                            id="new_password_confirmation"
+                                                                            name="new_password_confirmation" required>
                                                                     </div>
                                                                 </div>
                                                                 <div class="col-12">
-                                                                    <button type="submit" class="btn btn-medium btn-dark-gray">Cập nhật mật khẩu</button>
-                                                                    <button type="button" class="btn btn-fancy btn-medium btn-light-gray ms-2" id="cancelChangePassword">Hủy</button>
+                                                                    <button type="submit"
+                                                                        class="btn btn-medium btn-dark-gray">Cập nhật mật
+                                                                        khẩu</button>
+                                                                    <button type="button"
+                                                                        class="btn btn-fancy btn-medium btn-light-gray ms-2"
+                                                                        id="cancelChangePassword">Hủy</button>
                                                                 </div>
                                                             </div>
                                                         </form>
@@ -209,53 +226,24 @@
                                                 class="d-flex align-items-center justify-content-between border-bottom pb-2 mb-4">
                                                 <h6 class="text-primary text-uppercase fs-5 mb-0">Địa
                                                     chỉ giao hàng</h6>
-                                                <span class="badge bg-light text-primary fw-normal"><i
-                                                        class="bi bi-geo-alt-fill me-1"></i>Address
-                                                    Info</span>
+                                                <a href="{{ route('addresses.store') }}">
+                                                    <span class="badge bg-light text-primary fw-normal"><i
+                                                            class="bi bi-geo-alt-fill me-1"></i>Chỉnh sửa
+                                                    </span></a>
                                             </div>
-
                                             <div class="row g-4">
                                                 <!-- Home Address -->
-                                                <div class="col-md-6">
-                                                    <div class="card border-0 shadow-sm h-100">
-                                                        <div class="card-body position-relative">
-                                                            <a href="address.html"
-                                                                class="badge bg-primary-subtle text-primary position-absolute top-0 end-0 m-2">
-                                                                <i class="bi bi-pencil-fill me-1"></i>
-                                                                Chỉnh sửa
-                                                            </a>
-                                                            <p class="text-muted text-uppercase fw-semibold small mb-1">
-                                                                Home Address</p>
-                                                            <h6 class="fw-bold mb-1">Raquel Murillo</h6>
-                                                            <p class="text-muted mb-1">144 Cavendish
-                                                                Avenue, Indianapolis,
-                                                                IN 46251</p>
-                                                            <p class="text-muted mb-0">Mo. +(253) 01234
-                                                                5678</p>
+                                                @foreach ($addresses as $addr)
+                                                    <div class="col-md-6">
+                                                        <div class="card border-0 shadow-sm h-100">
+                                                            <div class="card-body position-relative">
+                                                                <h6 class="fw-bold mb-1">{{ $addr->name }}</h6>
+                                                                <p class="text-muted mb-1"><i class="bi bi-geo-alt-fill me-1"></i>{{ $addr->address }}</p>
+                                                                <p class="text-muted mb-0"><i class="bi bi-telephone-fill me-1"></i>{{ $addr->phone }}</p>
+                                                            </div>
                                                         </div>
                                                     </div>
-                                                </div>
-
-                                                <!-- Shipping Address -->
-                                                <div class="col-md-6">
-                                                    <div class="card border-0 shadow-sm h-100">
-                                                        <div class="card-body position-relative">
-                                                            <a href="address.html"
-                                                                class="badge bg-primary-subtle text-primary position-absolute top-0 end-0 m-2">
-                                                                <i class="bi bi-pencil-fill me-1"></i>
-                                                                Chỉnh sửa
-                                                            </a>
-                                                            <p class="text-muted text-uppercase fw-semibold small mb-1">
-                                                                Shipping Address</p>
-                                                            <h6 class="fw-bold mb-1">James Honda</h6>
-                                                            <p class="text-muted mb-1">1246 Virgil
-                                                                Street, Pensacola, FL
-                                                                32501</p>
-                                                            <p class="text-muted mb-0">Mo. +(253) 01234
-                                                                5678</p>
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                @endforeach
                                             </div>
                                             <!-- end address row -->
 
@@ -304,8 +292,8 @@
                                         <div class="tab-content">
                                             <!-- start tab content -->
                                             <div class="tab-pane fade in active show" id="tab_third1">
-                                                @if($orders->count() > 0)
-                                                    @foreach($orders as $order)
+                                                @if ($orders->count() > 0)
+                                                    @foreach ($orders as $order)
                                                         <div class="card border-0 shadow-sm mb-3">
                                                             <div class="card-body p-4">
                                                                 <!-- Order Header -->
@@ -314,34 +302,42 @@
                                                                     <div class="mb-2 mb-md-0">
                                                                         <span class="text-muted small">Mã đơn
                                                                             hàng: #{{ $order->code_order }}</span>
-                                                                        <span class="text-muted small ms-2">{{ $order->created_at->format('d/m/Y') }}</span>
+                                                                        <span
+                                                                            class="text-muted small ms-2">{{ $order->created_at->format('d/m/Y') }}</span>
                                                                     </div>
-                                                                    <span class="badge 
-                                                                        @if($order->status == 'pending') bg-warning text-dark
+                                                                    <span
+                                                                        class="badge 
+                                                                        @if ($order->status == 'pending') bg-warning text-dark
                                                                         @elseif($order->status == 'confirmed') bg-info text-white
                                                                         @elseif($order->status == 'shipping') bg-primary text-white
                                                                         @elseif($order->status == 'success') bg-success text-white
-                                                                        @elseif($order->status == 'cancelled') bg-danger text-white
-                                                                        @endif">
-                                                                        @if($order->status == 'pending') Chờ xác nhận
-                                                                        @elseif($order->status == 'confirmed') Đã xác nhận
-                                                                        @elseif($order->status == 'shipping') Đang vận chuyển
-                                                                        @elseif($order->status == 'success') Đã giao hàng
-                                                                        @elseif($order->status == 'cancelled') Đã hủy
+                                                                        @elseif($order->status == 'cancelled') bg-danger text-white @endif">
+                                                                        @if ($order->status == 'pending')
+                                                                            Chờ xác nhận
+                                                                        @elseif($order->status == 'confirmed')
+                                                                            Đã xác nhận
+                                                                        @elseif($order->status == 'shipping')
+                                                                            Đang vận chuyển
+                                                                        @elseif($order->status == 'success')
+                                                                            Đã giao hàng
+                                                                        @elseif($order->status == 'cancelled')
+                                                                            Đã hủy
                                                                         @endif
                                                                     </span>
                                                                 </div>
 
                                                                 <!-- Order Items -->
-                                                                @foreach($order->orderItems as $item)
+                                                                @foreach ($order->orderItems as $item)
                                                                     <div class="row g-3 mb-3">
                                                                         <!-- Product Image -->
                                                                         <div class="col-4 col-md-2">
-                                                                            @if($item->productVariant && $item->productVariant->product)
+                                                                            @if ($item->productVariant && $item->productVariant->product)
                                                                                 <img src="{{ asset('uploads/products/' . $item->productVariant->product->image_url) }}"
-                                                                                    alt="{{ $item->product_name }}" class="img-fluid rounded w-100" />
+                                                                                    alt="{{ $item->product_name }}"
+                                                                                    class="img-fluid rounded w-100" />
                                                                             @else
-                                                                                <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 80px;">
+                                                                                <div class="bg-light rounded d-flex align-items-center justify-content-center"
+                                                                                    style="height: 80px;">
                                                                                     <i class="bi bi-image text-muted"></i>
                                                                                 </div>
                                                                             @endif
@@ -349,23 +345,30 @@
 
                                                                         <!-- Product Info -->
                                                                         <div class="col-8 col-md-7">
-                                                                            <h6 class="mb-1">{{ $item->product_name }}</h6>
-                                                                            @if($item->productVariant)
+                                                                            <h6 class="mb-1">{{ $item->product_name }}
+                                                                            </h6>
+                                                                            @if ($item->productVariant)
                                                                                 <p class="text-muted small mb-1">
-                                                                                    @if($item->productVariant->size)
-                                                                                        Size: {{ $item->productVariant->size->size_name }}
+                                                                                    @if ($item->productVariant->size)
+                                                                                        Size:
+                                                                                        {{ $item->productVariant->size->size_name }}
                                                                                     @endif
-                                                                                    @if($item->productVariant->color)
-                                                                                        | Màu: {{ $item->productVariant->color->color_name }}
+                                                                                    @if ($item->productVariant->color)
+                                                                                        | Màu:
+                                                                                        {{ $item->productVariant->color->color_name }}
                                                                                     @endif
                                                                                 </p>
                                                                             @endif
-                                                                            <p class="text-muted small mb-0">Số lượng: {{ $item->quantity }}</p>
+                                                                            <p class="text-muted small mb-0">Số lượng:
+                                                                                {{ $item->quantity }}</p>
                                                                         </div>
 
                                                                         <!-- Price -->
-                                                                        <div class="col-12 col-md-3 text-start text-md-end">
-                                                                            <h6 class="text-danger mb-2">{{ number_format($item->sale_price * $item->quantity, 0, ',', '.') }}₫</h6>
+                                                                        <div
+                                                                            class="col-12 col-md-3 text-start text-md-end">
+                                                                            <h6 class="text-danger mb-2">
+                                                                                {{ number_format($item->sale_price * $item->quantity, 0, ',', '.') }}₫
+                                                                            </h6>
                                                                         </div>
                                                                     </div>
                                                                 @endforeach
@@ -375,21 +378,26 @@
                                                                     <div class="row">
                                                                         <div class="col-md-6">
                                                                             <p class="text-muted small mb-1">
-                                                                                <strong>Phương thức thanh toán:</strong> 
-                                                                                @if($order->pay_method == 'COD') Tiền mặt khi nhận hàng
-                                                                                @elseif($order->pay_method == 'VNPAY') VNPAY
-                                                                                @else {{ $order->pay_method }}
+                                                                                <strong>Phương thức thanh toán:</strong>
+                                                                                @if ($order->pay_method == 'COD')
+                                                                                    Tiền mặt khi nhận hàng
+                                                                                @elseif($order->pay_method == 'VNPAY')
+                                                                                    VNPAY
+                                                                                @else
+                                                                                    {{ $order->pay_method }}
                                                                                 @endif
                                                                             </p>
-                                                                            @if($order->shipping_fee > 0)
+                                                                            @if ($order->shipping_fee > 0)
                                                                                 <p class="text-muted small mb-1">
-                                                                                    <strong>Phí vận chuyển:</strong> {{ number_format($order->shipping_fee, 0, ',', '.') }}₫
+                                                                                    <strong>Phí vận chuyển:</strong>
+                                                                                    {{ number_format($order->shipping_fee, 0, ',', '.') }}₫
                                                                                 </p>
                                                                             @endif
                                                                         </div>
                                                                         <div class="col-md-6 text-md-end">
                                                                             <h6 class="text-primary mb-0">
-                                                                                <strong>Tổng cộng: {{ number_format($order->final_amount, 0, ',', '.') }}₫</strong>
+                                                                                <strong>Tổng cộng:
+                                                                                    {{ number_format($order->final_amount, 0, ',', '.') }}₫</strong>
                                                                             </h6>
                                                                         </div>
                                                                     </div>
@@ -402,8 +410,10 @@
                                                         <div class="card-body p-4 text-center">
                                                             <i class="bi bi-bag-x fs-1 text-muted mb-3"></i>
                                                             <h5 class="text-muted">Chưa có đơn hàng nào</h5>
-                                                            <p class="text-muted">Bạn chưa có đơn hàng nào. Hãy mua sắm ngay!</p>
-                                                            <a href="{{ route('home.shop') }}" class="btn btn-primary">Mua sắm ngay</a>
+                                                            <p class="text-muted">Bạn chưa có đơn hàng nào. Hãy mua sắm
+                                                                ngay!</p>
+                                                            <a href="{{ route('home.shop') }}"
+                                                                class="btn btn-primary">Mua sắm ngay</a>
                                                         </div>
                                                     </div>
                                                 @endif

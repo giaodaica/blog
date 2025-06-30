@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AddressBook;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\Order;
@@ -21,14 +22,22 @@ class InfoController extends Controller
         return redirect()->back()->with('success', 'Thông tin đã được cập nhật thành công!');
     }
 
-    public function getOrderHistory()
+    public function account()
     {
         $user = Auth::user();
-        $orders = Order::with(['orderItems.productVariant.color', 'orderItems.productVariant.size', 'orderItems.productVariant.product'])
-            ->where('user_id', $user->id)
-            ->orderBy('created_at', 'desc')
-            ->get();
-
-        return view('pages.shop.account', compact('orders'));
+    
+        $orders = Order::with([
+            'orderItems.productVariant.color',
+            'orderItems.productVariant.size',
+            'orderItems.productVariant.product'
+        ])
+        ->where('user_id', $user->id)
+        ->orderBy('created_at', 'desc')
+        ->get();
+    
+        $addresses = AddressBook::where('user_id', $user->id)->limit(2)->get();
+    
+        return view('pages.shop.account', compact('orders', 'addresses'));
     }
+   
 }
