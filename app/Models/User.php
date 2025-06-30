@@ -9,7 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Spatie\Permission\Traits\HasPermissions;
 use Spatie\Permission\Traits\HasRoles;
 
-class User extends Authenticatable implements MustVerifyEmail   
+class User extends Authenticatable implements MustVerifyEmail
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -27,7 +27,10 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'default_phone',
         'default_address',
-        
+        'role',
+        'total_spent',
+        'point',
+        'rank',
     ];
 
     /**
@@ -50,12 +53,17 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'total_spent' => 'float', 
+            'point' => 'integer',
         ];
     }
+    
     public function vouchers()
-{
-    return $this->belongsToMany(Vouchers::class, 'vouchers_users')
-                ->withPivot('status', 'is_used', 'issued_date')
-                ->withTimestamps();
-}
+    {
+        return $this->belongsToMany(Vouchers::class, 'vouchers_users')
+            ->withPivot('status', 'is_used', 'issued_date')
+            ->withTimestamps();
+    }
+
+    
 }

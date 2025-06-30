@@ -7,12 +7,12 @@ use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\ChatBotController;
 use App\Http\Controllers\ColorController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ImageProductVariantsController;
 use App\Http\Controllers\InfoController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ProductVariantsController;
 
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\web\SearchController;
 use App\Http\Controllers\SizeController;
 use App\Http\Controllers\Spatie\PermissionController;
@@ -127,11 +127,10 @@ Route::prefix('dashboard')->group(function () {
     Route::delete('variants/{id}', [ProductVariantsController::class, 'destroy'])->name('variants.destroy');
     Route::get('products/{product}/variants', [ProductVariantsController::class, 'showVariants'])->name('products.variants');
     Route::post('variants/{id}/restore', [ProductVariantsController::class, 'restore'])->name('variants.restore');
-
     Route::post('/products/upload-temp-image', [ProductsController::class, 'uploadTempImage'])->name('products.uploadTempImage');
-
-
     Route::post('/products/upload-temp-variant-image', [ProductsController::class, 'uploadTempVariantImage'])->name('products.uploadTempVariantImage');
+    Route::resource('users', UserController::class);
+    Route::delete('/users/bulk-delete', [UserController::class, 'bulkDelete'])->name('users.bulkDelete');
 });
 
 
@@ -145,3 +144,4 @@ Route::prefix('dashboard')->name('dashboard.')->group(function () {
 
 // VNPAY Payment Routes
 Route::post('/vnpay/ipn', [OrderController::class, 'vnpayIpn'])->name('vnpay.ipn');
+
