@@ -154,14 +154,6 @@
                                                 <td class="text-dark-gray fw-600">-{{ number_format($voucherDiscount, 0, ',', '.') }} đ</td>
                                             </tr>
                                         @endif
-                                        <tr class="shipping">
-                                            <th class="fw-600 text-dark-gray alt-font">Phí vận chuyển</th>
-                                            <td data-title="Shipping">
-                                                <div class="shipping-fee-display">
-                                                    <strong>{{ number_format($shippingFee, 0, ',', '.') }} đ</strong>
-                                                </div>
-                                            </td>
-                                        </tr>
                                         <tr class="total-amount">
                                             <th class="fw-600 text-dark-gray alt-font">Tổng cộng</th>
                                             <td data-title="Total">
