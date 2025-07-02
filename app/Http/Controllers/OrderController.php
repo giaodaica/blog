@@ -386,6 +386,18 @@ class OrderController extends Controller
             'note' => $note
         ]);
 
+if($count >= 2 && $present->status == 'failed') {
+            $present->status = 'cancelled';
+            $present->save();
+            OrderHistories::create([
+                'users' => Auth::user()->id,
+                'order_id' => $id,
+                'from_status' => 'failed',
+                'to_status' => 'cancelled',
+                'note' => 'Đơn hàng đã tự động hủy do giao thất bại 3 lần',
+                'content' => "",
+            ]);
+        }
 
 
         return redirect()->back()->with('success', 'Cập nhật trạng thái đơn hàng thành công!');
