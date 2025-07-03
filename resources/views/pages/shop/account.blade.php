@@ -271,10 +271,10 @@
                                         <ul
                                             class="nav justify-content-center text-center fw-500 border-color-light-medium-gray mb-7 gap-2">
                                             <li class="nav-item"><a class="nav-link active border text-black rounded"
-                                                    data-bs-toggle="tab" href="#tab_third1">Tất cả</a>
+                                                    data-bs-toggle="tab" href="#all-order  ">Tất cả</a>
                                             </li>
                                             <li class="nav-item"><a class="nav-link border text-black rounded"
-                                                    data-bs-toggle="tab" href="#tab_third2">Chờ xác
+                                                    data-bs-toggle="tab" href="#pendingOrders">Chờ xác
                                                     nhận</a></li>
                                             <li class="nav-item"><a class="nav-link border text-black rounded"
                                                     data-bs-toggle="tab" href="#tab_third3">Đã xác
@@ -288,13 +288,15 @@
                                             <li class="nav-item"><a class="nav-link border text-black rounded"
                                                     data-bs-toggle="tab" href="#tab_third6">Đã hủy</a>
                                             </li>
+                                            
                                         </ul>
                                         <div class="tab-content">
+                                            {{-- <pre>{{ print_r($orders, true) }}</pre> --}}
                                             <!-- start tab content -->
-                                            <div class="tab-pane fade show active" id="tab_third1">
+                                            <div class="tab-pane fade active" id="all-order">
                                                 @include('pages.shop.partials.order-list', ['orders' => $orders])
                                             </div>
-                                            <div class="tab-pane fade" id="tab_third2">
+                                            <div class="tab-pane fade" id="pendingOrders">
                                                 @include('pages.shop.partials.order-list', ['orders' => $pendingOrders])
                                             </div>
                                             <div class="tab-pane fade" id="tab_third3">
@@ -304,7 +306,7 @@
                                                 @include('pages.shop.partials.order-list', ['orders' => $shippingOrders])
                                             </div>
                                             <div class="tab-pane fade" id="tab_third5">
-                                                @include('pages.shop.partials.order-list', ['orders' => $completedOrders])
+                                                @include('pages.shop.partials.order-list', ['orders' => $successOrders])
                                             </div>
                                             <div class="tab-pane fade" id="tab_third6">
                                                 @include('pages.shop.partials.order-list', ['orders' => $cancelledOrders])
