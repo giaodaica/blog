@@ -323,7 +323,7 @@ public function removeVoucher()
 }
 
     public function add_to_cart($id,request $request){
-
+        // dd($request->all());
         $request->validate([
             'color' => 'required|exists:colors,id',
             'size' => 'required|exists:sizes,id',

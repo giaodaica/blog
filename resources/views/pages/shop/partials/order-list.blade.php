@@ -17,7 +17,7 @@
                 @foreach ($order->orderItems as $item)
                     <tr>
                         <td class="d-flex align-items-center gap-2">
-                            <img src="{{ asset($item->productVariant->product->image_url) }}"
+                            <img src="{{ asset($item->product_image_url) }}"
                                  alt="{{ $item->product_name }}" class="order-img " />
                             <div style="line-height:1.3;">
                                 <div class="product-name-truncate" style="font-weight: bold;">

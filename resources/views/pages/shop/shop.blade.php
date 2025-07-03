@@ -26,47 +26,53 @@
                         <div class="col-md-6">
                             <div id="search-summary" class="text-muted fs-15 mb-0"></div>
                         </div>
-                    
+
                         <div class="col-md-6 text-md-end">
-                            <form action="{{ route('home.shop') }}" method="GET" class="d-flex justify-content-md-end align-items-center gap-2">
+                            <form action="{{ route('home.shop') }}" method="GET"
+                                class="d-flex justify-content-md-end align-items-center gap-2">
                                 {{-- Preserve all existing filters --}}
-                                @foreach(request()->except('sort') as $key => $value)
-                                    @if(is_array($value))
-                                        @foreach($value as $v)
+                                @foreach (request()->except('sort') as $key => $value)
+                                    @if (is_array($value))
+                                        @foreach ($value as $v)
                                             <input type="hidden" name="{{ $key }}[]" value="{{ $v }}">
                                         @endforeach
                                     @else
                                         <input type="hidden" name="{{ $key }}" value="{{ $value }}">
                                     @endif
                                 @endforeach
-                    
-                                
-                                <select name="sort" id="sort" class="form-select form-select-sm w-auto border-0 bg-light">
+
+
+                                <select name="sort" id="sort"
+                                    class="form-select form-select-sm w-auto border-0 bg-light">
                                     <option value="">Sắp xếp</option>
-                                    <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Mới nhất</option>
-                                    <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Giá tăng dần</option>
-                                    <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Giá giảm dần</option>
+                                    <option value="newest" {{ request('sort') == 'newest' ? 'selected' : '' }}>Mới nhất
+                                    </option>
+                                    <option value="price_asc" {{ request('sort') == 'price_asc' ? 'selected' : '' }}>Giá
+                                        tăng dần</option>
+                                    <option value="price_desc" {{ request('sort') == 'price_desc' ? 'selected' : '' }}>Giá
+                                        giảm dần</option>
                                 </select>
                             </form>
                         </div>
                     </div>
-                    
-                    @if($products->isEmpty())
+
+                    @if ($products->isEmpty())
                         <div class="text-center py-5">
-                            <h6 class="alt-font fw-500 text-dark-gray mb-3">Rất tiếc, chúng tôi không tìm thấy sản phẩm nào phù hợp.</h6>
-                           
+                            <h6 class="alt-font fw-500 text-dark-gray mb-3">Rất tiếc, chúng tôi không tìm thấy sản phẩm nào
+                                phù hợp.</h6>
+
                         </div>
                     @else
-                   
-                    
-                        <ul class="shop-modern shop-wrapper grid-loading grid grid-5col lg-grid-4col md-grid-3col sm-grid-2col xs-grid-1col gutter-extra-large text-center">
+                        <ul
+                            class="shop-modern shop-wrapper grid-loading grid grid-5col lg-grid-4col md-grid-3col sm-grid-2col xs-grid-1col gutter-extra-large text-center">
                             <li class="grid-sizer"></li>
                             @if (!request('q'))
-                                @if($products->isEmpty())
+                                @if ($products->isEmpty())
                                     <div class="no-products-message">
                                         <i class="fas fa-search"></i>
                                         <h3>Không tìm thấy sản phẩm</h3>
-                                        <p>Không có sản phẩm nào phù hợp với bộ lọc của bạn. Vui lòng thử lại với các tiêu chí khác.</p>
+                                        <p>Không có sản phẩm nào phù hợp với bộ lọc của bạn. Vui lòng thử lại với các tiêu
+                                            chí khác.</p>
                                     </div>
                                 @else
                                     @foreach ($products as $product)
@@ -74,31 +80,41 @@
                                         <li class="grid-item">
                                             <div class="shop-box mb-10px">
                                                 <div class="shop-image mb-20px">
+                                                    @php
+                                                        $variant = $product->variants->first();
+                                                    @endphp
                                                     <a href="{{ route('home.show', $product->slug) }}">
-                                                        <img src="{{ asset($item->productVariant->product->image_url) }}"
-                                                        alt="{{ $item->product_name }}" class="order-img " />
-                                                        <div class="shop-overlay bg-gradient-gray-light-dark-transparent"></div>
+                                                        <img src="{{ asset(optional($variant)->variant_image_url) }}"
+                                                            alt="{{ $product->name }}">
+                                                        <div class="shop-overlay bg-gradient-gray-light-dark-transparent">
+                                                        </div>
                                                     </a>
                                                 </div>
                                                 <div class="shop-footer text-start">
-                                                    <a href="{{ route('home.show', $product->slug) }}" class="alt-font text-dark-gray fs-19 fw-500 product-name-truncate">{{ $product->name }}</a>
+                                                    <a href="{{ route('home.show', $product->slug) }}"
+                                                        class="alt-font text-dark-gray fs-19 fw-500 product-name-truncate">{{ $product->name }}</a>
                                                     <div class="price lh-22 fs-16">
                                                         @php
-                                                            $variant = $product->variants->first();
+                                                        
                                                             $rating = $product->rating ?? 0;
                                                             $reviewCount = $product->review_count ?? 0;
                                                         @endphp
                                                         @if ($variant && $variant->sale_price < $variant->listed_price)
                                                             <div class="product-price">
                                                                 {{ number_format($variant->sale_price) }} ₫
-                                                                <span class="product-old-price">{{ number_format($variant->listed_price) }} ₫</span>
+                                                                <span
+                                                                    class="product-old-price">{{ number_format($variant->listed_price) }}
+                                                                    ₫</span>
                                                             </div>
                                                         @elseif($variant)
-                                                            <span class="product-price">{{ number_format($variant->listed_price) }} ₫</span>
+                                                            <span
+                                                                class="product-price">{{ number_format($variant->listed_price) }}
+                                                                ₫</span>
                                                         @endif
                                                     </div>
                                                     <div class="rating">
-                                                        <span class="text-warning">★★★★★</span> {{ number_format($rating, 1) }}
+                                                        <span class="text-warning">★★★★★</span>
+                                                        {{ number_format($rating, 1) }}
                                                     </div>
                                                 </div>
                                             </div>
@@ -108,31 +124,36 @@
                                 @endif
                             @endif
                         </ul>
-                        
+                        @if ($products->lastPage() > 1)
                         <div class="w-100 d-flex mt-4 justify-content-center md-mt-30px">
                             <ul class="pagination pagination-style-01 fs-13 fw-500 mb-0">
                                 <!-- Nút Previous -->
                                 <li class="page-item {{ $products->onFirstPage() ? 'disabled' : '' }}">
-                                    <a class="page-link" href="{{ $products->previousPageUrl() }}" {{ $products->onFirstPage() ? 'aria-disabled="true"' : '' }}>
+                                    <a class="page-link" href="{{ $products->previousPageUrl() }}"
+                                        {{ $products->onFirstPage() ? 'aria-disabled="true"' : '' }}>
                                         <i class="feather icon-feather-arrow-left fs-18 d-xs-none"></i>
                                     </a>
                                 </li>
-                        
+
                                 <!-- Các trang -->
                                 @for ($i = 1; $i <= $products->lastPage(); $i++)
                                     <li class="page-item {{ $products->currentPage() == $i ? 'active' : '' }}">
-                                        <a class="page-link" href="{{ $products->url($i) }}">{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</a>
+                                        <a class="page-link"
+                                            href="{{ $products->url($i) }}">{{ str_pad($i, 2, '0', STR_PAD_LEFT) }}</a>
                                     </li>
                                 @endfor
-                        
+
                                 <!-- Nút Next -->
                                 <li class="page-item {{ $products->hasMorePages() ? '' : 'disabled' }}">
-                                    <a class="page-link" href="{{ $products->nextPageUrl() }}" {{ $products->hasMorePages() ? '' : 'aria-disabled="true"' }}>
+                                    <a class="page-link" href="{{ $products->nextPageUrl() }}"
+                                        {{ $products->hasMorePages() ? '' : 'aria-disabled="true"' }}>
                                         <i class="feather icon-feather-arrow-right fs-18 d-xs-none"></i>
                                     </a>
                                 </li>
                             </ul>
                         </div>
+                    @endif
+                       
                     @endif
                 </div>
                 <div class="col-xxl-2 col-lg-3 shop-sidebar"
@@ -150,7 +171,9 @@
                                 @endphp
                                 @foreach ($categories as $index => $category)
                                     @php
-                                        $selected = is_array(request('categories')) && in_array($category->id, request('categories'));
+                                        $selected =
+                                            is_array(request('categories')) &&
+                                            in_array($category->id, request('categories'));
                                     @endphp
                                     <li class="{{ $index >= $initialShow ? 'hidden-category' : '' }}">
                                         <label class="checkbox-container">
@@ -162,12 +185,14 @@
                                         <span class="item-qty">{{ $category->products_count }}</span>
                                     </li>
                                 @endforeach
-                                @if($totalCategories > $initialShow)
+                                @if ($totalCategories > $initialShow)
                                     <li class="show-more-categories">
-                                        <button type="button" class="btn btn-link p-0 text-decoration-none">Xem thêm</button>
+                                        <button type="button" class="btn btn-link p-0 text-decoration-none">Xem
+                                            thêm</button>
                                     </li>
                                     <li class="collapse-categories" style="display: none;">
-                                        <button type="button" class="btn btn-link p-0 text-decoration-none">Thu gọn</button>
+                                        <button type="button" class="btn btn-link p-0 text-decoration-none">Thu
+                                            gọn</button>
                                     </li>
                                 @endif
                             </ul>
@@ -178,7 +203,7 @@
                                 <span class="alt-font fw-500 fs-19 text-dark-gray d-block">Mức Giá</span>
                                 <i class="fa-solid fa-chevron-down ms-auto toggle-filter" style="cursor: pointer;"></i>
                             </div>
-                        
+
                             {{-- Bộ lọc radio sẵn có --}}
                             <ul class="shop-filter price-filter fs-16">
                                 @php
@@ -195,11 +220,10 @@
                                 @foreach ($priceRanges as $range => $label)
                                     <li>
                                         <label class="checkbox-container">
-                                            <input type="radio" 
-                                                   name="price_range" 
-                                                   value="{{ $range }}"
-                                                   {{ $selectedPriceRange === $range ? 'checked' : '' }}>
-                                            <span class="custom-checkbox {{ $selectedPriceRange === $range ? 'checked' : '' }}"></span>
+                                            <input type="radio" name="price_range" value="{{ $range }}"
+                                                {{ $selectedPriceRange === $range ? 'checked' : '' }}>
+                                            <span
+                                                class="custom-checkbox {{ $selectedPriceRange === $range ? 'checked' : '' }}"></span>
                                             {{ $label }}
                                         </label>
                                     </li>
@@ -260,7 +284,6 @@
 
 @push('styles')
     <link href="{{ asset('assets/css/shop.css') }}" rel="stylesheet">
-    
 @endpush
 
 @push('scripts')

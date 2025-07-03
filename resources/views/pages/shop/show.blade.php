@@ -108,9 +108,6 @@
                             @endif
                         </span>
                     </div>
-
-                    
-
                     <form action="{{ url('add-to-cart', $product->id) }}" method="post">
                         @csrf
                         <div class="d-flex align-items-center mb-20px">
