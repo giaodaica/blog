@@ -1,41 +1,17 @@
-// Lấy ngày hiện tại và định dạng
-const currentDate = new Date();
-const currentDateString = currentDate.toLocaleDateString('en-GB'); // Định dạng dd/mm/yyyy
-
-// Cập nhật placeholder với khoảng thời gian
-document.getElementById('daterange').placeholder = `01/01/2022-${currentDateString}`;
-
-// Khởi tạo flatpickr
-flatpickr("#daterange", {
-    mode: "range",  // Cho phép chọn một khoảng thời gian
-    dateFormat: "Y-m-d",  // Định dạng ngày
-    minDate: "2022-01-01",  // Giới hạn ngày bắt đầu là 1/1/2022
-    maxDate: currentDate,  // Giới hạn ngày kết thúc là ngày hiện tại
-    locale: {
-        firstDayOfWeek: 1, // Đặt ngày đầu tuần là thứ 2
-    },
-    onClose: function(selectedDates, dateStr, instance) {
-        if (selectedDates.length === 2) {
-            instance.input.value = selectedDates[0].toLocaleDateString() + " - " + selectedDates[1].toLocaleDateString();
-        }
-    }
-});
-
 document.addEventListener("DOMContentLoaded", function () {
-    // Xử lý form đổi mật khẩu
+    // Form đổi mật khẩu
     const showChangePasswordForm = document.getElementById('showChangePasswordForm');
     const changePasswordForm = document.getElementById('changePasswordForm');
     const cancelChangePassword = document.getElementById('cancelChangePassword');
 
     if (showChangePasswordForm && changePasswordForm && cancelChangePassword) {
-        showChangePasswordForm.addEventListener('click', function(e) {
+        showChangePasswordForm.addEventListener('click', function (e) {
             e.preventDefault();
             changePasswordForm.style.display = 'block';
-            // Cuộn đến form
             changePasswordForm.scrollIntoView({ behavior: 'smooth' });
         });
 
-        cancelChangePassword.addEventListener('click', function() {
+        cancelChangePassword.addEventListener('click', function () {
             changePasswordForm.style.display = 'none';
         });
     }
@@ -44,7 +20,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const selectedSubTab = localStorage.getItem("selectedSubTab");
 
     // Bật tab cha
-    if (selectedTab && selectedTab.startsWith('#')) {
+    if (selectedTab && selectedTab.startsWith('#') && selectedTab.length > 1) {
         const tabToActivate = document.querySelector(`a[href="${selectedTab}"]`);
         const tabContentToShow = document.querySelector(selectedTab);
 
@@ -55,15 +31,13 @@ document.addEventListener("DOMContentLoaded", function () {
             tabToActivate.classList.add('active');
             tabContentToShow.classList.add('show', 'active');
 
-            // Nếu là tab_seven2 → xử lý tab con
             if (selectedTab === "#tab_seven2") {
                 let subTabToActivate, subTabContentToShow;
 
-                if (selectedSubTab && selectedSubTab.startsWith('#')) {
-                    subTabToActivate = document.querySelector(`a[href="${selectedSubTab}"]`);
+                if (selectedSubTab && selectedSubTab.startsWith('#') && selectedSubTab.length > 1) {
+                    subTabToActivate = document.querySelector(`#tab_seven2 .nav-link[href="${selectedSubTab}"]`);
                     subTabContentToShow = document.querySelector(selectedSubTab);
                 } else {
-                    // Không có localStorage → bật tab_third1
                     subTabToActivate = document.querySelector('#tab_seven2 .nav-link[href="#tab_third1"]');
                     subTabContentToShow = document.querySelector('#tab_third1');
                 }
@@ -83,13 +57,12 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll('.nav-link').forEach(link => {
         link.addEventListener('click', function () {
             const href = this.getAttribute('href');
-            if (href && href.startsWith('#')) {
+            if (href && href.startsWith('#') && href.length > 1) {
                 localStorage.setItem("selectedTab", href);
-                
+
                 if (href !== '#tab_seven2') {
                     localStorage.removeItem("selectedSubTab");
                 } else {
-                    // Khi click tab_seven2 thì bật luôn tab_third1 và nội dung
                     const subTabToActivate = document.querySelector('#tab_seven2 .nav-link[href="#tab_third1"]');
                     const subTabContentToShow = document.querySelector('#tab_third1');
 
@@ -109,10 +82,29 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll('#tab_seven2 .nav-link').forEach(link => {
         link.addEventListener('click', function () {
             const href = this.getAttribute('href');
-            if (href && href.startsWith('#')) {
+            if (href && href.startsWith('#') && href.length > 1) {
                 localStorage.setItem("selectedSubTab", href);
                 localStorage.setItem("selectedTab", "#tab_seven2");
             }
         });
+    });
+
+    // Flatpickr
+    const currentDate = new Date();
+    const currentDateString = currentDate.toLocaleDateString('en-GB');
+    document.getElementById('daterange').placeholder = `01/01/2022-${currentDateString}`;
+    flatpickr("#daterange", {
+        mode: "range",
+        dateFormat: "Y-m-d",
+        minDate: "2022-01-01",
+        maxDate: currentDate,
+        locale: {
+            firstDayOfWeek: 1
+        },
+        onClose: function (selectedDates, dateStr, instance) {
+            if (selectedDates.length === 2) {
+                instance.input.value = selectedDates[0].toLocaleDateString() + " - " + selectedDates[1].toLocaleDateString();
+            }
+        }
     });
 });

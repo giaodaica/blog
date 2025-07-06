@@ -72,7 +72,7 @@ class OrderController extends Controller
         if (session('voucher_code')) {
             $appliedVoucher = Vouchers::where('code', session('voucher_code'))->first();
         }
-
+// dd($voucherDiscount);
         return view('pages.shop.checkout', compact(
             'cartItems',
             'subtotal',
@@ -199,6 +199,7 @@ class OrderController extends Controller
                 'address' => $address->address,
                 'total_amount' => $subtotal,
                 'final_amount' => $finalAmount,
+                'discount_amount' =>$voucherDiscount,
                 'status' => 'pending',
                 'code_order' => $orderCode,
                 'pay_method' => $request->payment_method,
@@ -209,7 +210,7 @@ class OrderController extends Controller
             ];
 
             $order = Order::create($orderData);
-
+// dd($order);
             // Tạo chi tiết đơn hàng
             foreach ($cartItems as $item) {
                 $orderItemData = [
@@ -386,6 +387,18 @@ class OrderController extends Controller
             'note' => $note
         ]);
 
+if($count >= 2 && $present->status == 'failed') {
+            $present->status = 'cancelled';
+            $present->save();
+            OrderHistories::create([
+                'users' => Auth::user()->id,
+                'order_id' => $id,
+                'from_status' => 'failed',
+                'to_status' => 'cancelled',
+                'note' => 'Đơn hàng đã tự động hủy do giao thất bại 3 lần',
+                'content' => "",
+            ]);
+        }
 
 
         return redirect()->back()->with('success', 'Cập nhật trạng thái đơn hàng thành công!');

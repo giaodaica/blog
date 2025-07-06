@@ -158,9 +158,12 @@
                 <!-- start shop item -->
                 <li class="grid-item" data-category="{{ $product->category_id }}">
                     <div class="shop-box mb-10px">
+                        @php
+                        $variant = $product->variants->first();
+                        @endphp
                         <div class="shop-image mb-20px">
                             <a href="{{ route('home.show', $product->slug) }}">
-                                <img src="{{ asset('assets/images/shop/demo-fashion-store-product-01.jpg') }}" alt="{{ $product->name }}">
+                                <img src="{{ asset(optional($variant)->variant_image_url) }}" alt="{{ $product->name }}">
                                 <div class="shop-overlay bg-gradient-gray-light-dark-transparent"></div>
                             </a>
                         </div>
@@ -168,7 +171,7 @@
                             <a href="{{ route('home.show', $product->slug) }}" class="alt-font text-dark-gray fs-19 fw-500 product-name-truncate">{{ $product->name }}</a>
                             <div class="price lh-22 fs-16">
                                 @php
-                                    $variant = $product->variants->first();
+                                    
                                     $rating = $product->rating ?? 0;
                                     $reviewCount = $product->review_count ?? 0;
                                 @endphp
