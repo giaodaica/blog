@@ -15,6 +15,7 @@ class Order extends Model
         'address',
         'total_amount',
         'final_amount',
+        'discount_amount',
         'status',
         'code_order',
         'pay_method',

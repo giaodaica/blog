@@ -91,20 +91,15 @@ document.addEventListener('DOMContentLoaded', function() {
             const parser = new DOMParser();
             const doc = parser.parseFromString(html, 'text/html');
             const newProducts = doc.querySelector('.shop-modern');
-            if (newProducts) {
-                // Destroy existing Isotope instance if any
-                if ($(productGrid).data('isotope')) {
-                    $(productGrid).isotope('destroy');
-                }
+            productGrid.innerHTML = ''; // Luôn xóa hết sản phẩm cũ
 
-                // Keep the grid-sizer element
+            if (newProducts) {
+                // Giữ lại grid-sizer nếu có
                 const gridSizer = productGrid.querySelector('.grid-sizer');
-                productGrid.innerHTML = '';
                 if (gridSizer) {
-                    productGrid.appendChild(gridSizer);
+                    productGrid.appendChild(gridSizer.cloneNode(true));
                 }
                 
-                // Check if there are any products
                 const noProductsMessage = newProducts.querySelector('.no-products-message');
                 if (noProductsMessage) {
                     productGrid.appendChild(noProductsMessage.cloneNode(true));
@@ -142,6 +137,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                     }
                 }
+            } else {
+                // Nếu không có .shop-modern trong HTML trả về, hiển thị thông báo
+                const noProductsDiv = document.createElement('div');
+                noProductsDiv.className = 'no-products-message';
+                noProductsDiv.textContent = 'Không có sản phẩm nào phù hợp với bộ lọc!';
+                productGrid.appendChild(noProductsDiv);
             }
 
             // Update pagination
