@@ -33,7 +33,7 @@ class OrderController extends Controller
 
         // Lấy các sản phẩm được chọn từ giỏ hàng
         $selectedIds = session('cart_selected_ids', []);
-        
+
         // Nếu chưa có sản phẩm nào được chọn, tự động chọn tất cả
         if (empty($selectedIds)) {
             $allCartItems = Cart::where('user_id', $userId)->pluck('id')->toArray();
@@ -42,7 +42,7 @@ class OrderController extends Controller
                 $selectedIds = $allCartItems;
             }
         }
-        
+
         if (empty($selectedIds)) {
             return redirect()->route('home.cart')->with('error', 'Vui lòng chọn sản phẩm để thanh toán!');
         }
@@ -129,7 +129,7 @@ class OrderController extends Controller
 
             // Lấy các sản phẩm được chọn từ giỏ hàng
             $selectedIds = session('cart_selected_ids', []);
-            
+
             // Nếu chưa có sản phẩm nào được chọn, tự động chọn tất cả
             if (empty($selectedIds)) {
                 $allCartItems = Cart::where('user_id', $userId)->pluck('id')->toArray();
@@ -138,7 +138,7 @@ class OrderController extends Controller
                     $selectedIds = $allCartItems;
                 }
             }
-            
+
             if (empty($selectedIds)) {
                 return redirect()->route('home.cart')->with('error', 'Vui lòng chọn sản phẩm để thanh toán!');
             }
@@ -319,6 +319,9 @@ class OrderController extends Controller
         if ($before && !in_array($before, $data_change)) {
             return  abort(403, "Hành động không hợp lệ");
         }
+        if($before == 'failed' || $before == 'cancelled'){
+            $id = $request->order_id;
+        }
         $old_status = Order::find($id);
         $present = Order::find($id);
         $count = OrderHistories::where('from_status', 'failed')->count();
@@ -449,7 +452,7 @@ if($count >= 2 && $present->status == 'failed') {
         // Tính toán lại phí vận chuyển và tổng tiền
         $userId = Auth::id();
         $selectedIds = session('cart_selected_ids', []);
-        
+
         if (empty($selectedIds)) {
             return response()->json(['error' => 'Không có sản phẩm nào được chọn'], 400);
         }

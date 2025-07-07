@@ -12,6 +12,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductsController;
 use App\Http\Controllers\ProductVariantsController;
 
+use App\Http\Controllers\RevenueController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\web\SearchController;
 use App\Http\Controllers\SizeController;
@@ -109,10 +110,12 @@ Route::prefix('dashboard')->group(function () {
 
     // phần order
     Route::get('order', [OrderController::class, 'db_order'])->name('dashboard.order');
-    Route::post('order/change/{id}', [OrderController::class, 'db_order_change']);
+    Route::post('order/change/{id}', [OrderController::class, 'db_order_change'])->name('dashboard.order.change');
     Route::get('order/{id}', [OrderController::class, 'db_order_show']);
 
-
+    // route thống kê
+    Route::get('thong-ke', [RevenueController::class, 'index'])->name('dashboard.revenue');
+    Route::post('fillter-revenue',[RevenueController::class,'index'])->name('dashboard.order.fillter');
     // Route resource cho color và size
     Route::resource('colors', ColorController::class);
     Route::resource('sizes', SizeController::class);
