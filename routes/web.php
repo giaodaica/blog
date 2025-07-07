@@ -103,6 +103,9 @@ Route::prefix('dashboard')->group(function () {
     Route::post('voucher/disable/{id}', [VouchersController::class, 'disable']);
     Route::post('voucher/active/{id}', [VouchersController::class, 'active']);
     Route::resource('products', ProductsController::class);
+    Route::get('/products/variant-partial', [ProductsController::class, 'renderVariantPartial'])
+        ->name('products.variant-partial');
+
 
     Route::post('/products/{id}/restore', [ProductsController::class, 'restore'])->name('products.restore');
     Route::resource('categories', CategoriesController::class);
@@ -133,6 +136,8 @@ Route::prefix('dashboard')->group(function () {
     Route::resource('users', UserController::class);
     Route::get('/users/{id}', [UserController::class, 'show'])->name('users.show');
     Route::post('/users/bulk-delete', [UserController::class, 'bulkDelete'])->name('users.bulk-delete');
+    Route::post('/users/lock', [UserController::class, 'lock'])->name('users.lock');
+    Route::post('/users/{user}/unlock', [UserController::class, 'unlock'])->name('users.unlock');
 });
 
 

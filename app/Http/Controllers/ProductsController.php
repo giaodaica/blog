@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Size;
 use Illuminate\Validation\ValidationException;
 use App\Models\Categories;
 use App\Models\Color;

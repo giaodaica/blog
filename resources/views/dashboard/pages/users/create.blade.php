@@ -2,7 +2,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-light p-3">
-                <h5 class="modal-title" id="exampleModalLabel">Thêm người dùng</h5>
+                <h5 class="modal-title" id="exampleModalLabel">Thêm người quản trị</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Đóng"></button>
             </div>
             <form class="user-form" method="POST" action="{{ route('users.store') }}">
@@ -33,30 +33,9 @@
                             <label for="user-address" class="form-label">Địa chỉ</label>
                             <input type="text" id="user-address" name="default_address" class="form-control">
                         </div>
-                        <div class="col-lg-6">
-                            <label for="user-role" class="form-label">Vai trò</label>
-                            <select id="user-role" name="role" class="form-control">
-                                <option value="guest">Khách</option>
-                                <option value="admin">Quản trị</option>
-                            </select>
-                        </div>
-                        <div class="col-lg-6">
-                            <label for="user-rank" class="form-label">Hạng</label>
-                            <select id="user-rank" name="rank" class="form-control">
-                                <option value="newbie">Newbie</option>
-                                <option value="silver">Silver</option>
-                                <option value="gold">Gold</option>
-                                <option value="diamond">Diamond</option>
-                            </select>
-                        </div>
-                        <div class="col-lg-6">
-                            <label for="user-point" class="form-label">Điểm</label>
-                            <input type="number" id="user-point" name="point" class="form-control">
-                        </div>
-                        <div class="col-lg-6">
-                            <label for="user-total" class="form-label">Tổng chi tiêu</label>
-                            <input type="number" step="0.01" id="user-total" name="total_spent" class="form-control">
-                        </div>
+
+                        {{-- Vai trò mặc định là guest (ẩn) --}}
+                        <input type="hidden" name="role" value="admin">
                     </div>
                 </div>
                 <div class="modal-footer">
