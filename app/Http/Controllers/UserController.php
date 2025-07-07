@@ -62,15 +62,27 @@ class UserController extends Controller
     // Hiển thị form chỉnh sửa
     public function edit($id)
     {
-        $user = User::withTrashed()->findOrFail($id);
+        $user = User::findOrFail($id);
+
+        if ($user->role !== 'admin') {
+            return redirect()->route('users.index')->with('error', 'Tài khoản khách hàng không được chỉnh sửa.');
+        }
+
         return view('dashboard.pages.users.edit', compact('user'));
     }
 
     // Cập nhật người dùng
     public function update(Request $request, $id)
     {
+        // dd($request);
         $user = User::withTrashed()->findOrFail($id);
 
+        // Nếu không phải admin thì không được cập nhật
+        if ($user->role !== 'admin') {
+            return redirect()->route('users.index')->with('error', 'Tài khoản khách hàng không được chỉnh sửa.');
+        }
+
+        // Validation cơ bản
         $request->validate([
             'name'  => 'required|string|max:255',
             'email' => 'required|email|unique:users,email,' . $user->id,
@@ -78,21 +90,25 @@ class UserController extends Controller
             'rank'  => 'nullable|in:newbie,silver,gold,diamond',
             'point' => 'nullable|integer|min:0',
             'total_spent' => 'nullable|numeric|min:0',
+            'default_address' => 'nullable|string|max:255',
+            'default_phone'   => 'nullable|string|max:20',
         ]);
 
+        // Gán các giá trị có trong request, còn lại sẽ đặt thành null nếu không có
         $user->update([
             'name'            => $request->name,
             'email'           => $request->email,
             'role'            => $request->role,
-            'default_address' => $request->default_address,
-            'default_phone'   => $request->default_phone,
-            'total_spent'     => $request->total_spent ?? 0,
-            'point'           => $request->point ?? 0,
-            'rank'            => $request->rank ?? 'newbie',
+            'default_address' => $request->filled('default_address') ? $request->default_address : null,
+            'default_phone'   => $request->filled('default_phone') ? $request->default_phone : null,
+            'total_spent' => $request->filled('total_spent') ? $request->total_spent : 0,
+            'point' => $request->filled('point') ? $request->point : 0,
+            'rank' => $request->filled('rank') ? $request->rank : 'newbie',
         ]);
 
         return redirect()->route('users.index')->with('success', 'Cập nhật tài khoản thành công');
     }
+
 
     // Xoá mềm người dùng
     public function destroy($id)
@@ -135,5 +151,28 @@ class UserController extends Controller
     {
         $user = User::findOrFail($id);
         return view('dashboard.pages.users.show', compact('user'));
+    }
+
+    public function lock(Request $request)
+    {
+        // dd($request);
+        $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'reason'  => 'required|string|max:255',
+            'note'    => 'nullable|string',
+        ]);
+
+        $user = User::findOrFail($request->user_id);
+        $user->update([
+            'status' => 'inactive',
+        ]);
+
+        return back()->with('warning', 'Tài khoản đã bị khóa.');
+    }
+
+    public function unlock(User $user)
+    {
+        $user->update(['status' => 'active']);
+        return back()->with('success', 'Tài khoản đã được mở lại.');
     }
 }

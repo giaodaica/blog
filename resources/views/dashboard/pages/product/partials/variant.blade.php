@@ -45,7 +45,8 @@ $selectedColorId = old("variants.$index.color_id", $variant['color_id'] ?? '');
         <label class="form-label">Giá nhập</label>
         <input type="number" class="form-control @error("variants.$index.import_price") is-invalid @enderror"
             name="variants[{{ $index }}][import_price]"
-            value="{{ old("variants.$index.import_price", $variant['import_price'] ?? '') }}" min="0" required>
+            value="{{ old("variants.$index.import_price", isset($variant['import_price']) ? number_format($variant['import_price'], 0, '', '') : '') }}"
+            min="0" required>
     </div>
 
     {{-- Listed Price --}}
@@ -53,7 +54,8 @@ $selectedColorId = old("variants.$index.color_id", $variant['color_id'] ?? '');
         <label class="form-label">Giá niêm yết</label>
         <input type="number" class="form-control @error("variants.$index.listed_price") is-invalid @enderror"
             name="variants[{{ $index }}][listed_price]"
-            value="{{ old("variants.$index.listed_price", $variant['listed_price'] ?? '') }}" min="0" required>
+            value="{{ old("variants.$index.listed_price", isset($variant['listed_price']) ? number_format($variant['listed_price'], 0, '', '') : '') }}"
+            min="0" required>
     </div>
 
     {{-- Sale Price --}}
@@ -61,7 +63,8 @@ $selectedColorId = old("variants.$index.color_id", $variant['color_id'] ?? '');
         <label class="form-label">Giá bán</label>
         <input type="number" class="form-control @error("variants.$index.sale_price") is-invalid @enderror"
             name="variants[{{ $index }}][sale_price]"
-            value="{{ old("variants.$index.sale_price", $variant['sale_price'] ?? '') }}" min="0">
+            value="{{ old("variants.$index.sale_price", isset($variant['sale_price']) ? number_format($variant['sale_price'], 0, '', '') : '') }}"
+            min="0">
     </div>
 
     {{-- Stock --}}
@@ -69,7 +72,8 @@ $selectedColorId = old("variants.$index.color_id", $variant['color_id'] ?? '');
         <label class="form-label">Số lượng</label>
         <input type="number" class="form-control @error("variants.$index.stock") is-invalid @enderror"
             name="variants[{{ $index }}][stock]"
-            value="{{ old("variants.$index.stock", $variant['stock'] ?? '') }}" min="0" required>
+            value="{{ old("variants.$index.stock", isset($variant['stock']) ? $variant['stock'] : '') }}"
+            min="0" required>
     </div>
 
     {{-- Image --}}
@@ -83,18 +87,27 @@ $selectedColorId = old("variants.$index.color_id", $variant['color_id'] ?? '');
             <label class="input-group-text" for="variant-image-{{ $index }}">Chọn ảnh</label>
         </div>
         <input type="hidden" name="variants[{{ $index }}][temp_variant_image_url]"
-            value="{{ old("variants.$index.temp_variant_image_url", $variant['temp_variant_image_url'] ?? '') }}">
+            value="{{ old("variants.$index.temp_variant_image_url", $variant['temp_variant_image_url'] ?? ($variant['variant_image_url'] ?? '')) }}">
         <div id="variant-image-preview-{{ $index }}" class="mt-2">
-            @if (!empty($variant['temp_variant_image_url']))
-                <img src="{{ $variant['temp_variant_image_url'] }}" alt="Preview" width="100">
+            @php
+                $previewUrl =
+                    old("variants.$index.temp_variant_image_url") ??
+                    ($variant['temp_variant_image_url'] ?? null ?? ($variant['variant_image_url'] ?? null));
+            @endphp
+
+            @if ($previewUrl && file_exists(public_path(parse_url($previewUrl, PHP_URL_PATH))))
+                <img src="{{ asset(parse_url($previewUrl, PHP_URL_PATH)) }}" alt="Preview" width="100">
+            @elseif (!empty($variant['variant_image_url']) && file_exists(public_path($variant['variant_image_url'])))
+                <img src="{{ asset($variant['variant_image_url']) }}" alt="Preview" width="100">
             @endif
+
         </div>
     </div>
 
     {{-- Remove Button --}}
- <div class="col-lg-8 text-end">
-    <button type="button" class="btn btn-danger btn-sm remove-variant">Xoá</button>
-</div>
+    <div class="col-lg-8 text-end">
+        <button type="button" class="btn btn-danger btn-sm remove-variant">Xoá</button>
+    </div>
 
     {{-- Grouped error block --}}
     @if (

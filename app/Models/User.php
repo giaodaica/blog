@@ -32,6 +32,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'total_spent',
         'point',
         'rank',
+        'status'
     ];
 
     /**
