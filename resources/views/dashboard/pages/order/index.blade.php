@@ -300,7 +300,7 @@
                                                                         <button class="btn btn-success">Xác nhận</button>
                                                                     </form>
                                                                     <button type="button" class="btn btn-danger add-btn"
-                                                                        data-bs-toggle="modal" id="create-btn"
+                                                                        data-bs-toggle="modal" data-id="{{ $render_order->id }}" id="create-btn"
                                                                         data-bs-target="#showModalcancel">Hủy đơn</button>
                                                                 </div>
                                                             @break
@@ -315,7 +315,7 @@
                                                                         <button class="btn btn-success">Giao Hàng</button>
                                                                     </form>
                                                                     <button type="button" class="btn btn-danger add-btn"
-                                                                        data-bs-toggle="modal" id="create-btn"
+                                                                        data-bs-toggle="modal" data-id="{{ $render_order->id }}" id="create-btn"
                                                                         data-bs-target="#showModalcancel">Hủy đơn</button>
                                                                 </div>
                                                             @break
@@ -330,7 +330,7 @@
                                                                         <button class="btn btn-success">Đã giao</button>
                                                                     </form>
                                                                   <button type="button" class="btn btn-danger add-btn"
-                                                                        data-bs-toggle="modal" id="create-btn"
+                                                                        data-bs-toggle="modal" data-id="{{ $render_order->id }}" id="create-btn"
                                                                         data-bs-target="#showModalfailed">Giao Thất Bại</button>
                                                                 </div>
                                                             @break
@@ -345,7 +345,7 @@
                                                                         <button class="btn btn-success">Giao lại</button>
                                                                     </form>
                                                                     <button type="button" class="btn btn-danger add-btn"
-                                                                        data-bs-toggle="modal" id="create-btn"
+                                                                        data-bs-toggle="modal" data-id="{{ $render_order->id }}" id="create-btn"
                                                                         data-bs-target="#showModalcancel">Hủy đơn</button>
                                                                 </div>
                                                             @break
@@ -506,6 +506,8 @@
                                             <div class="modal-body">
                                                 @csrf
                                                 <input type="hidden" name="change" value="failed">
+                                            <input type="hidden" name="order_id" id="order_id_failed">
+
                                                 <div class="mb-3">
                                                     <label for="reason-select-failed" class="form-label">Lý do</label>
                                                     <select id="reason-select-failed" name="content1"
@@ -551,6 +553,7 @@
                                         <form action="{{ url("dashboard/order/change/$render_order->id") }}" class="tablelist-form" autocomplete="off" id="reasonFormCancel" method="post">
                                             @csrf
                                             <input type="hidden" name="change" value="cancelled">
+                                            <input type="hidden" name="order_id" id="order_id_cancel">
                                             <div class="modal-body">
                                                 <div class="mb-3">
                                                     <label for="reason-select-cancel" class="form-label">Lý do</label>
@@ -683,7 +686,21 @@
             });
     }
 });
-
+const modalCancel = document.getElementById('showModalcancel');
+modalCancel.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const orderId = button.getAttribute('data-id');
+    const inputOrderId = modalCancel.querySelector('#order_id_cancel');
+    inputOrderId.value = orderId;
+});
+const modalFailed = document.getElementById('showModalfailed');
+modalFailed.addEventListener('show.bs.modal', function (event) {
+    const button = event.relatedTarget;
+    const orderId = button.getAttribute('data-id');
+    const inputOrderId = modalFailed.querySelector('#order_id_failed');
+    inputOrderId.value = orderId;
+});
 // ...existing code...
+
     </script>
 @endsection
