@@ -628,6 +628,14 @@
 @endsection
 @section('js-content')
     <!-- list.js min js -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+  $("button").prop("disabled", true);
+
+  $(window).on("load", function() {
+    $("button").prop("disabled", false);
+  });
+</script>
     <script src="{{ asset('admin/assets/libs/list.js/list.min.js') }}"></script>
 
     <!--list pagination js-->
