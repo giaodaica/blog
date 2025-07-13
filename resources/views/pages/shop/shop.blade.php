@@ -94,11 +94,7 @@
                                                     <a href="{{ route('home.show', $product->slug) }}"
                                                         class="alt-font text-dark-gray fs-19 fw-500 product-name-truncate">{{ $product->name }}</a>
                                                     <div class="price lh-22 fs-16">
-                                                        @php
-                                                        
-                                                            $rating = $product->rating ?? 0;
-                                                            $reviewCount = $product->review_count ?? 0;
-                                                        @endphp
+                                                       
                                                         @if ($variant && $variant->sale_price < $variant->listed_price)
                                                             <div class="product-price">
                                                                 {{ number_format($variant->sale_price) }} ₫
@@ -112,10 +108,7 @@
                                                                 ₫</span>
                                                         @endif
                                                     </div>
-                                                    <div class="rating">
-                                                        <span class="text-warning">★★★★★</span>
-                                                        {{ number_format($rating, 1) }}
-                                                    </div>
+                                                    
                                                 </div>
                                             </div>
                                         </li>

@@ -264,17 +264,17 @@
                                         <ul
                                             class="nav justify-content-center text-center fw-500 border-color-light-medium-gray mb-7 gap-2">
                                             <li class="nav-item-date">
-                                                Chọn khoảng thời gian<input type="text" name="daterange"
-                                                    id="daterange" />
+                                                Chọn khoảng thời gian
+                                                <input type="text" name="daterange" id="daterange" style="margin-left: -10px; min-width:220px; max-width:300px; width:260px;" />
                                             </li>
                                         </ul>
                                         <ul
                                             class="nav justify-content-center text-center fw-500 border-color-light-medium-gray mb-7 gap-2">
                                             <li class="nav-item"><a class="nav-link active border text-black rounded"
-                                                    data-bs-toggle="tab" href="#all-order  ">Tất cả</a>
+                                                    data-bs-toggle="tab" href="#tab_third1">Tất cả</a>
                                             </li>
                                             <li class="nav-item"><a class="nav-link border text-black rounded"
-                                                    data-bs-toggle="tab" href="#pendingOrders">Chờ xác
+                                                    data-bs-toggle="tab" href="#tab_third2">Chờ xác
                                                     nhận</a></li>
                                             <li class="nav-item"><a class="nav-link border text-black rounded"
                                                     data-bs-toggle="tab" href="#tab_third3">Đã xác
@@ -293,10 +293,10 @@
                                         <div class="tab-content">
                                             {{-- <pre>{{ print_r($orders, true) }}</pre> --}}
                                             <!-- start tab content -->
-                                            <div class="tab-pane fade active" id="all-order">
+                                            <div class="tab-pane fade active" id="tab_third1">
                                                 @include('pages.shop.partials.order-list', ['orders' => $orders])
                                             </div>
-                                            <div class="tab-pane fade" id="pendingOrders">
+                                            <div class="tab-pane fade" id="tab_third2">
                                                 @include('pages.shop.partials.order-list', ['orders' => $pendingOrders])
                                             </div>
                                             <div class="tab-pane fade" id="tab_third3">

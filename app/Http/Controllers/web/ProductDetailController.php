@@ -24,22 +24,22 @@ class ProductDetailController extends Controller
         // dd($variants);
         $colors = $variants->pluck('color')->unique('id'); // Lấy tất cả màu không trùng
         $sizes = $variants->pluck('size')->unique('id'); // Lấy tất cả màu không trùng
-        
+
         // Tạo map màu với ảnh tương ứng
         $colorImageMap = [];
         foreach ($variants as $variant) {
             if ($variant->color_id && $variant->variant_image_url) {
                 // Biến thành mảng nếu có nhiều ảnh, ví dụ ngăn cách bởi dấu phẩy
                 $images = explode(',', $variant->variant_image_url);
-                $colorImageMap[$variant->color_id] = array_map(function($img) {
+                $colorImageMap[$variant->color_id] = array_map(function ($img) {
                     return asset(trim($img));
                 }, $images);
             }
         }
-        
+
         // Debug để kiểm tra colorImageMap
         // dd($colorImageMap);
-        
+
         // Debug chi tiết hơn
         // dd([
         //     'variants_count' => $variants->count(),
@@ -66,6 +66,14 @@ class ProductDetailController extends Controller
             ->latest()
             ->get();
 
-        return view('pages.shop.show', compact('product', 'variants', 'reviews', 'colors', 'sizes', 'images', 'colorImageMap'));
+        // Giả sử biến $product là sản phẩm hiện tại
+        $relatedProducts = Products::where('category_id', $product->category_id)
+            ->where('id', '!=', $product->id)
+            ->latest() // hoặc ->inRandomOrder() nếu muốn ngẫu nhiên
+            ->take(4)
+            ->get();
+
+      
+        return view('pages.shop.show', compact('product', 'variants', 'reviews', 'colors', 'sizes', 'images', 'colorImageMap','relatedProducts'));
     }
 }

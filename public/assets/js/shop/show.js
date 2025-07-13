@@ -314,3 +314,37 @@ updateCartTotals();
 });
 
 
+function updateProductPrice() {
+    const color = document.querySelector('input[name="color"]:checked')?.value;
+    const size = document.querySelector('input[name="size"]:checked')?.value;
+    if (!color || !size) return;
+
+    const key = color + '-' + size;
+    const priceData = window.variantPriceMap[key];
+    if (!priceData) return;
+
+    // Cập nhật giá sale
+    const salePriceEl = document.getElementById('product-sale-price');
+    if (salePriceEl) {
+        salePriceEl.textContent = Number(priceData.sale_price).toLocaleString() + 'đ';
+    }
+
+    // Cập nhật giá niêm yết (nếu có)
+    const listedPriceEl = document.getElementById('product-listed-price');
+    if (listedPriceEl) {
+        if (priceData.listed_price != priceData.sale_price) {
+            listedPriceEl.textContent = Number(priceData.listed_price).toLocaleString() + 'đ';
+            listedPriceEl.style.display = '';
+        } else {
+            listedPriceEl.style.display = 'none';
+        }
+    }
+}
+
+// Lắng nghe sự kiện thay đổi
+document.querySelectorAll('input[name="color"], input[name="size"]').forEach(el => {
+    el.addEventListener('change', updateProductPrice);
+});
+
+// Gọi lần đầu khi trang load
+updateProductPrice();

@@ -92,19 +92,74 @@ document.addEventListener("DOMContentLoaded", function () {
     // Flatpickr
     const currentDate = new Date();
     const currentDateString = currentDate.toLocaleDateString('en-GB');
-    document.getElementById('daterange').placeholder = `01/01/2022-${currentDateString}`;
-    flatpickr("#daterange", {
-        mode: "range",
-        dateFormat: "Y-m-d",
-        minDate: "2022-01-01",
-        maxDate: currentDate,
-        locale: {
-            firstDayOfWeek: 1
-        },
-        onClose: function (selectedDates, dateStr, instance) {
-            if (selectedDates.length === 2) {
-                instance.input.value = selectedDates[0].toLocaleDateString() + " - " + selectedDates[1].toLocaleDateString();
+    const daterangeInput = document.getElementById('daterange');
+    if (daterangeInput) {
+        console.log('[INFO] Initializing Flatpickr for daterange input');
+        daterangeInput.placeholder = `2022-01-01 to ${currentDate.toISOString().slice(0, 10)}`;
+        flatpickr("#daterange", {
+            mode: "range",
+            dateFormat: "Y-m-d",
+            minDate: "2022-01-01",
+            maxDate: currentDate,
+            locale: {
+                firstDayOfWeek: 1
+            },
+            onClose: function (selectedDates, dateStr, instance) {
+                if (selectedDates.length === 2) {
+                    const format = d => d.getFullYear() + '-' +
+                        String(d.getMonth() + 1).padStart(2, '0') + '-' +
+                        String(d.getDate()).padStart(2, '0');
+                    const from = format(selectedDates[0]);
+                    const to = format(selectedDates[1]);
+                    instance.input.value = from + " to " + to;
+            
+                    // Lấy status tab hiện tại nếu có
+                    let status = '';
+                    const activeTab = document.querySelector('#tab_seven2 .nav-link.active');
+                    if (activeTab) {
+                        const href = activeTab.getAttribute('href');
+                        if (href && href.startsWith('#tab_third')) {
+                            // Map tab id sang status nếu cần
+                            if (href === '#tab_third2') status = 'pending';
+                            if (href === '#tab_third3') status = 'confirmed';
+                            if (href === '#tab_third4') status = 'shipping';
+                            if (href === '#tab_third5') status = 'success';
+                            if (href === '#tab_third6') status = 'cancelled';
+                        }
+                    }
+            
+                    // Gọi AJAX
+                    let url = `/account/orders?from=${from}&to=${to}`;
+                    if (status) url += `&status=${status}`;
+            
+                    fetch(url, {
+                        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                    })
+                    .then(res => res.text())
+                    .then(html => {
+                        // Cập nhật lại danh sách đơn hàng trong tab hiện tại
+                        if (status) {
+                            document.querySelector(`#tab_seven2 ${activeTab.getAttribute('href')}`).innerHTML = html;
+                        } else {
+                            document.querySelector('#tab_third1').innerHTML = html;
+                        }
+                    })
+                    .catch(err => {
+                        alert('Lỗi khi lọc đơn hàng!');
+                        console.error(err);
+                    });
+                }
             }
-        }
-    });
+        });
+    } else {
+        console.error('[ERROR] daterange input not found on the page. Flatpickr not initialized.');
+    }
+
+    // Nếu có from/to trên URL thì set lại value cho input
+    const urlParams = new URLSearchParams(window.location.search);
+    const from = urlParams.get('from');
+    const to = urlParams.get('to');
+    if (from && to && daterangeInput) {
+        daterangeInput.value = from + " to " + to;
+    }
 });

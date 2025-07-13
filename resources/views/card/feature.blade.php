@@ -26,8 +26,7 @@
                                 <div class="price lh-22 fs-16">
                                     @php
                                         $variant = $product->variants->first();
-                                        $rating = $product->rating ?? 0; // Giả sử có trường rating
-                                        $reviewCount = $product->review_count ?? 0; // Giả sử có trường review_count
+                                       
                                     @endphp
                                     @if ($variant && $variant->sale_price < $variant->listed_price)
                                         {{-- <del class="text-muted">{{ number_format($variant->listed_price, 3) }}đ</del>
@@ -40,11 +39,7 @@
                                         <span class="product-price">{{ number_format($variant->listed_price) }}₫</span>
                                     @endif
                                 </div>
-                                <div class="rating">
-                                    <span class="text-warning">★★★★★</span> {{ number_format($rating, 1) }}
-                                    {{-- <div> ( đánh giá)</div> --}}
-                                    {{-- <div class="rating-text"> ({{ $reviewCount }} đánh giá)</div> --}}
-                                </div>
+                                
                             </div>
                         </div>
                     </li>
