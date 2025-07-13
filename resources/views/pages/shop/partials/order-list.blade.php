@@ -14,50 +14,50 @@
             <tbody>
               
                 @forelse($orders as $order)
-                @foreach ($order->orderItems as $item)
-                    <tr>
-                        <td class="d-flex align-items-center gap-2">
-                            <img src="{{ asset($item->product_image_url) }}"
-                                 alt="{{ $item->product_name }}" class="order-img " />
+                <tr>
+                    <td class="d-flex align-items-center gap-2">
+                        @php
+                            $firstItem = $order->orderItems->first();
+                        @endphp
+                        @if($firstItem)
+                            <img src="{{ asset($firstItem->product_image_url) }}"
+                                 alt="{{ $firstItem->product_name }}" class="order-img " />
                             <div style="line-height:1.3;">
                                 <div class="product-name-truncate" style="font-weight: bold;">
-                                    {{ \Illuminate\Support\Str::limit($item->product_name, 30) }}
-                                </div>
-                                <div style="font-weight: bold font-size: 13px; color: #555;">
-                                    {{ $item->productVariant->color->color_name ?? '-' }},
-                                    {{ $item->productVariant->size->size_name ?? '-' }}
-                                   <br>
-                                    x{{ $item->quantity }}
+                                    {{ \Illuminate\Support\Str::limit($firstItem->product_name, 25) }}
+                                    @if($order->orderItems->count() > 1)
+                                        và {{ $order->orderItems->count() - 1 }} sản phẩm khác
+                                    @endif
                                 </div>
                             </div>
-                        </td>
-                        <td>{{ number_format($item->sale_price * $item->quantity, 0, ',', '.') }}₫</td>
-                        <td>
-                            @php
-                                $statusMap = [
-                                    'pending' => ['color' => 'warning', 'label' => 'Chờ xác nhận'],
-                                    'confirmed' => ['color' => 'info', 'label' => 'Đã xác nhận'],
-                                    'shipping' => ['color' => 'primary', 'label' => 'Đang giao'],
-                                    'success' => ['color' => 'success', 'label' => 'Thành công'],
-                                    'failed' => ['color' => 'danger', 'label' => 'Thất bại'],
-                                    'cancelled' => ['color' => 'secondary', 'label' => 'Đã hủy'],
-                                ];
-                                $status = $order->status;
-                                $statusColor = $statusMap[$status]['color'] ?? 'secondary';
-                                $statusLabel = $statusMap[$status]['label'] ?? ucfirst($status);
-                            @endphp
-                            <span class="badge bg-{{ $statusColor }}-subtle text-{{ $statusColor }}">
-                                {{ $statusLabel }}
-                            </span>
-                        </td>
-                        <td>
-                            <a href="{{ route('home.orderDetail',$order->id) }}" 
-                               class="btn btn-sm btn-soft-primary">
-                                Xem chi tiết
-                            </a>
-                        </td>
-                    </tr>
-                    @endforeach
+                        @endif
+                    </td>
+                    <td>{{ number_format($order->final_amount, 0, ',', '.') }}₫</td>
+                    <td>
+                        @php
+                            $statusMap = [
+                                'pending' => ['color' => 'warning', 'label' => 'Chờ xác nhận'],
+                                'confirmed' => ['color' => 'info', 'label' => 'Đã xác nhận'],
+                                'shipping' => ['color' => 'primary', 'label' => 'Đang giao'],
+                                'success' => ['color' => 'success', 'label' => 'Thành công'],
+                                'failed' => ['color' => 'danger', 'label' => 'Thất bại'],
+                                'cancelled' => ['color' => 'secondary', 'label' => 'Đã hủy'],
+                            ];
+                            $status = $order->status;
+                            $statusColor = $statusMap[$status]['color'] ?? 'secondary';
+                            $statusLabel = $statusMap[$status]['label'] ?? ucfirst($status);
+                        @endphp
+                        <span class="badge bg-{{ $statusColor }}-subtle text-{{ $statusColor }}">
+                            {{ $statusLabel }}
+                        </span>
+                    </td>
+                    <td>
+                        <a href="{{ route('home.orderDetail',$order->id) }}" 
+                           class="btn btn-sm btn-soft-primary">
+                            Xem chi tiết
+                        </a>
+                    </td>
+                </tr>
                 @empty
                    <tr>
                     <td colspan="5" class="text-center py-4">
@@ -79,46 +79,47 @@
     <!-- Mobile Cards (hiển thị trên điện thoại) -->
     <div class="d-block d-md-none">
         @forelse($orders as $order)
-            @foreach ($order->orderItems as $item)
-                <div class="card order-card mb-3">
-                    <div class="card-body d-flex gap-2 align-items-start">
-                        <img src="{{ asset($item->productVariant->product->image_url) }}"
-                             alt="{{ $item->product_name }}" class="order-img me-2" />
+            @php
+                $firstItem = $order->orderItems->first();
+            @endphp
+            <div class="card order-card mb-3">
+                <div class="card-body d-flex gap-2 align-items-start">
+                    @if($firstItem)
+                        <img src="{{ asset($firstItem->product_image_url) }}"
+                             alt="{{ $firstItem->product_name }}" class="order-img me-2" />
                         <div style="flex:1;line-height:1.3;">
                             <div class="product-name-truncate" style="font-weight: bold;">
-                                {{ \Illuminate\Support\Str::limit($item->product_name, 30) }}
+                                {{ \Illuminate\Support\Str::limit($firstItem->product_name, 30) }}
+                                @if($order->orderItems->count() > 1)
+                                    và {{ $order->orderItems->count() - 1 }} sản phẩm khác
+                                @endif
                             </div>
-                            <div style="font-size: 13px; color: #555;">
-                                {{ $item->productVariant->color->color_name ?? '-' }},
-                                {{ $item->productVariant->size->size_name ?? '-' }}<br>
-                                x{{ $item->quantity }}
-                            </div>
-                            <div style="margin-top: 6px; font-weight: bold; color: #0d6efd;">
-                                {{ number_format($item->sale_price * $item->quantity, 0, ',', '.') }}₫
-                            </div>
-                            @php
-                                $statusMap = [
-                                    'pending' => ['color' => 'warning', 'label' => 'Chờ xác nhận'],
-                                    'confirmed' => ['color' => 'info', 'label' => 'Đã xác nhận'],
-                                    'shipping' => ['color' => 'primary', 'label' => 'Đang giao'],
-                                    'success' => ['color' => 'success', 'label' => 'Thành công'],
-                                    'failed' => ['color' => 'danger', 'label' => 'Thất bại'],
-                                    'cancelled' => ['color' => 'secondary', 'label' => 'Đã hủy'],
-                                ];
-                                $status = $order->status;
-                                $statusColor = $statusMap[$status]['color'] ?? 'secondary';
-                                $statusLabel = $statusMap[$status]['label'] ?? ucfirst($status);
-                            @endphp
-                            <span class="badge bg-{{ $statusColor }}-subtle text-{{ $statusColor }} mt-2">
-                                {{ $statusLabel }}
-                            </span>
                         </div>
+                    @endif
+                    <div style="margin-top: 6px; font-weight: bold; color: #0d6efd;">
+                        {{ number_format($order->total_price, 0, ',', '.') }}₫
                     </div>
-                    <div class="card-footer bg-transparent border-0 pt-0 pb-2 px-3">
-                        <a href="{{ route('home.orderDetail',$order->id) }}" class="btn btn-sm btn-soft-primary w-100">Xem chi tiết</a>
-                    </div>
+                    @php
+                        $statusMap = [
+                            'pending' => ['color' => 'warning', 'label' => 'Chờ xác nhận'],
+                            'confirmed' => ['color' => 'info', 'label' => 'Đã xác nhận'],
+                            'shipping' => ['color' => 'primary', 'label' => 'Đang giao'],
+                            'success' => ['color' => 'success', 'label' => 'Thành công'],
+                            'failed' => ['color' => 'danger', 'label' => 'Thất bại'],
+                            'cancelled' => ['color' => 'secondary', 'label' => 'Đã hủy'],
+                        ];
+                        $status = $order->status;
+                        $statusColor = $statusMap[$status]['color'] ?? 'secondary';
+                        $statusLabel = $statusMap[$status]['label'] ?? ucfirst($status);
+                    @endphp
+                    <span class="badge bg-{{ $statusColor }}-subtle text-{{ $statusColor }} mt-2">
+                        {{ $statusLabel }}
+                    </span>
                 </div>
-            @endforeach
+                <div class="card-footer bg-transparent border-0 pt-0 pb-2 px-3">
+                    <a href="{{ route('home.orderDetail',$order->id) }}" class="btn btn-sm btn-soft-primary w-100">Xem chi tiết</a>
+                </div>
+            </div>
         @empty
             <div class="text-center py-4">
                 <div class="text-muted">
