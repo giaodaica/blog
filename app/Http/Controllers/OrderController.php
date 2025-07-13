@@ -8,6 +8,8 @@ use App\Models\OrderItem;
 use App\Models\Cart;
 use App\Models\AddressBook;
 use App\Models\Vouchers;
+use App\Models\VouchersLog;
+use App\Models\VouchersUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
@@ -72,7 +74,7 @@ class OrderController extends Controller
         if (session('voucher_code')) {
             $appliedVoucher = Vouchers::where('code', session('voucher_code'))->first();
         }
-// dd($voucherDiscount);
+        // dd($voucherDiscount);
         return view('pages.shop.checkout', compact(
             'cartItems',
             'subtotal',
@@ -199,7 +201,7 @@ class OrderController extends Controller
                 'address' => $address->address,
                 'total_amount' => $subtotal,
                 'final_amount' => $finalAmount,
-                'discount_amount' =>$voucherDiscount,
+                'discount_amount' => $voucherDiscount,
                 'status' => 'pending',
                 'code_order' => $orderCode,
                 'pay_method' => $request->payment_method,
@@ -210,7 +212,7 @@ class OrderController extends Controller
             ];
 
             $order = Order::create($orderData);
-// dd($order);
+            // dd($order);
             // Tạo chi tiết đơn hàng
             foreach ($cartItems as $item) {
                 $orderItemData = [
@@ -292,9 +294,9 @@ class OrderController extends Controller
             return abort(403, 'Không có hành động này');
         }
         if ($type) {
-            $data_order = Order::where('status', $type)->paginate(10);
+            $data_order = Order::where('status', $type)->orderBy('created_at', 'desc')->paginate(10);
         } else {
-            $data_order = Order::paginate(10);
+            $data_order = Order::orderBy('created_at', 'desc')->paginate(10);
         }
         // dd($data_order);
         return view('dashboard.pages.order.index', compact('data_order', 'count'));
@@ -320,7 +322,7 @@ class OrderController extends Controller
         if ($before && !in_array($before, $data_change)) {
             return  abort(403, "Hành động không hợp lệ");
         }
-        if($before == 'failed' || $before == 'cancelled'){
+        if ($before == 'failed' || $before == 'cancelled') {
             $id = $request->order_id;
         }
         $old_status = Order::find($id);
@@ -380,6 +382,46 @@ class OrderController extends Controller
                 }
                 break;
         }
+        // dd($present);
+        if ($present->status == 'cancelled') {
+            OrderItem::where('order_id', $id)->get()->each(function ($item) {
+                $item->productVariant->increment('stock', $item->quantity);
+            });
+            $voucher = Vouchers::find($present->voucher_id);
+            if ($present->voucher_id && $voucher->end_date < now()) {
+                VouchersUsers::updateOrCreate(
+                    [
+                        'user_id' => $present->user_id,
+                        'voucher_id' => $present->voucher_id,
+                    ],
+                    [
+                        'is_used'    => 'unused',
+                        'start_date' => now(),
+                        'end_date'   => now()->addDays(7),
+                    ]
+                );
+                VouchersLog::create([
+                    'user_id' => $present->user_id,
+                    'voucher_id' => $present->voucher_id,
+                    'order_id' => $id,
+                    'type' => 'refund_new',
+                    'content' => 'Voucher đã được tạo lại do đơn hàng bị hủy',
+                ]);
+            } else {
+                VouchersUsers::where('user_id', $present->user_id)
+                    ->where('voucher_id', $present->voucher_id)
+                    ->update([
+                        'is_used' => 'unused',
+                    ]);
+                VouchersLog::create([
+                    'user_id' => $present->user_id,
+                    'voucher_id' => $present->voucher_id,
+                    'order_id' => $id,
+                    'type' => 'refund_reuse',
+                    'content' => 'Voucher đã được đánh dấu là chưa sử dụng do đơn hàng bị hủy',
+                ]);
+            }
+        }
 
         $present->save();
         OrderHistories::create([
@@ -390,7 +432,7 @@ class OrderController extends Controller
             'note' => $note
         ]);
 
-if($count >= 2 && $present->status == 'failed') {
+        if ($count >= 2 && $present->status == 'failed') {
             $present->status = 'cancelled';
             $present->save();
             OrderHistories::create([
@@ -613,7 +655,6 @@ if($count >= 2 && $present->status == 'failed') {
 
                 return redirect()->route('home.done')->with('error', $errorMsg);
             }
-
         } catch (\Exception $e) {
             return redirect()->route('home.done')->with('error', 'Có lỗi xảy ra khi xử lý thanh toán! Vui lòng liên hệ hỗ trợ.');
         }
@@ -836,7 +877,6 @@ if($count >= 2 && $present->status == 'failed') {
             }
 
             return response()->json(['success' => true]);
-
         } catch (\Exception $e) {
             return response()->json(['error' => 'Internal server error'], 500);
         }
