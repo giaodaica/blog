@@ -42,7 +42,7 @@
                                     </h5>
                                 </div>
                                 <div class="col-lg-3 col-6">
-                                    <p class="text-muted mb-2 text-uppercase fw-semibold fs-14">Trạng thái thanh toán</p>
+                                    <p class="text-muted mb-2 text-uppercase fw-semibold fs-14">Trạng thái đơn hàng</p>
                                     @php
                                         $statusMap = [
                                             'pending' => ['color' => 'warning', 'label' => 'Chờ xác nhận'],

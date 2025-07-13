@@ -13,6 +13,15 @@
     foreach ($variants as $variant) {
         $stockMap[$variant->color_id . '-' . $variant->size_id] = $variant->stock;
     }
+
+    $priceMap = [];
+    foreach ($variants as $variant) {
+        $key = $variant->color_id . '-' . $variant->size_id;
+        $priceMap[$key] = [
+            'sale_price' => $variant->sale_price,
+            'listed_price' => $variant->listed_price,
+        ];
+    }
 @endphp
 @extends('layouts.layout')
 @section('content')
@@ -88,25 +97,23 @@
                     <div class="d-block d-sm-flex align-items-center mb-15px">
                         <div class="me-10px xs-me-0">
                             <a href="#tab" class="section-link ls-minus-1px icon-small">
-                                <i class="bi bi-star-fill text-golden-yellow"></i>
-                                <i class="bi bi-star-fill text-golden-yellow"></i>
-                                <i class="bi bi-star-fill text-golden-yellow"></i>
-                                <i class="bi bi-star-fill text-golden-yellow"></i>
-                                <i class="bi bi-star-fill text-golden-yellow"></i>
+                                @for ($i = 1; $i <= 5; $i++)
+                                    <i class="bi {{ $i <= round($averageRating) ? 'bi-star-fill text-golden-yellow' : 'bi-star text-golden-yellow' }}"></i>
+                                @endfor
                             </a>
                         </div>
-                        <a href="#tab" class="me-25px text-dark-gray fw-500 section-link xs-me-0">165 Reviews</a>
+                        <a href="#tab" class="me-25px text-dark-gray fw-500 section-link xs-me-0">{{ $totalReviews }} Đánh giá</a>
 
                     </div>
                     <div class="product-price mb-10px">
-                        <span class="text-red fs-28 xs-fs-24 fw-700 ls-minus-1px">
-                            @if($variants->first())
+                        <span class="text-red fs-28 xs-fs-24 fw-700 ls-minus-1px" id="product-sale-price">
                             {{ number_format($variants->first()->sale_price) }}đ
-                                @if($variants->first()->listed_price != $variants->first()->sale_price)
-                                    <del class="text-medium-gray me-10px fw-400">{{ number_format($variants->first()->listed_price) }}đ</del>
-                                @endif
-                            @endif
                         </span>
+                        @if($variants->first()->listed_price != $variants->first()->sale_price)
+                            <del class="text-medium-gray me-10px fw-400" id="product-listed-price">
+                                {{ number_format($variants->first()->listed_price) }}đ
+                            </del>
+                        @endif
                     </div>
                     <form action="{{ url('add-to-cart', $product->id) }}" method="post">
                         @csrf
@@ -162,19 +169,7 @@
                             <span id="stock-text"></span>
                         </span>
                     </div>
-                    <div class="row mb-20px">
-                        <div class="col-auto icon-with-text-style-08">
-                            <div class="feature-box feature-box-left-icon-middle d-inline-flex align-middle">
-                                <div class="feature-box-icon me-10px">
-                                    <i class="feather icon-feather-repeat align-middle text-dark-gray"></i>
-                                </div>
-                                <div class="feature-box-content">
-                                    <a href="#" class="alt-font fw-500 text-dark-gray d-block">Compare</a>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
+                 
                     <div class="mb-20px h-1px w-100 bg-extra-medium-gray d-block"></div>
                     <div class="row mb-15px">
                         <div class="col-12 icon-with-text-style-08">
@@ -184,8 +179,8 @@
                                         class="feather icon-feather-truck top-8px position-relative align-middle text-dark-gray"></i>
                                 </div>
                                 <div class="feature-box-content">
-                                    <span><span class="alt-font text-dark-gray fw-500">Estimated delivery:</span> March 03
-                                        - March 07</span>
+                                    <span><span class="alt-font text-dark-gray fw-500">Dự kiến giao hàng:</span> 03 Tháng 3
+                                        - 07 Tháng 3</span>
                                 </div>
                             </div>
                         </div>
@@ -196,8 +191,7 @@
                                         class="feather icon-feather-archive top-8px position-relative align-middle text-dark-gray"></i>
                                 </div>
                                 <div class="feature-box-content">
-                                    <span><span class="alt-font text-dark-gray fw-500">Free shipping & returns:</span> On
-                                        all orders over $50</span>
+                                    <span><span class="alt-font text-dark-gray fw-500">Miễn phí vận chuyển & trả hàng:</span> Cho tất cả đơn hàng trên 1.200.000đ</span>
                                 </div>
                             </div>
                         </div>
@@ -281,7 +275,8 @@
                                         </span>
                                         <span
                                             class="ps-15px pe-15px pt-10px pb-10px lh-normal bg-dark-gray text-white fs-12 fw-600 text-uppercase border-radius-4px d-inline-block text-center">{{ $totalReviews }}
-                                            Reviews</span>
+                                            
+Đánh giá</span>
                                     </div>
                                 </div>
                                 <div class="col-9 col-lg-4 col-md-5 col-sm-8 progress-bar-style-02">
@@ -449,181 +444,54 @@
         <div class="container">
             <div class="row mb-5">
                 <div class="col-12 text-center">
-                    <h2 class="alt-font text-dark-gray mb-0 ls-minus-2px">Related <span
-                            class="text-highlight fw-600">products<span
+                    <h2 class="alt-font text-dark-gray mb-0 ls-minus-2px">Gợi Ý <span
+                            class="text-highlight fw-600">Sản Phẩm<span
                                 class="bg-base-color h-5px bottom-2px"></span></span></h2>
                 </div>
             </div>
             <div class="row">
                 <div class="col-12">
-                    <ul
-                        class="shop-modern shop-wrapper grid grid-4col md-grid-3col sm-grid-2col xs-grid-1col gutter-extra-large text-center">
+                    <ul class="shop-modern shop-wrapper grid grid-4col md-grid-3col sm-grid-2col xs-grid-1col gutter-extra-large text-center">
                         <li class="grid-sizer"></li>
-                        <!-- start shop item -->
-                        <li class="grid-item">
-                            <div class="shop-box mb-10px">
-                                <div class="shop-image mb-20px">
-                                    <a href="demo-fashion-store-single-product.html">
-                                        <img src="https://placehold.co/600x765" alt="">
-                                        <span class="lable new">New</span>
-                                        <div class="shop-overlay bg-gradient-gray-light-dark-transparent"></div>
-                                    </a>
-                                    <div class="shop-buttons-wrap">
-                                        <a href="demo-fashion-store-single-product.html"
-                                            class="alt-font btn btn-small btn-box-shadow btn-white btn-round-edge left-icon add-to-cart">
-                                            <i class="feather icon-feather-shopping-bag"></i><span
-                                                class="quick-view-text button-text">Thêm vào giỏ</span>
-                                        </a>
-                                    </div>
-                                    <div class="shop-hover d-flex justify-content-center">
-                                        <ul>
-                                            <li>
-                                                <a href="#"
-                                                    class="w-40px h-40px bg-white text-dark-gray d-flex align-items-center justify-content-center rounded-circle ms-5px me-5px"
-                                                    data-bs-toggle="tooltip" data-bs-placement="left"
-                                                    title="Add to wishlist"><i
-                                                        class="feather icon-feather-heart fs-16"></i></a>
-                                            </li>
-                                            <li>
-                                                <a href="#"
-                                                    class="w-40px h-40px bg-white text-dark-gray d-flex align-items-center justify-content-center rounded-circle ms-5px me-5px"
-                                                    data-bs-toggle="tooltip" data-bs-placement="left"
-                                                    title="Quick shop"><i class="feather icon-feather-eye fs-16"></i></a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="shop-footer text-center">
-                                    <a href="demo-fashion-store-single-product.html"
-                                        class="alt-font text-dark-gray fs-19 fw-500">Textured sweater</a>
-                                    <div class="price lh-22 fs-16"><del>$200.00</del>$189.00</div>
-                                </div>
-                            </div>
-                        </li>
-                        <!-- end shop item -->
-                        <!-- start shop item -->
-                        <li class="grid-item">
-                            <div class="shop-box mb-10px">
-                                <div class="shop-image mb-20px">
-                                    <a href="demo-fashion-store-single-product.html">
-                                        <img src="https://placehold.co/600x765" alt="">
-                                        <div class="shop-overlay bg-gradient-gray-light-dark-transparent"></div>
-                                    </a>
-                                    <div class="shop-buttons-wrap">
-                                        <a href="demo-fashion-store-single-product.html"
-                                            class="alt-font btn btn-small btn-box-shadow btn-white btn-round-edge left-icon add-to-cart">
-                                            <i class="feather icon-feather-shopping-bag"></i><span
-                                                class="quick-view-text button-text">Add to cart</span>
-                                        </a>
-                                    </div>
-                                    <div class="shop-hover d-flex justify-content-center">
-                                        <ul>
-                                            <li>
-                                                <a href="#"
-                                                    class="w-40px h-40px bg-white text-dark-gray d-flex align-items-center justify-content-center rounded-circle ms-5px me-5px"
-                                                    data-bs-toggle="tooltip" data-bs-placement="left"
-                                                    title="Add to wishlist"><i
-                                                        class="feather icon-feather-heart fs-16"></i></a>
-                                            </li>
-                                            <li>
-                                                <a href="#"
-                                                    class="w-40px h-40px bg-white text-dark-gray d-flex align-items-center justify-content-center rounded-circle ms-5px me-5px"
-                                                    data-bs-toggle="tooltip" data-bs-placement="left"
-                                                    title="Quick shop"><i class="feather icon-feather-eye fs-16"></i></a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="shop-footer text-center">
-                                    <a href="demo-fashion-store-single-product.html"
-                                        class="alt-font text-dark-gray fs-19 fw-500">Traveller shirt</a>
-                                    <div class="price lh-22 fs-16"><del>$350.00</del>$289.00</div>
-                                </div>
-                            </div>
-                        </li>
-                        <!-- end shop item -->
-                        <!-- start shop item -->
-                        <li class="grid-item">
-                            <div class="shop-box mb-10px">
-                                <div class="shop-image mb-20px">
-                                    <a href="demo-fashion-store-single-product.html">
-                                        <img src="https://placehold.co/600x765" alt="">
-                                        <div class="shop-overlay bg-gradient-gray-light-dark-transparent"></div>
-                                    </a>
-                                    <div class="shop-buttons-wrap">
-                                        <a href="demo-fashion-store-single-product.html"
-                                            class="alt-font btn btn-small btn-box-shadow btn-white btn-round-edge left-icon add-to-cart">
-                                            <i class="feather icon-feather-shopping-bag"></i><span
-                                                class="quick-view-text button-text">Add to cart</span>
-                                        </a>
-                                    </div>
-                                    <div class="shop-hover d-flex justify-content-center">
-                                        <ul>
-                                            <li>
-                                                <a href="#"
-                                                    class="w-40px h-40px bg-white text-dark-gray d-flex align-items-center justify-content-center rounded-circle ms-5px me-5px"
-                                                    data-bs-toggle="tooltip" data-bs-placement="left"
-                                                    title="Add to wishlist"><i
-                                                        class="feather icon-feather-heart fs-16"></i></a>
-                                            </li>
-                                            <li>
-                                                <a href="#"
-                                                    class="w-40px h-40px bg-white text-dark-gray d-flex align-items-center justify-content-center rounded-circle ms-5px me-5px"
-                                                    data-bs-toggle="tooltip" data-bs-placement="left"
-                                                    title="Quick shop"><i class="feather icon-feather-eye fs-16"></i></a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="shop-footer text-center">
-                                    <a href="demo-fashion-store-single-product.html"
-                                        class="alt-font text-dark-gray fs-19 fw-500">Crewneck sweatshirt</a>
-                                    <div class="price lh-22 fs-16"><del>$220.00</del>$199.00</div>
-                                </div>
-                            </div>
-                        </li>
-                        <!-- end shop item -->
-                        <!-- start shop item -->
-                        <li class="grid-item">
-                            <div class="shop-box mb-10px">
-                                <div class="shop-image mb-20px">
-                                    <a href="demo-fashion-store-single-product.html">
-                                        <img src="https://placehold.co/600x765" alt="">
-                                        <div class="shop-overlay bg-gradient-gray-light-dark-transparent"></div>
-                                    </a>
-                                    <div class="shop-buttons-wrap">
-                                        <a href="demo-fashion-store-single-product.html"
-                                            class="alt-font btn btn-small btn-box-shadow btn-white btn-round-edge left-icon add-to-cart">
-                                            <i class="feather icon-feather-shopping-bag"></i><span
-                                                class="quick-view-text button-text">Add to cart</span>
-                                        </a>
-                                    </div>
-                                    <div class="shop-hover d-flex justify-content-center">
-                                        <ul>
-                                            <li>
-                                                <a href="#"
-                                                    class="w-40px h-40px bg-white text-dark-gray d-flex align-items-center justify-content-center rounded-circle ms-5px me-5px"
-                                                    data-bs-toggle="tooltip" data-bs-placement="left"
-                                                    title="Add to wishlist"><i
-                                                        class="feather icon-feather-heart fs-16"></i></a>
-                                            </li>
-                                            <li>
-                                                <a href="#"
-                                                    class="w-40px h-40px bg-white text-dark-gray d-flex align-items-center justify-content-center rounded-circle ms-5px me-5px"
-                                                    data-bs-toggle="tooltip" data-bs-placement="left"
-                                                    title="Quick shop"><i class="feather icon-feather-eye fs-16"></i></a>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div class="shop-footer text-center">
-                                    <a href="demo-fashion-store-single-product.html"
-                                        class="alt-font text-dark-gray fs-19 fw-500">Skinny trousers</a>
-                                    <div class="price lh-22 fs-16"><del>$300.00</del>$259.00</div>
-                                </div>
-                            </div>
-                        </li>
-                        <!-- end shop item -->
+                        @foreach ($relatedProducts as $product)
+                                        <!-- start shop item -->
+                                        <li class="grid-item">
+                                            <div class="shop-box mb-10px">
+                                                <div class="shop-image mb-20px">
+                                                    @php
+                                                        $variant = $product->variants->first();
+                                                    @endphp
+                                                    <a href="{{ route('home.show', $product->slug) }}">
+                                                        <img src="{{ asset(optional($variant)->variant_image_url) }}"
+                                                            alt="{{ $product->name }}">
+                                                        <div class="shop-overlay bg-gradient-gray-light-dark-transparent">
+                                                        </div>
+                                                    </a>
+                                                </div>
+                                                <div class="shop-footer text-start">
+                                                    <a href="{{ route('home.show', $product->slug) }}"
+                                                        class="alt-font text-dark-gray fs-19 fw-500 product-name-truncate">{{ $product->name }}</a>
+                                                    <div class="price lh-22 fs-16">
+                                                    
+                                                        @if ($variant && $variant->sale_price < $variant->listed_price)
+                                                            <div class="product-price">
+                                                                {{ number_format($variant->sale_price) }} ₫
+                                                                <span
+                                                                    class="product-old-price">{{ number_format($variant->listed_price) }}
+                                                                    ₫</span>
+                                                            </div>
+                                                        @elseif($variant)
+                                                            <span
+                                                                class="product-price">{{ number_format($variant->listed_price) }}
+                                                                ₫</span>
+                                                        @endif
+                                                    </div>
+                                                    
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <!-- end shop item -->
+                                    @endforeach
                     </ul>
                 </div>
             </div>
@@ -693,7 +561,19 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .product-price {
+    color: #ff6b35;
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
 
+.product-old-price {
+    color: #999;
+    text-decoration: line-through;
+    font-size: 13px;
+    margin-right: 10px;
+}
         
     </style>
 
@@ -707,6 +587,8 @@
 <script>
     window.variantStock = @json($stockMap ?? []);
     window.colorImageMap = @json($colorImageMap);
+    window.variantPriceMap = @json($priceMap);
+    
 </script>
 @endpush
 
