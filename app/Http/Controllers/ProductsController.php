@@ -96,7 +96,7 @@ class ProductsController extends Controller
 
     public function store(Request $request)
     {
-        dd($request);
+        // dd($request);
         $request->validate([
             'name' => 'required|string|max:255|unique:products,name',
             'slug' => 'nullable|unique:products,slug',

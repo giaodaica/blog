@@ -133,7 +133,9 @@ class VouchersController extends Controller
         }
         VouchersUsers::create([
             'user_id' => $user_id,
-            'voucher_id' => $id
+            'voucher_id' => $id,
+            'start_date' => $voucher->start_date,
+            'end_date' => $voucher->end_date
         ]);
         $voucher->update([
             'max_used' => $voucher->max_used - 1,

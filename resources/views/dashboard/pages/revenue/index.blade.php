@@ -184,10 +184,10 @@
                                     @if ($data_doanhthu->sodonhang > 0)
                                         <tr>
                                             <td>{{ number_format($data_doanhthu->doanhthu) }} đ</td>
-                                            <td>{{ $data_doanhthu->tongsanpham }}</td>
+                                            <td>{{ $data_loinhan->tongsanpham }}</td>
                                             <td>{{ number_format($dtb) }} đ</td>
                                             <td>{{ number_format($data_doanhthu->tong_giam_gia) }} đ</td>
-                                            <td>{{ number_format($data_doanhthu->loinhuan) }} đ</td>
+                                            <td>{{ number_format($data_loinhan->loinhuan) }} đ</td>
                                         </tr>
                                     @else
                                         <tr>

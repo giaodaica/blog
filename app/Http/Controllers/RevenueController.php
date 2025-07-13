@@ -74,10 +74,16 @@ class RevenueController extends Controller
         $revenue_doanhthu = Order::selectRaw('
         COUNT(*) as sodonhang,
         SUM(final_amount) as doanhthu,
-        SUM(discount_amount) as tong_giam_gia,
-        SUM(quantity) as tongsanpham,
-        SUM((order_items.sale_price - order_items.import_price) * order_items.quantity) as loinhuan')->join('order_items', 'order_items.order_id', 'orders.id')
+        SUM(discount_amount) as tong_giam_gia')
             ->where('orders.status', 'success');
+
+        // thống kê số lượng sản phẩm đã bán và loinhuan
+        $revenue_loinhan = OrderItem::selectRaw('
+        SUM(quantity) as tongsanpham,
+        SUM((sale_price - import_price) * quantity) as loinhuan')
+            ->join('orders', 'orders.id', 'order_items.order_id')
+            ->where('orders.status', 'success');
+        // dd($revenue_loinhan->first());
 
         // thống kê sản phẩm bán chạy
         $revenue_top_product = OrderItem::selectRaw(
@@ -150,12 +156,13 @@ class RevenueController extends Controller
         $data_doanhthu = $revenue_doanhthu->where($timeFilter)->first();
         // dd($data_doanhthu);
         // dd($start, $end);
+        $data_loinhan = $revenue_loinhan->where($timeFilter)->first();
         $data_top_5_users = $revenue_top_users->where($timeFilter)->get();
         $sodonhang = $data_order->sodonhang ?? 0;
         $doanhthu = $data_doanhthu->doanhthu ?? 0;
         $dtb = $sodonhang > 0 ? $doanhthu / $sodonhang : 0;
 
-        return view('dashboard.pages.revenue.index', compact('dtb', 'start', 'end', 'data_order', 'data_top_5', 'data_doanhthu', 'sodonhang', 'doanhthu', 'data_top_5_users'));
+        return view('dashboard.pages.revenue.index', compact('dtb', 'start', 'end', 'data_order', 'data_top_5', 'data_doanhthu', 'sodonhang', 'doanhthu', 'data_top_5_users','data_loinhan'));
     }
 
 
