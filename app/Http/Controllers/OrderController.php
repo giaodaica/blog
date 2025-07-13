@@ -407,7 +407,7 @@ class OrderController extends Controller
                     'type' => 'refund_new',
                     'content' => 'Voucher đã được tạo lại do đơn hàng bị hủy',
                 ]);
-            } else {
+            } else if ($present->voucher_id) {
                 VouchersUsers::where('user_id', $present->user_id)
                     ->where('voucher_id', $present->voucher_id)
                     ->update([
