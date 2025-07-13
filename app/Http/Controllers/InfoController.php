@@ -23,9 +23,9 @@ class InfoController extends Controller
             'default_phone' => 'nullable|string|max:20',
             'email' => 'required|email|unique:users,email,' . $user->id,
         ]);
-        
+
         DB::table('users')->where('id', $user->id)->update($validatedData);
-        
+
         return redirect()->back()->with('success', 'Thông tin đã được cập nhật thành công!');
     }
 
@@ -44,7 +44,7 @@ class InfoController extends Controller
         $orders = $query->latest()->get();
 
         $user = Auth::user();
-    
+
         $addresses = AddressBook::where('user_id', $user->id)->limit(2)->get();
         $pendingOrders = $orders->where('status', 'pending')->values();
         $confirmedOrders = $orders->where('status', 'confirmed')->values();
@@ -73,7 +73,7 @@ class InfoController extends Controller
             return $item->sale_price * $item->quantity;
         });
         $discount = $order->discount_amount ?? 0; // hoặc trường discount nếu có
-        // dd($discount);   
+        // dd($discount);
         $shipping = $order->shipping_fee ?? 0;
         $total = $subtotal - $discount + $shipping;
 
@@ -117,7 +117,7 @@ class InfoController extends Controller
                     'type' => 'refund_new',
                     'content' => 'Voucher đã được tạo lại do đơn hàng bị hủy',
                 ]);
-            } else {
+            } else if ($order->voucher_id) {
                 VouchersUsers::where('user_id', $order->user_id)
                     ->where('voucher_id', $order->voucher_id)
                     ->update([
@@ -133,19 +133,19 @@ class InfoController extends Controller
             }
         }
 
-        
+
         $order->save();
-    
+
         // Lưu lịch sử hủy đơn nếu cần
         OrderHistories::create([
             'users' => Auth::id(),
             'order_id' => $order->id,
-            'from_status' => 'pending', 
+            'from_status' => 'pending',
             'to_status' => 'cancelled',
             'note' => $request->cancel_reason,
             'content' => $request->cancel_note,
         ]);
-    
+
         return redirect()->back()->with('success', 'Đã hủy đơn hàng thành công!');
     }
 
