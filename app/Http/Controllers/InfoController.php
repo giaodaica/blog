@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Order;
 use App\Models\OrderHistories;
 use App\Models\OrderItem;
+use App\Models\RefundMoney;
 use App\Models\Vouchers;
 use App\Models\VouchersLog;
 use App\Models\VouchersUsers;
@@ -77,8 +78,12 @@ class InfoController extends Controller
         $shipping = $order->shipping_fee ?? 0;
         $total = $subtotal - $discount + $shipping;
 
+        $refund = RefundMoney::where('order_id',$id)
+                             ->where('user_id',Auth::user()->id)
+                             ->first();
+                            //  dd($refund);
         return view('pages.shop.partials.order-detail', compact(
-            'order', 'shippingAddress', 'subtotal', 'discount', 'shipping', 'total'
+            'order', 'shippingAddress', 'subtotal', 'discount', 'shipping', 'total','refund'
         ));
     }
     public function cancel(Request $request, $id)

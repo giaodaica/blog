@@ -170,6 +170,16 @@
                                 data-bs-target="#cancelOrderModal">Hủy đơn hàng</a>
                         @endif
                         <a href="{{ route('home.info') }}" class="btn btn-warning no-hover">Quay lại</a>
+                        @if ($refund)
+                            @if ($refund->status == 'approved')
+                                <span class="btn btn-success no-hover">Đã hoàn tiền</span>
+                                @if (!empty($refund->QR_images))
+                                    <a href="{{ asset($refund->QR_images) }}" target="_blank" class="btn btn-info no-hover">Xem bill</a>
+                                @endif
+                            @else
+                                <a href="#" class="btn btn-primary no-hover" data-bs-toggle="modal" data-bs-target="#refundModal">Yêu cầu hoàn tiền</a>
+                            @endif
+                        @endif
                     </div>
                 </div>
             </div>
@@ -209,6 +219,70 @@
             </form>
         </div>
     </div>
+
+    <!-- Modal Hoàn tiền -->
+    <div class="modal fade" id="refundModal" tabindex="-1" role="dialog" aria-labelledby="refundModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <form id="refundForm" method="POST" action="{{ route('order.refund', $order->id) }}" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="refundModalLabel">Yêu cầu hoàn tiền</h5>
+                    </div>
+                    <div class="modal-body">
+                        <ul class="nav nav-tabs mb-3" id="refundTab" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="tab-stk" data-bs-toggle="tab" data-bs-target="#stk" type="button" role="tab">STK</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="tab-qr" data-bs-toggle="tab" data-bs-target="#qr" type="button" role="tab">QR</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content" id="refundTabContent">
+                            <div class="tab-pane fade show active" id="stk" role="tabpanel">
+                                <div class="mb-2">
+                                    <label>Ngân hàng</label>
+                                    <select class="form-control" name="bank_code" id="bankSelect" required></select>
+                                </div>
+                                <div class="mb-2">
+                                    <label>Số tài khoản</label>
+                                    <input type="text" class="form-control" name="account_number" required />
+                                </div>
+                                <div class="mb-2">
+                                    <label>Tên chủ thẻ</label>
+                                    <input type="text" class="form-control" name="account_name" required />
+                                </div>
+                                <div class="mb-2">
+                                    <label>Lý do hoàn tiền</label>
+                                    <input type="text" class="form-control" name="reason" required />
+                                </div>
+                            </div>
+                            <div class="tab-pane fade" id="qr" role="tabpanel">
+                                <div class="mb-2">
+                                    <label>Upload mã QR</label>
+                                    <input type="file" class="form-control" name="qr_image" accept="image/*" />
+                                </div>
+                                @if (!empty($refund->QR_images))
+                                    <div class="mb-2">
+                                        <label>Mã QR đã upload:</label><br>
+                                        <img src="{{ asset($refund->QR_images) }}" alt="QR Code" style="max-width: 200px;" />
+                                    </div>
+                                @endif
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary no-hover" data-bs-dismiss="modal">Đóng</button>
+                        @if ($refund->status == 'pending')
+                            <button type="submit" class="btn btn-primary no-hover">Gửi yêu cầu</button>
+                        @else
+                            <button type="button" class="btn btn-primary no-hover" disabled>Không thể gửi yêu cầu</button>
+                        @endif
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 @endsection
 <style>
     .order-img {
@@ -228,3 +302,25 @@
         outline: none !important;
     }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Call API lấy danh sách ngân hàng khi mở modal
+        var bankSelect = document.getElementById('bankSelect');
+        if (bankSelect) {
+            fetch('https://api.vietqr.io/v2/banks')
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.data) {
+                        data.data.forEach(function(bank) {
+                            var option = document.createElement('option');
+                            option.value = bank.code;
+                            option.text = bank.shortName + ' - ' + bank.name;
+                            bankSelect.appendChild(option);
+                        });
+                    }
+                });
+            // Thêm search cho select nếu muốn (có thể dùng select2 nếu đã có)
+        }
+    });
+</script>
