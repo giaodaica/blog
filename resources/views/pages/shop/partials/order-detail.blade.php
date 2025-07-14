@@ -223,7 +223,7 @@
     <!-- Modal Hoàn tiền -->
     <div class="modal fade" id="refundModal" tabindex="-1" role="dialog" aria-labelledby="refundModalLabel" aria-hidden="true">
         <div class="modal-dialog" role="document">
-            <form id="refundForm" method="POST" action="{{ route('order.refund', $order->id) }}" enctype="multipart/form-data">
+            <form id="refundForm" method="POST" action="" enctype="multipart/form-data">
                 @csrf
                 <div class="modal-content">
                     <div class="modal-header">
