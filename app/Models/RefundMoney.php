@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class RefundMoney extends Model
 {
+
     protected $table = 'refund_money';
 
     protected $fillable = [
@@ -30,4 +31,5 @@ class RefundMoney extends Model
     {
         return $this->belongsTo(Order::class);
     }
+
 }

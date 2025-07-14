@@ -23,6 +23,11 @@
                     {{ session('success') }}
                 </div>
             @endif
+            @if (session('error'))
+            <div class="alert alert-success">
+                {{ session('error') }}
+            </div>
+        @endif
             <div class="card mb-4">
 
                 <div class="card-body">
@@ -174,10 +179,15 @@
                             @if ($refund->status == 'approved')
                                 <span class="btn btn-success no-hover">Đã hoàn tiền</span>
                                 @if (!empty($refund->QR_images))
-                                    <a href="{{ asset($refund->QR_images) }}" target="_blank" class="btn btn-info no-hover">Xem bill</a>
+                                    <button type="button" class="btn btn-info no-hover" data-bs-toggle="modal" data-bs-target="#qrImageModal">Xem bill</button>
                                 @endif
+                            @elseif ($refund->status == 'pending')
+                                <span class="btn btn-secondary no-hover">Đang chờ xử lý</span>
+                                <button type="button" class="btn btn-info no-hover" data-bs-toggle="modal" data-bs-target="#refundDetailModal">
+                                    Xem chi tiết
+                                </button>
                             @else
-                                <a href="#" class="btn btn-primary no-hover" data-bs-toggle="modal" data-bs-target="#refundModal">Yêu cầu hoàn tiền</a>
+                                <a href="{{ route('order.refund.request', $order->id) }}" class="btn btn-primary no-hover">Yêu cầu hoàn tiền</a>
                             @endif
                         @endif
                     </div>
@@ -221,66 +231,117 @@
     </div>
 
     <!-- Modal Hoàn tiền -->
-    <div class="modal fade" id="refundModal" tabindex="-1" role="dialog" aria-labelledby="refundModalLabel" aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <form id="refundForm" method="POST" action="" enctype="multipart/form-data">
-                @csrf
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="refundModalLabel">Yêu cầu hoàn tiền</h5>
+    <!-- Đã chuyển sang view riêng, xóa modal này -->
+
+    @if ($refund && $refund->status == 'pending')
+        <!-- Modal Chi tiết hoàn tiền -->
+        <div class="modal fade" id="refundDetailModal" tabindex="-1" role="dialog" aria-labelledby="refundDetailModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div class="modal-content refund-detail-modal-content">
+                    <div class="modal-header border-0 pb-0 d-flex justify-content-between align-items-center">
+                        <h5 class="modal-title fw-bold" id="refundDetailModalLabel">Chi tiết yêu cầu hoàn tiền</h5>
+                        <button type="button" class="btn-close btn-close-lg" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body">
-                        <ul class="nav nav-tabs mb-3" id="refundTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="tab-stk" data-bs-toggle="tab" data-bs-target="#stk" type="button" role="tab">STK</button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="tab-qr" data-bs-toggle="tab" data-bs-target="#qr" type="button" role="tab">QR</button>
-                            </li>
-                        </ul>
-                        <div class="tab-content" id="refundTabContent">
-                            <div class="tab-pane fade show active" id="stk" role="tabpanel">
-                                <div class="mb-2">
-                                    <label>Ngân hàng</label>
-                                    <select class="form-control" name="bank_code" id="bankSelect" required></select>
+                    <div class="modal-body py-4">
+                        <div class="row g-3">
+                            @php
+                                $hasBank = !empty($refund->bank) || !empty($refund->stk) || !empty($refund->bank_account_name) || !empty($refund->reason);
+                                $hasQR = !empty($refund->QR_images);
+                            @endphp
+                            @if ($hasBank)
+                                <div class="col-12 col-md-6">
+                                    @if (!empty($refund->bank))
+                                        <div class="mb-2"><span class="fw-semibold text-muted">Ngân hàng:</span> <span class="fw-bold">{{ $refund->bank }}</span></div>
+                                    @endif
+                                    @if (!empty($refund->stk))
+                                        <div class="mb-2"><span class="fw-semibold text-muted">Số tài khoản:</span> <span class="fw-bold">{{ $refund->stk }}</span></div>
+                                    @endif
+                                    @if (!empty($refund->bank_account_name))
+                                        <div class="mb-2"><span class="fw-semibold text-muted">Tên chủ thẻ:</span> <span class="fw-bold">{{ $refund->bank_account_name }}</span></div>
+                                    @endif
+                                    <div class="mb-2"><span class="fw-semibold text-muted">Số tiền hoàn:</span> <span class="fw-bold text-danger">{{ number_format($refund->amount) }}đ</span></div>
+                                    @if (!empty($refund->reason))
+                                        <div class="mb-2"><span class="fw-semibold text-muted">Lý do:</span> <span class="fw-bold">{{ $refund->reason }}</span></div>
+                                    @endif
+                                    <div class="mb-2 mt-3"><span class="fw-semibold text-muted">Trạng thái:</span> <span class="badge bg-secondary-subtle text-secondary">Đang chờ xử lý</span></div>
                                 </div>
-                                <div class="mb-2">
-                                    <label>Số tài khoản</label>
-                                    <input type="text" class="form-control" name="account_number" required />
+                            @endif
+                            @if ($hasQR)
+                                <div class="col-12 col-md-{{ $hasBank ? '6' : '12' }} d-flex flex-column align-items-center justify-content-center">
+                                    <div class="mb-2"><span class="fw-semibold text-muted">Mã QR đã upload:</span></div>
+                                    <img src="{{ asset($refund->QR_images) }}" alt="QR Code" class="img-fluid refund-detail-qr-img shadow" style="max-width: 220px; border-radius: 14px; border: 2px solid #f1f1f1; transition: transform 0.2s; cursor: pointer;" />
+                                    <div class="mt-3"><span class="fw-semibold text-muted">Số tiền hoàn:</span> <span class="fw-bold text-danger">{{ number_format($refund->amount) }}đ</span></div>
+                                    <div class="mb-2 mt-3"><span class="fw-semibold text-muted">Trạng thái:</span> <span class="badge bg-secondary-subtle text-secondary">Đang chờ xử lý</span></div>
                                 </div>
-                                <div class="mb-2">
-                                    <label>Tên chủ thẻ</label>
-                                    <input type="text" class="form-control" name="account_name" required />
-                                </div>
-                                <div class="mb-2">
-                                    <label>Lý do hoàn tiền</label>
-                                    <input type="text" class="form-control" name="reason" required />
-                                </div>
-                            </div>
-                            <div class="tab-pane fade" id="qr" role="tabpanel">
-                                <div class="mb-2">
-                                    <label>Upload mã QR</label>
-                                    <input type="file" class="form-control" name="qr_image" accept="image/*" />
-                                </div>
-                                @if (!empty($refund->QR_images))
-                                    <div class="mb-2">
-                                        <label>Mã QR đã upload:</label><br>
-                                        <img src="{{ asset($refund->QR_images) }}" alt="QR Code" style="max-width: 200px;" />
-                                    </div>
-                                @endif
-                            </div>
+                            @endif
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary no-hover" data-bs-dismiss="modal">Đóng</button>
-                        @if ($refund->status == 'pending')
-                            <button type="submit" class="btn btn-primary no-hover">Gửi yêu cầu</button>
-                        @else
-                            <button type="button" class="btn btn-primary no-hover" disabled>Không thể gửi yêu cầu</button>
-                        @endif
+                    <div class="modal-footer border-0 pt-0 d-flex justify-content-center">
+                        <button type="button" class="btn btn-secondary no-hover px-4 py-2 fs-5" data-bs-dismiss="modal">Đóng</button>
                     </div>
                 </div>
-            </form>
+            </div>
+        </div>
+        <style>
+            .refund-detail-modal-content {
+                border-radius: 18px;
+                box-shadow: 0 8px 32px rgba(60,60,60,0.18);
+                background: #fff;
+            }
+            .refund-detail-qr-img {
+                border-radius: 14px;
+                border: 2px solid #f1f1f1;
+                box-shadow: 0 4px 16px rgba(0,0,0,0.10);
+                max-width: 90vw;
+                max-height: 40vh;
+                margin: 0 auto;
+                display: block;
+            }
+            .refund-detail-qr-img:hover {
+                transform: scale(1.05);
+                box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+            }
+            .btn-close-lg {
+                font-size: 1.5rem;
+                width: 2.5rem;
+                height: 2.5rem;
+            }
+            @media (max-width: 600px) {
+                .refund-detail-qr-img {
+                    max-width: 98vw;
+                    max-height: 30vh;
+                }
+                .modal-content.refund-detail-modal-content {
+                    padding: 0 2px;
+                }
+            }
+        </style>
+    @endif
+
+    <!-- Modal hiển thị ảnh QR -->
+    <div class="modal fade" id="qrImageModal" tabindex="-1" role="dialog" aria-labelledby="qrImageModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+            <div class="modal-content qr-modal-content">
+                <div class="modal-header border-0 pb-0 d-flex justify-content-between align-items-center">
+                    <h5 class="modal-title fw-bold" id="qrImageModalLabel">Bill hoàn tiền</h5>
+                    <button type="button" class="btn-close btn-close-lg" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-center py-4">
+                    <div id="qrImageLoading" style="display:none;">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                    @if (!empty($refund->QR_images))
+                        <img id="qrBillImage" src="{{ asset($refund->QR_images) }}" alt="QR Code" class="img-fluid qr-bill-img shadow" style="max-width: 350px; border-radius: 16px; border: 2px solid #f1f1f1; transition: transform 0.2s; cursor: pointer;" onload="document.getElementById('qrImageLoading').style.display='none';" onerror="document.getElementById('qrImageLoading').style.display='none';" />
+                    @else
+                        <div class="alert alert-warning mt-3">Chưa có bill hoàn tiền.</div>
+                    @endif
+                </div>
+                <div class="modal-footer border-0 pt-0 d-flex justify-content-center">
+                    <button type="button" class="btn btn-secondary no-hover px-4 py-2 fs-5" data-bs-dismiss="modal">Đóng</button>
+                </div>
+            </div>
         </div>
     </div>
 @endsection
@@ -320,7 +381,39 @@
                         });
                     }
                 });
-            // Thêm search cho select nếu muốn (có thể dùng select2 nếu đã có)
+        }
+        // Sửa số tiền ở tab STK
+        document.getElementById('editAmountStk').addEventListener('click', function() {
+            var input = document.getElementById('refundAmountStk');
+            input.readOnly = !input.readOnly;
+            if (!input.readOnly) input.focus();
+        });
+        // Sửa số tiền ở tab QR
+        document.getElementById('editAmountQr').addEventListener('click', function() {
+            var input = document.getElementById('refundAmountQr');
+            input.readOnly = !input.readOnly;
+            if (!input.readOnly) input.focus();
+        });
+
+        // Preview ảnh QR khi upload
+        var qrImageInput = document.getElementById('qrImageInput');
+        var qrImagePreview = document.getElementById('qrImagePreview');
+        var previewImage = document.getElementById('previewImage');
+
+        if (qrImageInput) {
+            qrImageInput.addEventListener('change', function(e) {
+                var file = e.target.files[0];
+                if (file) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        qrImagePreview.style.display = 'block';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    qrImagePreview.style.display = 'none';
+                }
+            });
         }
     });
 </script>
