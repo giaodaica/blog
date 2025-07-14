@@ -433,7 +433,10 @@ class OrderController extends Controller
                     'status' => 'admin',
                 ]);
             }
-            Mail::to($present->user->email)->send(new OrderCancelledMail($present));
+            // dd($present);
+            $voucher = VouchersUsers::findOrFail($present->voucher_id);
+            $type = VouchersLog::where('voucher_id', $present->voucher_id)->first();
+            Mail::to($present->user->email)->send(new OrderCancelledMail($present, $voucher,$type));
         }
 
         $present->save();
@@ -442,7 +445,8 @@ class OrderController extends Controller
             'order_id' => $id,
             'from_status' => $old_status->status,
             'to_status' => $present->status,
-            'note' => $note
+            'note' => $note,
+            'content' => $request->content ?? '',
         ]);
 
         if ($count >= 2 && $present->status == 'failed') {
