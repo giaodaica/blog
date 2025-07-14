@@ -253,6 +253,14 @@
                                     <input type="text" class="form-control" name="account_name" required />
                                 </div>
                                 <div class="mb-2">
+                                    <label>Số tiền hoàn (VNĐ)</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" name="amount" id="refundAmountStk" value="{{ $total ?? ($order->total_amount ?? 0) }}" readonly required min="0">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" id="editAmountStk">Sửa</button>
+                                    </div>
+                                    <small class="text-muted">Bạn có thể chỉnh sửa số tiền nếu không đúng với đơn hàng.</small>
+                                </div>
+                                <div class="mb-2">
                                     <label>Lý do hoàn tiền</label>
                                     <input type="text" class="form-control" name="reason" required />
                                 </div>
@@ -261,6 +269,14 @@
                                 <div class="mb-2">
                                     <label>Upload mã QR</label>
                                     <input type="file" class="form-control" name="qr_image" accept="image/*" />
+                                </div>
+                                <div class="mb-2">
+                                    <label>Số tiền hoàn (VNĐ)</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control" name="amount" id="refundAmountQr" value="{{ $total ?? ($order->total_amount ?? 0) }}" readonly required min="0">
+                                        <button type="button" class="btn btn-outline-secondary btn-sm" id="editAmountQr">Sửa</button>
+                                    </div>
+                                    <small class="text-muted">Bạn có thể chỉnh sửa số tiền nếu không đúng với đơn hàng.</small>
                                 </div>
                                 @if (!empty($refund->QR_images))
                                     <div class="mb-2">
@@ -320,7 +336,18 @@
                         });
                     }
                 });
-            // Thêm search cho select nếu muốn (có thể dùng select2 nếu đã có)
         }
+        // Sửa số tiền ở tab STK
+        document.getElementById('editAmountStk').addEventListener('click', function() {
+            var input = document.getElementById('refundAmountStk');
+            input.readOnly = !input.readOnly;
+            if (!input.readOnly) input.focus();
+        });
+        // Sửa số tiền ở tab QR
+        document.getElementById('editAmountQr').addEventListener('click', function() {
+            var input = document.getElementById('refundAmountQr');
+            input.readOnly = !input.readOnly;
+            if (!input.readOnly) input.focus();
+        });
     });
 </script>
