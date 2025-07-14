@@ -421,6 +421,9 @@ class OrderController extends Controller
                     'content' => 'Voucher đã được đánh dấu là chưa sử dụng do đơn hàng bị hủy',
                 ]);
             }
+          if($present->status == 'cancelled' && $present->status_pay == 'paid') {
+             
+            }
         }
 
         $present->save();
