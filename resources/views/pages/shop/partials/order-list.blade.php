@@ -25,9 +25,7 @@
                             <div style="line-height:1.3;">
                                 <div class="product-name-truncate" style="font-weight: bold;">
                                     {{ \Illuminate\Support\Str::limit($firstItem->product_name, 25) }}
-                                    @if($order->orderItems->count() > 1)
-                                        và {{ $order->orderItems->count() - 1 }} sản phẩm khác
-                                    @endif
+                                    
                                 </div>
                             </div>
                         @endif
