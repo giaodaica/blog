@@ -6,16 +6,30 @@ use Illuminate\Database\Eloquent\Model;
 
 class RefundMoney extends Model
 {
+
+    protected $table = 'refund_money';
+
     protected $fillable = [
         'user_id',
         'order_id',
-        'bank',
-        'bank_account_name',
         'amount',
         'status',
+        'bank',
+        'bank_account_name',
         'reason',
-        'stk',
         'images',
         'QR_images',
+        'stk'
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
 }
