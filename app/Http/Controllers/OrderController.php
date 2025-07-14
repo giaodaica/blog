@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\OrderCancelledMail;
 use App\Models\Order;
 use App\Models\OrderHistories;
 use App\Models\OrderItem;
 use App\Models\Cart;
 use App\Models\AddressBook;
+use App\Models\RefundMoney;
+use App\Models\User;
 use App\Models\Vouchers;
 use App\Models\VouchersLog;
 use App\Models\VouchersUsers;
@@ -16,6 +19,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Mail;
 
 class OrderController extends Controller
 {
@@ -421,9 +425,15 @@ class OrderController extends Controller
                     'content' => 'Voucher đã được đánh dấu là chưa sử dụng do đơn hàng bị hủy',
                 ]);
             }
-          if($present->status == 'cancelled' && $present->status_pay == 'paid') {
-             
+            if ($present->status_pay == 'paid' && $present->pay_method == 'VNPAY' || $present->pay_method == 'QR') {
+                RefundMoney::create([
+                    'user_id' => $present->user_id,
+                    'order_id' => $id,
+                    'amount' => $present->final_amount,
+                    'status' => 'admin',
+                ]);
             }
+            Mail::to($present->user->email)->send(new OrderCancelledMail($present));
         }
 
         $present->save();
